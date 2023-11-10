@@ -6,10 +6,14 @@ https://github.com/sgware/sabre
 
 ## Usage
 
-On Windows:
+To clone this project (including Sabre as a submodule), compile the code, and
+run the code, run this series of commands in a terminal:
 
 ```
 git clone --recurse-submodules https://github.com/sgware/sabre-benchmarks
+cd sabre-benchmarks
+javac -cp sabre/lib/sabre.jar -sourcepath src -d bin src/edu/uky/cs/nil/sabre/bench/Main.java
+java -Xms10g -Xmx10g -cp bin;sabre/lib/sabre.jar edu.uky.cs.nil.sabre.bench.Main
 ```
 
 On Max/Linux:
