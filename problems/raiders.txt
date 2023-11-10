@@ -1,0 +1,202 @@
+/**
+ * Raiders of the Lost Ark
+ * 
+ * This domain represents a high-level summary of the 1981 Indiana Jones film
+ * Raiders of the Lost Ark. It was originally designed by Stephen G. Ware in
+ * 2013 for the Glaive narrative planner as a small domain which requires
+ * conflict and a partially-executed plan. It was adapted for Sabre by the same
+ * author in 2019 with the modification that characters can either believe the
+ * Ark to be dangerous or not (taking advantage of Sabre's model of beliefs,
+ * which was not available in Glaive).
+ * 
+ * Shortest solution (author temporal limit 6, character temporal limit 4;
+ * epistemic limit 2):
+ *   travel(Jones, USA, Tanis)
+ *   dig(Jones, Ark, Tanis)
+ *   take(Nazis, Ark, Jones, Tanis)
+ *   travel(Nazis, Tanis, USA)
+ *   open(Nazis, Ark, USA)
+ *   take(USArmy, Ark, Nazis, USA)
+ * 
+ * Longer solution that mirrors the plot of the film (author temporal limit 7;
+ * character temporal limit 4; epistemic limit 2):
+ *   travel(Jones, USA, Tanis)
+ *   dig(Jones, Ark, Tanis)
+ *   take(Nazis, Ark, Jones, Tanis)
+ *   open(Nazis, Ark, Tanis)
+ *   take(Jones, Ark, Nazis, Tanis)
+ *   travel(Jones, Tanis, USA)
+ *   give(Jones, Ark, USArmy, USA)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Stephen G. Ware and R. Michael Young, "Glaive: a state-space narrative
+ *   planner supporting intentionality and conflict," in Proceedings of the
+ *   10th AAAI conference on Artificial Intelligence and Interactive Digital
+ *   Entertainment, pp. 80-86, 2014.
+ */
+
+type location;
+type character : location;
+type place : location;
+type item : entity;
+type status : entity;
+
+entity Jones : character;
+entity Nazis : character;
+entity USArmy : character;
+entity USA : place;
+entity Tanis : place;
+entity Ark : item;
+entity Immortal : status;
+entity Alive : status;
+entity Dead : status;
+
+property at(character : character) : place;
+property at(item : item) : location;
+property armed(character : character) : boolean;
+property dangerous(Ark) : boolean;
+property status(character : character) : status;
+
+at(Jones) = USA;
+at(Nazis) = Tanis;
+at(USArmy) = USA;
+at(Ark) = Tanis;
+armed(Nazis);
+armed(USArmy);
+dangerous(Ark);
+status(Jones) = Alive;
+status(Nazis) = Alive;
+status(USArmy) = Alive;
+believes(Nazis, at(Ark)) = ?;
+!believes(Nazis, dangerous(Ark));
+believes(USArmy, at(Ark)) = ?;
+
+action travel(character : character, from : place, to : place) {
+	precondition:
+		from != to &
+		status(character) != Dead &
+		at(character) == from;
+	effect:
+		at(character) = to;
+	consenting: character;
+	observing(c : character) : status(c) != Dead & (at(c) == from | at(c) == to);
+};
+
+action dig(character : character, Ark, place : place) {
+	precondition:
+		status(character) != Dead &
+		at(character) == place &
+		at(Ark) == place;
+	effect:
+		at(Ark) = character;
+	consenting: character;
+	observing(c : character) : status(c) != Dead & at(c) == place;
+};
+
+action give(character : character, item : item, other : character, place : place) {
+	precondition:
+		character != other &
+		status(character) != Dead &
+		at(character) == place &
+		at(item) == character &
+		status(other) != Dead &
+		at(other) == place;
+	effect:
+		at(item) = other;
+	consenting: character, other;
+	observing(c : character) : status(c) != Dead & at(c) == place;
+};
+
+action take(character : character, item : item, other : character, place : place) {
+	precondition:
+		character != other &
+		status(character) != Dead &
+		at(character) == place &
+		at(item) == other &
+		(status(other) == Dead | (armed(character) & !armed(other))) &
+		at(other) == place;
+	effect:
+		at(item) = character;
+	consenting: character;
+	observing(c : character) : status(c) != Dead & at(c) == place;
+};
+
+action open(character : character, Ark, place : place) {
+	precondition:
+		status(character) != Dead &
+		at(Ark) == character &
+		at(character) == place;
+	effect:
+		if(dangerous(Ark))
+			status(character) = Dead
+		else
+			status(character) = Immortal;
+	consenting: character;
+	observing(c : character) : status(c) != Dead & at(c) == place;
+};
+
+trigger see_at(character : character, other : character, place : place) {
+	precondition:
+		status(character) != Dead &
+		at(character) == place &
+		at(other) == place &
+		believes(character, at(other)) != place;
+	effect:
+		believes(character, at(other)) = place;
+};
+
+trigger see_not_at(character : character, other : character, place : place) {
+	precondition:
+		status(character) != Dead &
+		at(character) == place &
+		at(other) != place &
+		believes(character, at(other)) == place;
+	effect:
+		believes(character, at(other)) = ?;
+};
+
+trigger see_has(character : character, other : character, item : item, place : place) {
+	precondition:
+		status(character) != Dead &
+		at(character) == place &
+		at(other) == place &
+		at(item) == other &
+		believes(character, at(item)) != other;
+	effect:
+		believes(character, at(item)) = other;
+};
+
+trigger see_hasnt(character : character, other : character, item : item, place : place) {
+	precondition:
+		status(character) != Dead &
+		at(character) == place &
+		at(other) == place &
+		at(item) != other &
+		believes(character, at(item)) == other;
+	effect:
+		believes(character, at(item)) = ?;
+};
+
+utility():
+	if(at(Ark) == USArmy & status(Nazis) == Dead)
+		1
+	else
+		0;
+
+utility(Jones):
+	if(at(Ark) == USArmy)
+		1
+	else
+		0;
+
+utility(Nazis):
+	if(status(Nazis) == Immortal)
+		1
+	else
+		0;
+
+utility(USArmy):
+	if(at(Ark) == USArmy)
+		1
+	else
+		0;

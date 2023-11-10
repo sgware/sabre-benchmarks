@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE xml>
+<project name="Sabre Benchmarks" default="build">
+	<target name="build" depends="clean,javadoc"/>
+	<target name="clean">
+		<delete dir="doc"/>
+	</target>
+    <target name="javadoc">
+    	<javadoc
+    		doctitle="Sabre Benchmark Tool Documentation"
+    		classpath="."
+    		sourcepath="src"
+    		destdir="doc"
+    		packagenames="edu.uky.cs.nil.sabre.bench"
+    		access="protected"
+    		source="11"
+    		use="true"
+    		author="true"
+    		version="true"
+    	/>
+    </target>
+</project>

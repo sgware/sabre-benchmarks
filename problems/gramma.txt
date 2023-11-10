@@ -1,0 +1,306 @@
+/**
+ * Save Gramma
+ * 
+ * This domain represents a small interactive narrative with several possible
+ * variations. It is a subset of the domain from The Best Laid Plans, a 2014
+ * prototype interactive narrative game that is controlled by the Glaive
+ * narrative planner. The original domain was designed by Stephen G. Ware, and
+ * this subset has been adapted by the same author for Sabre in 2018. It
+ * focuses on a protagonist, Tom (originally the goblin in BLP) who has been
+ * tasked with obtaining a potion (oringally the hair tonic) for his sick
+ * grandmother (originally the Dark Overlord). This smaller domain was used
+ * to create a prototype interactive narrative in the Camelot game engine that
+ * adapted the narrative in real time, though all planning was done offline
+ * before the game ran. The game has two possible endings: Tom wins by bringing
+ * the potion back to his cottage, or Tom dies during his quest.
+ *
+ * Shortest solution where Tom dies (author temporal limit 3; character temporal
+ * limit 4; epistemic limit 2):
+ *   walk(Tom, Cottage, Crossroads)
+ *   walk(Bandit, Camp, Crossroads)
+ *   attack(Bandit, Tom, Crossroads)
+ *
+ * Shortest solution where Tom wins (author temporal limit 5; character temporal
+ * limit 4; epistemic limit 2):
+ *   walk(Tom, Cottage, Crossroads)
+ *   walk(Tom, Crossroads, Market)
+ *   buy(Tom, Medicine, TomCoin, Market)
+ *   walk(Tom, Market, Crossroads)
+ *   walk(Tom, Crossroads, Cottage)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Stephen G. Ware, Edward T. Garcia, Alireza Shirvani, and Rachelyn Farrell,
+ *   "Multi-agent narrative experience management as story graph pruning," in
+ *   Proceedings of the 15th AAAI conference on Artificial Intelligence and
+ *   Interactive Digital Entertainment, pp. 87-93, 2019.
+ */
+
+type location;
+type character : location;
+type place : location;
+type container : location;
+type item;
+type coin : item;
+type weapon : item;
+
+entity Tom : character;
+entity Merchant : character;
+entity Guard : character;
+entity Bandit : character;
+entity Cottage : place;
+entity Market : place;
+entity Camp : place;
+entity Crossroads : place;
+entity Medicine : item;
+entity TomCoin : coin;
+entity BanditCoin : coin;
+entity GuardSword : weapon;
+entity BanditSword : weapon;
+entity MerhcantSword : weapon;
+entity Chest : container;
+
+property alive(character : character) : boolean;
+property armed(character : character) : boolean;
+property criminal(character : character) : boolean;
+property location(character : character) : place;
+property location(item : item) : location;
+property path(from : place, to : place) : boolean;
+
+action attack(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		location(character) == place &
+		alive(other) &
+		location(other) == place &
+		(armed(character) | !armed(other));
+	effect:
+		alive(other) = False &
+		if(!criminal(other))
+			criminal(character);
+	consenting: character;
+	observing(c : character): alive(c) & location(c) == place;
+};
+
+action buy(character : character, item : item, coin : coin, place : place) {
+	precondition:
+		character != Merchant &
+		!item : coin &
+		alive(character) &
+		location(character) == place &
+		location(item) == Merchant &
+		location(coin) == character &
+		location(Merchant) == place;
+	effect:
+		location(item) = character &
+		location(coin) = Merchant;
+	consenting: character, Merchant;
+	observing(c : character): alive(c) & location(c) == place;
+};
+
+action loot(character : character, item : item, other : character, place : place) {
+	precondition:
+		alive(character) &
+		location(character) == place &
+		location(item) == other &
+		!alive(other) &
+		location(other) == place;
+	effect:
+		location(item) = character;
+	consenting: character;
+	observing(c : character): alive(c) & location(c) == place;
+};
+
+action report(character : character, spot : place, place : place) {
+	precondition:
+		spot != place &
+		alive(character) &
+		location(character) == place &
+		alive(Guard) &
+		location(Guard) == place &
+		believes(character, location(Bandit)) == spot;
+	effect:
+		believes(Guard, location(Bandit)) = spot;
+	consenting: character;
+	observing(c : character): alive(c) & location(c) == place;
+};
+
+action rob(character : character, item : item, victim : character, place : place) {
+	precondition:
+		character != victim &
+		alive(character) &
+		location(character) == place &
+		armed(character) &
+		location(item) == victim &
+		alive(victim) &
+		location(victim) == place &
+		!armed(victim);
+	effect:
+		location(item) = character &
+		if(!criminal(character))
+			criminal(character);
+	consenting: character;
+	observing(c : character): alive(c) & location(c) == place;
+};
+
+action take(character : character, item : item, Chest, Camp) {
+	precondition:
+		alive(character) &
+		location(character) == Camp &
+		location(item) == Chest;
+	effect:
+		location(item) = character;
+	consenting: character;
+	observing(c : character): alive(c) & location(c) == Camp;
+};
+
+action walk(character : character, from : place, to : place) {
+	precondition:
+		from != to &
+		path(from, to) &
+		alive(character) &
+		location(character) == from;
+	effect:
+		location(character) = to;
+	consenting: character;
+	observing(c : character): alive(c) & (location(c) == from | location(c) == to);
+};
+
+trigger armed(character : character) {
+	precondition:
+		exists(weapon : weapon)
+			location(weapon) == character &
+		!armed(character);
+	effect:
+		armed(character);
+};
+
+trigger unarmed(character : character) {
+	precondition:
+		forall(weapon : weapon)
+			location(weapon) != character &
+		armed(character);
+	effect:
+		!armed(character);
+};
+
+trigger see_character_at(observer : character, other : character, place : place) {
+	precondition:
+		alive(observer) &
+		location(observer) == place &
+		location(other) == place &
+		believes(observer, location(other)) != place;
+	effect:
+		believes(observer, location(other)) = place;
+};
+
+trigger see_character_not_at(observer : character, other : character, place : place) {
+	precondition:
+		alive(observer) &
+		location(observer) == place &
+		location(other) != place &
+		believes(observer, location(other)) == place;
+	effect:
+		believes(observer, location(other)) = ?;
+};
+
+trigger see_item_on(observer : character, item : item, other : character, place : place) {
+	precondition:
+		alive(observer) &
+		location(observer) == place &
+		location(item) == other &
+		believes(observer, location(item)) != other &
+		location(other) == place;
+	effect:
+		believes(observer, location(item)) = other;
+};
+
+trigger see_item_not_on(observer : character, item : item, other : character, place : place) {
+	precondition:
+		alive(observer) &
+		location(observer) == place &
+		location(item) != other &
+		believes(observer, location(item)) == other &
+		location(other) == place;
+	effect:
+		believes(observer, location(item)) = ?;
+};
+
+trigger see_item_in(observer : character, item : item, Chest, Camp) {
+	precondition:
+		alive(observer) &
+		location(observer) == Camp &
+		location(item) == Chest &
+		believes(observer, location(item)) != Chest;
+	effect:
+		believes(observer, location(item)) = Chest;
+};
+
+trigger see_item_not_in(observer : character, item : item, Chest, Camp) {
+	precondition:
+		alive(observer) &
+		location(observer) == Camp &
+		location(item) != Chest &
+		believes(observer, location(item)) == Chest;
+	effect:
+		believes(observer, location(item)) = ?;
+};
+
+trigger path_to(from : place, to : place) {
+	precondition:
+		path(from, to) &
+		!path(to, from);
+	effect:
+		path(to, from);
+};
+
+forall(character : character)
+	alive(character);
+criminal(Bandit);
+location(Tom) = Cottage;
+location(Merchant) = Market;
+location(Guard) = Market;
+location(Bandit) = Camp;
+location(Medicine) = Merchant;
+location(TomCoin) = Tom;
+location(BanditCoin) = Chest;
+location(GuardSword) = Guard;
+location(BanditSword) = Bandit;
+location(MerhcantSword) = Merchant;
+path(Crossroads, Cottage);
+path(Crossroads, Market);
+path(Crossroads, Camp);
+believes(Tom, location(Bandit)) = ?;
+believes(Merchant, location(TomCoin)) = ?;
+believes(Merchant, location(BanditCoin)) = ?;
+believes(Guard, location(Bandit)) = ?;
+believes(Bandit, location(Tom)) = Crossroads;
+
+utility():
+	if(location(Tom) == Cottage & location(Medicine) == Tom)
+		2
+	elseif(!alive(Tom))
+		1
+	else
+		0;
+
+utility(Tom):
+	if(location(Medicine) == Tom & location(Tom) == Cottage)
+		1
+	else
+   		0;
+
+utility(Merchant):
+	if(location(TomCoin) == Merchant & !criminal(Merchant)) 2 else 0 +
+	if(location(BanditCoin) == Merchant & !criminal(Merchant)) 2 else 0 +
+	if(location(Merchant) == Market) 1 else 0;
+
+utility(Guard):
+	if(!alive(Bandit) & !criminal(Guard)) 2 else 0 +
+	if(criminal(Tom) & !alive(Tom) & !criminal(Guard)) 2 else 0 +
+	if(location(Guard) == Market) 1 else 0;
+
+utility(Bandit):
+	if(location(BanditCoin) == Bandit | location(BanditCoin) == Chest) 2 else 0 +
+	if(location(TomCoin) == Bandit) 2 else 0 +
+	if(location(Medicine) == Bandit) 2 else 0 +
+	if(location(Bandit) == Camp) 1 else 0;

@@ -1,0 +1,295 @@
+/**
+ * Deer Hunter
+ *
+ * This domain is a the second introduced in Mark Riedl's 2004 dissertation on
+ * narrative planning. It tells the story of a hunter named Bubba who wants to
+ * be rich and wants to eat. He has a gun at home which can help with both
+ * goals: he can use it to rob a bank and hunt some dinner. This domain was
+ * adapted by Stephen G. Ware and Rachelyn Farrell in 2023 for Sabre. This
+ * domain was originally designed for Riedl's IPOCL planner where characters
+ * did not have to act on goals. For example, the original 'decide_to_eat'
+ * action required that the character already be hungry, and the action
+ * represents the character adopting the intention to eat. To adapt this to
+ * Sabre's utility functions, the 'decide_to_get_money' action causes a
+ * character to increase their greed (that is, the amount of money they want to
+ * have), and the 'decide_to_eat' action causes a character to become hungry.
+ * Both actions lower the character's utility, and they can raise it again by
+ * getting money or eating respectively. Consequently, the author's goal that
+ * Bubba not be hungry (which is already true in the initial state) has been
+ * changed to the goal that Bambi be eaten.
+ *
+ * Shortest solution where Bubba robs the bank (author utility 1; author
+ * temporal limit 6; character temporal limit 5; epistemic limit 1):
+ *   decide_to_get_money(Bubba)
+ *   pickup(Bubba, Rifle, House)
+ *   pickup(Bubba, Ammo, House)
+ *   load(Bubba, Rifle, Ammo)
+ *   go(Bubba, House, Bank)
+ *   steal(Bubba, Clerk, Rifle, Bank)
+ *
+ * Shortest solution where Bubba eats Bambi (author utility 1; author temporal
+ * limit 7; character temporal limit 6; epistemic limit 1):
+ *   decide_to_eat(Bubba)
+ *   pickup(Bubba, Rifle, House)
+ *   pickup(Bubba, Ammo, House)
+ *   load(Bubba, Rifle, Ammo)
+ *   go(Bubba, House, Forest)
+ *   shoot(Bubba, Bambi, Rifle, Forest)
+ *   eat(Bubba, Bambi, Forest)
+ *
+ * Shortest solution where Bubba does both (author utility 2; author temporal
+ * limit 10; character temporal limit 5; epistemic limit 1):
+ *   decide_to_get_money(Bubba)
+ *   decide_to_eat(Bubba)
+ *   pickup(Bubba, Rifle, House)
+ *   pickup(Bubba, Ammo, House)
+ *   load(Bubba, Rifle, Ammo)
+ *   go(Bubba, House, Bank)
+ *   steal(Bubba, Clerk, Rifle, Bank)
+ *   go(Bubba, Bank, Forest)
+ *   shoot(Bubba, Bambi, Rifle, Forest)
+ *   eat(Bubba, Bambi, Forest)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Mark Owen Riedl, "Narrative planning: balancing plot and character,"
+ *   dissertation, North Carolina State University, 2004.
+ */
+
+type location;
+type character : location;
+type human : character;
+type animal : character;
+type place : location;
+type item;
+type container : location, item;
+type gun : container;
+type ammo : item;
+
+entity Bubba : human;
+entity Clerk : human;
+entity Bambi : animal;
+entity House : place;
+entity Bank : place;
+entity Forest : place;
+entity Rifle : gun;
+entity Ammo : ammo;
+
+property path(from : place, to : place) : boolean;
+property alive(character : character) : boolean;
+property at(character : character) : place;
+property money(character : character) : number;
+property greed(character : character) : number;
+property hungry(character : character): boolean;
+property at(item : item) : location;
+
+path(House, Bank);
+path(House, Forest);
+path(Bank, Forest);
+path(Forest, Bank);
+alive(Bubba);
+at(Bubba) = House;
+money(Bubba) = 0;
+greed(Bubba) = 0;
+alive(Clerk);
+at(Clerk) = Bank;
+money(Clerk) = 1;
+greed(Clerk) = 1;
+alive(Bambi);
+at(Bambi) = Forest;
+at(Rifle) = House;
+at(Ammo) = House;
+believes(Clerk, at(Rifle) = ?);
+believes(Clerk, at(Ammo) = ?);
+
+action decide_to_get_money(character : human) {
+	precondition:
+		alive(character);
+	effect:
+		greed(character) = greed(character) + 1;
+	observing(c : character): c == character;
+};
+
+action decide_to_eat(character : human) {
+	precondition:
+		alive(character) &
+		!hungry(character);
+	effect:
+		hungry(character);
+	observing(c : character): c == character;
+};
+
+action pickup(character : human, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(item) == place;
+	effect:
+		at(item) = character;
+	consenting: character;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action load(character : human, gun : gun, ammo : ammo) {
+	precondition:
+		alive(character) &
+		at(gun) == character &
+		at(ammo) == character;
+	effect:
+		at(ammo) = gun;
+	consenting: character;
+	observing(c : character): c == character;
+};
+
+action go(character : character, from : place, to : place) {
+	precondition:
+		path(from, to) &
+		alive(character) &
+		at(character) == from;
+	effect:
+		at(character) = to;
+	consenting: character;
+	observing(c : character): alive(c) & (at(c) == from | at(c) == to);
+};
+
+action steal(thief : human, victim : human, gun : gun, place : place) {
+	precondition:
+		thief != victim &
+		alive(thief) &
+		at(thief) == place &
+		alive(victim) &
+		at(victim) == place &
+		money(victim) > 0 &
+		at(gun) == thief &
+		exists(a : ammo)
+			at(a) == gun;
+	effect:
+		money(thief) = money(thief) + money(victim) &
+		money(victim) = 0;
+	consenting: thief;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action shoot(shooter : human, target : character, gun : gun, place : place) {
+	precondition:
+		alive(shooter) &
+		at(shooter) == place &
+		alive(target) &
+		at(target) == place &
+		at(gun) == shooter &
+		exists(a : ammo)
+			at(a) == gun;
+	effect:
+		!alive(target);
+	consenting: shooter;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action eat(character : human, food : animal, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		!alive(food) &
+		at(food) == place;
+	effect:
+		at(food) = ? &
+		!hungry(character);
+	consenting: character;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+trigger see_alive(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		alive(other) &
+		at(other) == place &
+		believes(character, !alive(other));
+	effect:
+		believes(character, alive(other));
+};
+
+trigger see_dead(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		!alive(other) &
+		at(other) == place &
+		believes(character, alive(other));
+	effect:
+		believes(character, !alive(other));
+};
+
+trigger see_money(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		alive(other) &
+		at(other) == place &
+		believes(character, money(other)) != money(other);
+	effect:
+		believes(character, money(other)) = money(other);
+};
+
+trigger see_item_at(character : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(item) == place &
+		believes(character, at(item) != place);
+	effect:
+		believes(character, at(item) = place);
+};
+
+trigger see_item_not_at(character : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(item) != place &
+		believes(character, at(item) == place);
+	effect:
+		believes(character, at(item) = ?);
+};
+
+trigger see_has_item(character : character, other : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		at(item) == other &
+		believes(character, at(item) != other);
+	effect:
+		believes(character, at(item) = other);
+};
+
+trigger see_hasnt_item(character : character, other : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		at(item) != other &
+		believes(character, at(item) == other);
+	effect:
+		believes(character, at(item) = ?);
+};
+
+utility():
+	(if(money(Bubba) > 0) 1 else 0) +
+	(if(at(Bambi) == ?) 1 else 0);
+
+utility(Bubba):
+	if(!alive(Bubba))
+		0
+	else
+		1 + (if(!hungry(Bubba)) 1 else 0) + (if(money(Bubba) >= greed(Bubba)) 1 else 0);
+
+utility(Clerk):
+	if(!alive(Clerk))
+		0
+	else
+		1 + (if(!hungry(Clerk)) 1 else 0) + (if(money(Clerk) >= greed(Clerk)) 1 else 0);
+
+utility(Bambi):
+	if(alive(Bambi))
+		1
+	else
+		0;

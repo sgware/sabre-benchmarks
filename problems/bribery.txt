@@ -1,0 +1,108 @@
+/**
+ * Bribery
+ *
+ * This domain is a small, simple domain introduced in Mark Riedl's 2004
+ * dissertation on narrative planning. It tells the story of how a villain
+ * gains leverage over the president, possibly by coercing a hero into stealing
+ * the money required for the bribe. It was adapted by Stephen G. Ware in 2023
+ * for Sabre. The IPOCL narrative planner, for which this domain was originally
+ * written, had a feature that would allow one character to delegate its goals
+ * to another. The original 'coerce' action could be used to cause a character
+ * to adopt any goal. There is no simple way to translate this concept into
+ * Sabre's utility functions, so in this version characters have a location
+ * where they want each item to be. The 'coerce' action can be used to make a
+ * character adopt the goal of getting an item (e.g. the money) to some
+ * location (e.g. the villain). This is less general than the original action,
+ * but it preserves the simplicity of the domain.
+ *
+ * Shortest solution (author temporal limit 2; character temporal limit 2;
+ * epistemic limit 1):
+ *   steal(Villain, Money, Bank)
+ *   bribe(Villain, President, Money)
+ *
+ * Original Riedl solution (author temporal limit 5; character temporal limit 5;
+ * epistemic limit 2):
+ *   threaten(Villain, Hero)
+ *   coerce(Villain, Hero, Money)
+ *   steal(Hero, Money, Bank)
+ *   give(Hero, Villain, Money)
+ *   bribe(Villain, President, Money)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Mark Owen Riedl, "Narrative planning: balancing plot and character,"
+ *   dissertation, North Carolina State University, 2004.
+ */
+
+type location;
+type character : location;
+type place : location;
+type item;
+type money : item;
+
+entity Hero : character;
+entity Villain : character;
+entity President : character;
+entity Money : money;
+entity Bank : place;
+
+property at(item : item) : location;
+property fears(victim : character, character : character) : boolean;
+property controls(master : character, character : character) : boolean;
+property intends(character : character, item : item) : location;
+
+at(Money) = Bank;
+
+action steal(character : character, item : item, place : place) {
+	precondition:
+		at(item) == place;
+	effect:
+		at(item) = character;
+	consenting: character;
+	observing(c : character): c == character;
+};
+
+action bribe(character : character, target : character, money : money) {
+	precondition:
+		character != target &
+		at(money) == character;
+	effect:
+		at(money) = target &
+		controls(character, target);
+	consenting: character;
+	observing(c : character): c == character | c == target;
+};
+
+action threaten(character : character, victim : character) {
+	precondition:
+		character != victim;
+	effect:
+		fears(victim, character);
+	consenting: character;
+	observing(c : character): c == character | c == victim;
+};
+
+action coerce(character : character, victim : character, item : item) {
+	precondition:
+		character != victim &
+		fears(victim, character);
+	effect:
+		intends(victim, item) = character;
+	consenting: character;
+	observing(c : character): c == character | c == victim;
+};
+
+action give(character : character, target : character, item : item) {
+	precondition:
+		character != target &
+		at(item) == character;
+	effect:
+		at(item) = target;
+	consenting: character;
+	observing(c : character): c == character | c == target;
+};
+
+utility(): controls(Villain, President);
+
+utility(Hero): at(Money) == intends(Hero, Money);
+
+utility(Villain): controls(Villain, President);

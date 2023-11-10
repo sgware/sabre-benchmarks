@@ -1,0 +1,109 @@
+/* Types */
+
+type character : location; // Character is a built-in type but can be given more parent types.
+type place : location;
+type item; // By default, all new types extend entity.
+
+/* Entities */
+
+entity Tom : character;
+entity Merchant : character;
+entity Home : place;
+entity Market : place;
+entity MacGuffin : item;
+
+/* Properties */
+
+property alive(character : character): boolean; // Boolean is a built-in type.
+property at(character : character) : place;
+property money(character : character) : number; // Number is a built-in type.
+property at(item : item) : location;
+
+/* Initial State */
+
+forall(c : character) // Example of a `forall` quantifier; the other is `exists`.
+	alive(c);
+at(Tom) = Home;
+money(Tom) = 1;
+at(Merchant) = Market;
+at(MacGuffin) = Merchant;
+believes(Merchant, at(Tom) = ?); // Merchant wrongly believes Tom is nowhere.
+
+/* Actions */
+
+// A character walks from one place to another.
+action walk(character : character, from : place, to : place) {
+	precondition:
+		from != to &
+		alive(character) &
+		at(character) == from;
+	effect:
+		at(character) = to;
+	consenting: character;
+	observing(c : character): at(c) == from | at(c) == to;
+};
+
+// One character buys an item from the Merchant for 1 money.
+action buy(buyer : character, item : item, Merchant) {
+	precondition:
+		buyer != Merchant &
+		alive(buyer) &
+		alive(Merchant) &
+		at(buyer) == at(Merchant) & // Characters are in the same location.
+		money(buyer) > 0 &
+		at(item) == Merchant;
+	effect:
+		at(item) = buyer &
+		money(buyer) = money(buyer) - 1 &
+		money(Merchant) = money(Merchant) + 1;
+	consenting: buyer, Merchant; // Buyer and merchant have to want to take this action.
+	observing(c : character): at(c) == at(buyer); // Anyone at the buyer's location sees this happen.
+};
+
+/* Triggers */
+
+// One character sees another character in the same place.
+trigger see_character_at(viewer : character, other : character, place : place) {
+	precondition:
+		alive(viewer) &
+		at(viewer) == place &
+		at(other) == place &                  
+		believes(viewer, at(other) != place); // Precondition should be made false
+	effect:                                   // by effect or trigger runs forever.
+		believes(viewer, at(other) = place);  // Beliefs can be updated explicitly.
+};
+
+// One character realizes a character they thought was at a place isn't there.
+trigger see_character_gone(viewer : character, other : character, place : place) {
+	precondition:
+		alive(viewer) &
+		at(viewer) == place &
+		at(other) != place &
+		believes(viewer, at(other) == place);
+	effect:
+		believes(viewer, at(other) = ?); // ? is unknown, equivalent to null.
+};
+
+/* Utilities */
+
+// Author utility is the one the planner must improve.
+// The author wants Tom to have the MacGuffin.
+utility():
+	at(MacGuffin) == Tom; // Boolean utilities are translated into "if x 1 else 0".
+
+// Characters take actions they think can improve their utilities.
+// Tom wants the MacGuffin.
+utility(Tom):
+	if(!alive(Tom))
+		0
+	elseif(at(MacGuffin) == Tom)
+		2
+	else
+		1;
+
+// The merchant wants to have as much money as possible as long as they are alive.
+utility(Merchant):
+	if(!alive(Merchant))
+		0
+	else
+		money(Merchant);

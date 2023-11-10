@@ -1,0 +1,498 @@
+/**
+ * Aladdin
+ *
+ * This domains represents an alternative version of the tale of Aladdin.
+ * Aladdin was added to a later edition of One Thousand and One Nights and
+ * was adapted in a 1992 Disney film. This version contains the protagnist
+ * Aladdin, a king named Jafar to whom Aladdin is loyal, the pricess Jasmine,
+ * and the genie of the lamp. The usual antagonist sorcerer is missing, and a
+ * dragon has been added. This problem is the best known of three narrative
+ * planning problems originally introduced by Mark Riedl in his 2004
+ * dissertation, though the version given here is the slightly later version
+ * from the appendix of a 2010 journal article on the IPOCL narrative planner.
+ * This problem was adapted for the Glaive narrative planner by Stephen G. Ware
+ * in 2014 and then for Sabre in 2023. This adaptation is made from the original
+ * 2004 version and is more faithful to the original. Some modifications have
+ * been made as follows:
+ * (1) Characters no longer have a sex and any pair of humans can marry.
+ * (2) Characters can only marry if they are not already married.
+ * (3) The original domain had various actions which causes characters to adopt
+ *     goals (e.g. when a monster appears threatening to a character, that
+ *     character intends for the monster to be dead). These goals have been
+ *     adapted to utility functions as follows:
+ *     - A dead character has a utility of 0.
+ *     - An character married to someone they love is happy, and happy
+ *       characters get +1 utility. They can lose this utility if their spouse
+ *       dies.
+ *     - An character afraid of a living monster gets -1 utility. They regain
+ *       the utility when the monster dies.
+ *     - Characters gain utility by completing tasks (see below).
+ * (4) The IPOCL narrative planner, for which this domain was originally
+ *     written, had a feature that would allow one character to delegate its
+ *     goals to another. These were used in the 'order' action, where a king
+ *     orders his loyal subordinate to accomplish one of the king's goals, and
+ *     the 'command' action, where the master of the genie commands the genie
+ *     to accomplish one of the master's goals. Because Sabre uses utility
+ *     functions instead of goals, in this version of the domain uses tasks:
+ *     - The master property is used to represent both loyalty and mastry.
+ *       When a subjct is loyal, their master is their king. The master of the
+ *       genie can command the genie.
+ *     - The 'order' and 'command' actions have been replaced by the
+ *       'command_kill', 'command_love', and 'command_bring' actions, where the
+ *       master orders the subordinate to kill a monster, cause someone to love
+ *       the master, or bring an item to the master respectively.
+ *     - When a task is completed, the subordinate gains +1 utility.
+ * (5) There were two versions of this problem in Riedl's dissertation: one
+ *     where the only goal was for the the sultan to marry the princess and one
+ *     where the genie should also be dead by the end (both a significant
+ *     departure from any version of the original Aladdin story). In this
+ *     adaptation, the author gains 1 utility for having the sultan marry the
+ *     pricess and 1 from the death of the genie, allowing both stories.
+ *
+ * This problem is challenging for Sabre because it has a large branching
+ * factor and many actions which are possible cannot be explained. For example,
+ * once the genie is free, it can cast a love spell on most characters, but
+ * this is rarely useful to the story.
+ *
+ * Shortest solution for author utility 1 (author temporal limit 7; character
+ * temporal limit 8; epistemic limit 2):
+ *   fall_in_love(Aladdin, Jasmine, Castle)
+ *   travel(Aladdin, Castle, Mountain)
+ *   slay(Aladdin, Dragon, Mountain)
+ *   pillage(Aladdin, Dragon, Lamp, Mountain)
+ *   summon(Aladdin, Genie, Lamp, Mountain)
+ *   appear_threatening(Genie, Aladdin, Mountain)
+ *   slay(Aladdin, Genie, Mountain)
+ *
+ * Shortest solution for author utility 2 (author temporal limit 11; character
+ * temporal limit 8; epistemic limit 3):
+ *   fall_in_love(Jafar, Jasmine, Castle)
+ *   travel(Jafar, Castle, Mountain)
+ *   slay(Jafar, Dragon, Mountain)
+ *   pillage(Jafar, Dragon, Lamp, Mountain)
+ *   travel(Jafar, Mountain, Castle)
+ *   summon(Jafar, Genie, Lamp, Castle)
+ *   command_love(Jafar, Genie, Jasmine, Castle)
+ *   love_spell(Genie, Jasmine, Jafar)
+ *   marry(Jafar, Jasmine, Castle)
+ *   appear_threatening(Genie, Aladdin, Castle)
+ *   slay(Aladdin, Genie, Castle)
+ *
+ * Original solution used by Riedl (author utility 2; author temporal limit 13;
+ * character temporal limit 10; epistemic limit 2):
+ *   fall_in_love(Jafar, Jasmine, Castle)
+ *   command_bring(Jafar, Aladdin, Lamp, Castle)
+ *   travel(Aladdin, Castle, Mountain)
+ *   slay(Aladdin, Dragon, Mountain)
+ *   pillage(Aladdin, Dragon, Lamp, Mountain)
+ *   travel(Aladdin, Mountain, Castle)
+ *   give(Aladdin, Jafar, Lamp, Castle)
+ *   summon(Jafar, Genie, Lamp, Castle)
+ *   command_love(Jafar, Genie, Jasmine, Castle)
+ *   love_spell(Genie, Jasmine, Jafar)
+ *   marry(Jafar, Jasmine, Castle)
+ *   appear_threatening(Genie, Aladdin, Castle)
+ *   slay(Aladdin, Genie, Castle)
+ * 
+ * The preferred citation for the origin of this domain is:
+ *   Mark O. Riedl, R. Michael Young, "Narrative planning: balancing plot and
+ *   character," Journal of Artificial Intelligence Research, vol. 39, num. 1,
+ *   pp. 217-268, 2010.
+ */
+
+type location;
+type character : location;
+type human : character;
+type monster : character;
+type place : location;
+type item;
+
+entity Aladdin : human;
+entity Jafar : human;
+entity Jasmine : human;
+entity Dragon : monster;
+entity Genie : monster;
+entity Castle : place;
+entity Mountain : place;
+entity Lamp : place, item;
+
+property path(from : place, to : place) : boolean;
+property alive(character : character) : boolean;
+property master(character : character) : character;
+property loves(lover : character, beloved : character) : boolean;
+property spouse(human : human) : human;
+property happy(character : character) : boolean;
+property fears(character : character, monster : monster) : boolean;
+property afraid(character : character) : boolean;
+property at(character : character) : place;
+property at(item : item) : location;
+property tasks(character : character) : number;
+property task_kill(worker : character, requester : character, monster : monster) : boolean;
+property task_love(worker : character, requester : character, beloved : character) : boolean;
+property task_bring(worker : character, requester : character, item : item) : boolean;
+
+path(Castle, Mountain);
+path(Mountain, Castle);
+alive(Aladdin);
+master(Aladdin) = Jafar;
+at(Aladdin) = Castle;
+alive(Jafar);
+at(Jafar) = Castle;
+alive(Jasmine);
+at(Jasmine) = Castle;
+alive(Dragon);
+at(Dragon) = Mountain;
+at(Lamp) = Dragon;
+alive(Genie);
+at(Genie) = Lamp;
+
+action travel(character : character, from : place, to : place) {
+	precondition:
+		from != to &
+		path(from, to) &
+		alive(character) &
+		at(character) == from;
+	effect:
+		at(character) = to;
+	consenting: character;
+	observing(c : character): alive(c) & (at(c) == from | at(c) == to);
+};
+
+action slay(slayer : character, monster : monster, place : place) {
+	precondition:
+		slayer != monster &
+		alive(slayer) &
+		at(slayer) == place &
+		alive(monster) &
+		at(monster) == place;
+	effect:
+		!alive(monster);
+	consenting: slayer;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action pillage(pillager : character, body : character, item : item, place : place) {
+	precondition:
+		alive(pillager) &
+		at(pillager) == place &
+		!alive(body) &
+		at(body) == place &
+		at(item) == body;
+	effect:
+		at(item) = pillager;
+	consenting: pillager;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action give(giver : character, receiver : character, item : item, place : place) {
+	precondition:
+		giver != receiver &
+		alive(giver) &
+		at(giver) == place &
+		alive(receiver) &
+		at(receiver) == place &
+		at(item) == giver;
+	effect:
+		at(item) = receiver;
+	consenting: giver;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action summon(character : character, Genie, Lamp, place : place) {
+	precondition:
+		character != Genie &
+		alive(character) &
+		at(character) == place &
+		alive(Genie) &
+		at(Genie) == Lamp &
+		at(Lamp) == character;
+	effect:
+		at(Genie) = place &
+		if(master(Genie) == ?)
+			master(Genie) = character;
+	consenting: character;
+	observing(c : character): alive(c) & (at(c) == Lamp | at(c) == place);
+};
+
+action love_spell(Genie, beloved : character, lover : character) {
+	precondition:
+		Genie != beloved &
+		Genie != lover &
+		beloved != lover &
+		alive(Genie) &
+		at(Genie) != Lamp &
+		alive(beloved) &
+		!loves(beloved, lover) &
+		alive(lover);
+	effect:
+		loves(beloved, lover);
+	consenting: Genie;
+	observing(c : character): c == Genie | c == beloved | c == lover;
+};
+
+action marry(first : human, second : human, place : place) {
+	precondition:
+		first != second &
+		alive(first) &
+		loves(first, second) &
+		spouse(first) == ? &
+		at(first) == place &
+		alive(second) &
+		loves(second, first) &
+		spouse(second) == ? &
+		at(second) == place;
+	effect:
+		spouse(first) = second &
+		spouse(second) = first;
+	consenting: first, second;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action fall_in_love(lover : human, beloved : human, place : place) {
+	precondition:
+		lover != beloved &
+		!loves(lover, beloved) &
+		spouse(lover) == ? &
+		at(lover) == place &
+		!loves(beloved, lover) &
+		at(beloved) == place;
+	effect:
+		loves(lover, beloved);
+	observing(c : character): c == lover | c == beloved;
+};
+
+action command_kill(requester : character, worker : character, monster : monster, place : place) {
+	precondition:
+		requester != worker &
+		requester != monster &
+		worker != monster &
+		alive(requester) &
+		fears(requester, monster) &
+		at(requester) == place &
+		alive(worker) &
+		master(worker) == requester &
+		at(worker) == place &
+		alive(monster);
+	effect:
+		task_kill(worker, requester, monster);
+	consenting: requester;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action command_love(requester : character, worker : character, beloved : human, place : place) {
+	precondition:
+		requester != worker &
+		requester != beloved &
+		worker != beloved &
+		alive(requester) &
+		at(requester) == place &
+		alive(worker) &
+		master(worker) == requester &
+		at(worker) == place &
+		!loves(beloved, requester);
+	effect:
+		task_love(worker, requester, beloved);
+	consenting: requester;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action command_bring(requester : character, worker : character, item : item, place : place) {
+	precondition:
+		requester != worker &
+		alive(requester) &
+		at(requester) == place &
+		alive(worker) &
+		master(worker) == requester &
+		at(worker) == place &
+		at(item) != requester;
+	effect:
+		task_bring(worker, requester, item);
+	consenting: requester;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action appear_threatening(monster : monster, character : character, place : place) {
+	precondition:
+		monster != character &
+		alive(monster) &
+		at(monster) == place &
+		alive(character) &
+		!fears(character, monster) &
+		at(character) == place;
+	effect:
+		fears(character, monster);
+	observing(c : character): c == character;
+};
+
+trigger parted(character : human, spouse : human) {
+	precondition:
+		!alive(character) &
+		spouse(character) == spouse;
+	effect:
+		spouse(character) = ?;
+};
+
+trigger see_alive(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		alive(other) &
+		at(other) == place &
+		believes(character, !alive(other));
+	effect:
+		believes(character, alive(other));
+};
+
+trigger see_dead(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		!alive(other) &
+		at(other) == place &
+		believes(character, alive(other));
+	effect:
+		believes(character, !alive(other));
+};
+
+trigger happy(character : human, spouse : human) {
+	precondition:
+		alive(character) &
+		loves(character, spouse) &
+		spouse(character) == spouse &
+		!happy(character);
+	effect:
+		happy(character);
+};
+
+trigger unhappy(character : human) {
+	precondition:
+		alive(character) &
+		!exists(spouse : human)
+			(loves(character, spouse) & spouse(character) == spouse) &
+		happy(character);
+	effect:
+		!happy(character);
+};
+
+trigger afraid(character : character) {
+	precondition:
+		alive(character) &
+		exists(m : monster)
+			(alive(m) & fears(character, m)) &
+		!afraid(character);
+	effect:
+		afraid(character);
+};
+
+trigger not_afraid(character : character) {
+	precondition:
+		alive(character) &
+		!exists(m : monster)
+			(alive(m) & fears(character, m)) &
+		afraid(character);
+	effect:
+		!afraid(character);
+};
+
+trigger see_character_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		believes(character, at(other) != place);
+	effect:
+		believes(character, at(other) = place);
+};
+
+trigger see_character_not_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) != place &
+		believes(character, at(other) == place);
+	effect:
+		believes(character, at(other) = ?);
+};
+
+trigger see_has(character : character, other : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		at(item) == other &
+		believes(character, at(item) != other);
+	effect:
+		believes(character, at(item) = other);
+};
+
+trigger see_hasnt(character : character, other : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		at(item) != other &
+		believes(character, at(item) == other);
+	effect:
+		believes(character, at(item) = ?);
+};
+
+trigger accomplish_task_kill(worker : character, requester : character, monster : monster) {
+	precondition:
+		!alive(monster) &
+		task_kill(worker, requester, monster);
+	effect:
+		tasks(worker) = tasks(worker) + 1 &
+		!task_kill(worker, requester, monster);
+};
+
+trigger accomplish_task_love(worker : character, requester : character, beloved : character) {
+	precondition:
+		loves(beloved, requester) &
+		task_love(worker, requester, beloved);
+	effect:
+		tasks(worker) = tasks(worker) + 1 &
+		!task_love(worker, requester, beloved);
+};
+
+trigger accomplish_task_bring(worker : character, requester : character, item : item) {
+	precondition:
+		at(item) == requester &
+		task_bring(worker, requester, item);
+	effect:
+		tasks(worker) = tasks(worker) + 1 &
+		!task_bring(worker, requester, item);
+};
+
+utility():
+	(if(spouse(Jafar) == Jasmine) 1 else 0) +
+	(if(!alive(Genie)) 1 else 0);
+
+utility(Aladdin):
+	if(!alive(Aladdin))
+		0
+   else
+		1 + (if(happy(Aladdin)) 1 else 0) + (if(afraid(Aladdin)) -1 else 0) + tasks(Aladdin);
+
+utility(Jafar):
+	if(!alive(Jafar))
+		0
+	else
+		1 + (if(happy(Jafar)) 1 else 0) + (if(afraid(Jafar)) -1 else 0) + tasks(Jafar);
+
+utility(Jasmine):
+	if(!alive(Jasmine))
+		0
+	else
+		1 + (if(happy(Jasmine)) 1 else 0) + (if(afraid(Jasmine)) -1 else 0) + tasks(Jasmine);
+
+utility(Dragon):
+	if(!alive(Dragon))
+		0
+	else
+		1 + (if(afraid(Dragon)) -1 else 0) + tasks(Dragon);
+
+utility(Genie):
+	if(!alive(Genie))
+		0
+	else
+		1 + (if(afraid(Genie)) -1 else 0) + tasks(Genie);

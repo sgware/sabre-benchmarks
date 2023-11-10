@@ -1,0 +1,374 @@
+/**
+ * Fantasy
+ *
+ * This domain tells the story in a Medieval fantasy setting about three
+ * characters and a dragon. Characters can propose and marry, gain or lose
+ * wealth, and be eaten by the dragon. The domain was originally written by
+ * Stephen G. Ware in 2012 for an experiment to validate a plan-based model of
+ * narrative conflict. It was used in the CPOCL and Glaive narrative planners.
+ * It was adapted for Sabre by the same author in 2023. A few changes have been
+ * made to enable a variety of solutions of different quality:
+ * (1) Originally, it was only possible to steal an item from the owner while
+ *     that item was at a location. Thus it was possible to steal the dragon's
+ *     treasure but not Vince's money. The 'steal' action has been replaced
+ *     with 'pickup' and 'take' actions. A character can pick up any item at a
+ *     location, regardless of who owns it. A character can take an item from
+ *     another character if that character is dead.
+ * (2) When an item was stolen, the owner only wanted to get it back if they
+ *     witnesses the theft. Now, any character who desires wealth can improve
+ *     their utility by having valuable items, regardless of who owns them.
+ *     Thus the dragon will always want the treasure, but will also want
+ *     Vince's money.
+ * (3) The goals of the problem has been translated into numeric utility
+ *     functions. Any character who is dead automatically has a utility of 0.
+ *     Characters become happy by being married to someone they love.
+ *     Characters are wealthy when they have valuable items or when their 
+ *     spouse has valuable items. Move valuable items means higher wealth.
+ *     Characters alleviate hunger by eating others.
+ * (4) Each character has a slightly different utility function to add variety:
+ *     - Talia wants to be happy and wealthy; she does not care about hunger.
+ *     - Rory wants to be happy and fed; he does not care about wealth.
+ *     - Vince wants to be happy, wealthy, and fed.
+ *     - Gargax wants to be wealthy and fed; she does not care about happiness.
+ * (5) The author's utility is the sum of Talia's happiness and wealth. This
+ *     allows for various solutions with utilities ranging from 1 to 3. The
+ *     author's goal that Vince stay alive has been removed because it
+ *     prevented any stories where his money changes hands.
+ *
+ * Shortest solution with author utility 1 (author temporal limit 2, character
+ * temporal limit 2; epistemic limit 1):
+ *   travel(Talia, Village, Cave)
+ *   pickup(Talia, Treasure, Cave)
+ *
+ * Another solution with author utility 1 (author temporal limit 3, character
+ * temporal limit 3; epistemic limit 3):
+ *   propose(Rory, Talia, Village)
+ *   accept(Talia, Rory, Village)
+ *   marry(Rory, Talia, Village)
+ *
+ * Another solution with author utility 1 (author temporal limit 3, character
+ * temporal limit 3; epistemic limit 3):
+ *   propose(Vince, Talia, Village)
+ *   accept(Talia, Vince, Village)
+ *   marry(Vince, Talia, Village)
+ *
+ * Shortest solution with author utility 2 (author temporal limit 5, character
+ * temporal limit 3; epistemic limit 3):
+ *   propose(Rory, Talia, Village)
+ *   accept(Talia, Rory, Village)
+ *   marry(Rory, Talia, Village)
+ *   travel(Talia, Village, Cave)
+ *   pickup(Talia, Treasure, Cave)
+ *
+ * Shortest solution with author utility 3 (author temporal limit 9, character
+ * temporal limit 3; epistemic limit 3):
+ *   propose(Rory, Talia, Village)
+ *   accept(Talia, Rory, Village)
+ *   marry(Rory, Talia, Village)
+ *   get_hungry(Gargax)
+ *   travel(Gargax, Cave, Village)
+ *   eat(Gargax, Vince, Village)
+ *   take(Talia, Money, Vince, Village)
+ *   travel(Talia, Village, Cave)
+ *   pickup(Talia, Treasure, Cave)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Stephen G. Ware, R. Michael Young, Brent Harrison, David L. Roberts, "A
+ *   computational model of narrative conflict at the fabula level," in IEEE
+ *   Transactions on Computational Intelligence and Artificial Intelligence in
+ *   Games, vol. 6, num. 3, pp. 271-288, 2014.
+ */
+
+type location;
+type character : location;
+type person : character;
+type monster : character;
+type place : location;
+type item;
+type valuable : item;
+type relationship;
+
+entity Talia : character;
+entity Rory : character;
+entity Vince : character;
+entity Gargax : monster;
+entity Village : place;
+entity Cave : place;
+entity Money : valuable;
+entity Treasure : valuable;
+entity Proposed : relationship;
+entity Accepted : relationship;
+entity Married : relationship;
+
+property alive(character : character) : boolean;
+property loves(character : character, other : character) : boolean;
+property relationship(first : character, second : character) : relationship;
+property happiness(character : character) : number;
+property wealth(character : character) : number;
+property hunger(character : character) : number;
+property at(character : character) : place;
+property at(item : item) : location;
+property has(character : character, item : item) : number;
+
+alive(Talia);
+loves(Talia, Rory);
+at(Talia) = Village;
+alive(Rory);
+loves(Rory, Talia);
+at(Rory) = Village;
+alive(Vince);
+loves(Vince, Talia);
+at(Vince) = Village;
+at(Money) = Vince;
+alive(Gargax);
+at(Gargax) = Cave;
+at(Treasure) = Cave;
+
+action propose(lover : character, beloved : character, place : place) {
+	precondition:
+		lover != beloved &
+		alive(lover) &
+		loves(lover, beloved) &
+		relationship(lover, beloved) == ? &
+		at(lover) == place &
+		alive(beloved) &
+		at(beloved) == place;
+	effect:
+		relationship(lover, beloved) = Proposed;
+	consenting: lover;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action accept(beloved : character, lover : character, place : place) {
+	precondition:
+		beloved != lover &
+		alive(beloved) &
+		relationship(beloved, lover) == ? &
+		at(beloved) == place &
+		alive(lover) &
+		at(lover) == place &
+		relationship(lover, beloved) == Proposed;
+	effect:
+		relationship(beloved, lover) == Accepted;
+	consenting: beloved;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action marry(lover : character, beloved : character, place : place) {
+	precondition:
+		lover != beloved &
+		alive(lover) &
+		relationship(lover, beloved) == Proposed &
+		!exists(a : character) relationship(lover, a) == Married &
+		at(lover) == place &
+		alive(beloved) &
+		relationship(beloved, lover) == Accepted &
+		!exists(a : character) relationship(beloved, a) == Married &
+		at(beloved) == place;
+	effect:
+		relationship(lover, beloved) = Married &
+		relationship(beloved, lover) = Married;
+	consenting: lover, beloved;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action travel(character : character, from : place, to : place) {
+	precondition:
+		from != to &
+		alive(character) &
+		at(character) == from;
+	effect:
+		at(character) = to;
+	consenting: character;
+	observing(c : character): alive(c) & (at(c) == from | at(c) == to);
+};
+
+action pickup(character : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(item) == place;
+	effect:
+		at(item) = character;
+	consenting: character;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action take(taker : character, item : item, victim : character, place : place) {
+	precondition:
+		alive(taker) &
+		at(taker) == place &
+		at(item) == victim &
+		!alive(victim) &
+		at(victim) == place;
+	effect:
+		at(item) = taker;
+	consenting: taker;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action get_hungry(character : character) {
+	precondition:
+		alive(character);
+	effect:
+		hunger(character) = hunger(character) + 1;
+	observing(c : character): c == character;
+};
+
+action eat(monster : monster, victim : character, place : place) {
+	precondition:
+		monster != victim &
+		alive(monster) &
+		hunger(monster) >= 1 &
+		at(monster) == place &
+		alive(victim) &
+		at(victim) == place;
+	effect:
+		hunger(monster) = hunger(monster) - 1 &
+		!alive(victim);
+	consenting: monster;
+	observing(c : character): alive(c) & at(c) == place;		
+};
+
+trigger see_alive(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		alive(other) &
+		at(other) == place &
+		believes(character, !alive(other));
+	effect:
+		believes(character, alive(other));
+};
+
+trigger see_dead(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		!alive(other) &
+		at(other) == place &
+		believes(character, alive(other));
+	effect:
+		believes(character, !alive(other));
+};
+
+trigger end_relationship(lover : character, beloved : character) {
+	precondition:
+		!alive(lover) &
+		relationship(lover, beloved) != ?;
+	effect:
+		relationship(lover, beloved) = ?;
+};
+
+trigger see_character_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		believes(character, at(other) != place);
+	effect:
+		believes(character, at(other) = place);
+};
+
+trigger see_character_not_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) != place &
+		believes(character, at(other) == place);
+	effect:
+		believes(character, at(other) = ?);
+};
+
+trigger see_item_at(character : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(item) == place &
+		believes(character, at(item) != place);
+	effect:
+		believes(character, at(item) = place);
+};
+
+trigger see_item_not_at(character : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(item) != place &
+		believes(character, at(item) == place);
+	effect:
+		believes(character, at(item) = ?);
+};
+
+trigger happy(character : character) {
+	precondition:
+		exists(a : character)
+			(loves(character, a) & relationship(character, a) == Married) &
+		happiness(character) == 0;
+	effect:
+		happiness(character) = 1;
+};
+
+trigger unhappy(character : character) {
+	precondition:
+		!exists(a : character)
+			(loves(character, a) & relationship(character, a) == Married) &
+		happiness(character) == 1;
+	effect:
+		happiness(character) = 0;
+};
+
+trigger has(character : character, item : item) {
+	precondition:
+		(
+			at(item) == character |
+			exists(a : character)
+				(relationship(character, a) == Married & at(item) == a)
+		) &
+		has(character, item) == 0;
+	effect:
+		has(character, item) = 1;
+};
+
+trigger hasnt(character : character, item : item) {
+	precondition:
+		at(item) != character &
+		!exists(a : character)
+			(relationship(character, a) == Married & at(item) == a) &
+		has(character, item) == 1;
+	effect:
+		has(character, item) = 0;
+};
+
+trigger change_wealth(character : character) {
+	precondition:
+		wealth(character) != sum(v : valuable) has(character, v);
+	effect:
+		wealth(character) = sum(v : valuable) has(character, v);
+};
+
+utility(): happiness(Talia) + wealth(Talia);
+
+utility(Talia):
+	if(!alive(Talia))
+		0
+	else
+		happiness(Talia) + wealth(Talia);
+
+utility(Rory):
+	if(!alive(Rory))
+		0
+	else
+		happiness(Rory) - hunger(Rory);
+
+utility(Vince):
+	if(!alive(Vince))
+		0
+	else
+		happiness(Vince) + wealth(Vince) - hunger(Vince);
+
+utility(Gargax):
+	if(!alive(Gargax))
+		0
+	else
+		wealth(Gargax) - hunger(Gargax);

@@ -1,0 +1,8 @@
+steal(Ernest, Cigarettes, Cells)
+| goal(Ernest, alive(Ernest) == True & location(Cigarettes) == Ernest & threatened(Ernest) == True)
+confiscate(Ernest, Cigarettes, Cells, Gym)
+recreation(Bully, Gym)
+| goal(Bully, alive(Ernest) == True & alive(Roy) == True & location(Bully) == Gym & threatened(Ernest) == True & threatened(Roy) == True)
+kill(Bully, Ernest, Gym)
+| goal(Bully, alive(Ernest) == False & alive(Roy) == True & location(Bully) == Gym & threatened(Ernest) == False & threatened(Roy) == True)
+goal(alive(Ernest) == False & alive(Roy) == True & location(Cigarettes) == Cells)

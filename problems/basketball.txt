@@ -1,0 +1,251 @@
+/**
+ * Basketball
+ * 
+ * This domain represents stories in the crime genre, where characters can
+ * commit theft and murder. Theft angers the victim, but characters can play
+ * basketball to relieve anger. Crimes leave clues, and the police can find
+ * clues and used them to arrest the perpetrators. This domain was introduced
+ * by Kartal et. al in 2014 to demonstrate a technique for handling large story
+ * domains, and is easily scalable by adding more characters and items. The
+ * domain was originally designed for a classical planner without character
+ * intentionality, and was adapted for Sabre by Rachelyn Farrell and Stephen G.
+ * Ware in 2023. This version uses three citizens, each with a different
+ * utility function to vary their behavior; and one detective, whose utility is
+ * the sum of the number of places that have been searched and the number of
+ * citizens who have been arrested.
+ * 
+ * Shortest solution (author temporal limit 3, character temporal limit 5;
+ * epistemic limit 3):
+ *   travel(Bob, HomeB, BasketballCourt)
+ *   travel(Alice, Downtown, BasketballCourt)
+ *   playBasketball(Bob, Alice, BasketballCourt)
+ * 
+ * Shortest solution where a citizen is arrested (author temporal limit 4;
+ * character temporal limit 2; epistemic limit 1):
+ *   kill(Charlie, Alice, Bat, Downtown)
+ *   findClues(Sherlock, Murder, Bat, Downtown)
+ *   suspectOfCrime(Sherlock, Charlie, Murder, Bat, Downtown)
+ *   arrest(Sherlock, Charlie, Downtown, Murder)
+ *
+ * Shortest solution where characters play basketball and a citizen is arrested
+ * (author temporal limit 7; character temporal limit 5; epistemic limit 3):
+ *   travel(Bob, HomeB, BasketballCourt)
+ *   travel(Alice, Downtown, BasketballCourt)
+ *   travel(Sherlock, Downtown, BasketballCourt)
+ *   steal(Alice, Bob, Basketball, BasketballCourt)
+ *   playBasketball(Alice, Bob, BasketballCourt)
+ *   suspectOfCrime(Sherlock, Alice, Theft, Basketball, BasketballCourt)
+ *   arrest(Sherlock, Alice, BasketballCourt, Theft)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Bilal Kartal, John Koenig, and Stephen J. Guy, "User-driven narrative 
+ *   variation in large story domains using monte carlo tree search," in 
+ *   Proceedings of the 2014 International Conference on Autonomous Agents
+ *   and Multi-agent Systems, pp. 69-76, 2014.
+ */
+
+type item;
+type place;
+type basketballPlace : place;
+type arrestPlace : place;
+type crime; 
+type citizen : character;
+type police : character;
+type detective : police;
+type inspector : police;
+
+property alive(character : character) : boolean;
+property underArrest(character : character) : number;
+property angry(character : character) : number;
+property searched(place : place) : number;
+property suspect(character : character, c : crime) : boolean;
+property clue(crime : crime, item : item, place : place) : boolean;
+property at(character : character) : place;
+property has(item : item) : character;
+
+entity Alice : citizen;
+entity Bob : citizen;
+entity Charlie : citizen;
+entity Sherlock : detective;
+entity HomeB : place;
+entity BasketballCourt : basketballPlace;
+entity Downtown : arrestPlace;
+entity Basketball : item;
+entity Bat : item;
+entity Theft : crime;
+entity Murder : crime;
+
+alive(Alice);
+angry(Alice) = 1;
+at(Alice) = Downtown;
+alive(Bob);
+at(Bob) = HomeB;
+has(Basketball) = Bob;
+alive(Charlie);
+angry(Charlie) = 1;
+at(Charlie) = Downtown;
+has(Bat) = Charlie;
+alive(Sherlock);
+at(Sherlock) = Downtown;
+
+action travel(character : character, from : place, to : place){
+	precondition:
+		from != to & 
+		at(character) == from &
+		alive(character);
+	effect:
+		at(character) = to;
+	consenting: character; 
+	observing(c : character) : at(c) == from | at(c) == to; 
+};
+
+action arrest(police : police, character : character, place : place, crime : crime){
+	precondition: 
+		at(police) == place &
+		at(character) == place &
+		police != character &
+		alive(police) &
+		alive(character) &
+		suspect(character, crime);
+	effect:
+		underArrest(character) = 1;
+	consenting: police;
+	observing(a : character) : at(a) == place;
+};
+
+action steal(thief : citizen, victim : citizen, item : item, place : place){
+	precondition:
+		at(thief) == place &
+		at(victim) == place &
+		has(item) == victim &
+		thief != victim &
+		alive(thief);
+	effect:
+		has(item) = thief &
+		angry(victim) = 1 &
+		clue(Theft, item, place);
+	consenting: thief;
+	observing(c : character) : (c == thief | c == victim) | (at(c) == place & place != Downtown); // crimes downtown aren't observed
+};
+
+action playBasketball(player1 : citizen, player2 : citizen, place : basketballPlace){
+	precondition:
+		player1 != player2 &
+		at(player1) == place &
+		alive(player1) &
+		at(player2) == place &
+		alive(player2) &
+		has(Basketball) == player1;
+	effect:
+		angry(player1) = 0 &
+		angry(player2) = 0;
+	consenting: player1, player2;
+	observing(c : character) : at(c) == place;
+};
+
+action kill(killer : citizen, victim : citizen, item : item, place : place){
+	precondition:
+		killer != victim &
+		at(killer) == place &
+		at(victim) == place &
+		alive(killer) &
+		alive(victim) &
+		has(item) == killer &
+		underArrest(killer) == 0;
+	effect:
+		!alive(victim) &
+		clue(Murder, item, place);
+	consenting: killer;
+	observing(c : character) : c == killer | (at(c) == place & place != Downtown); 
+};
+	
+action findClues(police : police, crime : crime, item : item, place : place){
+	precondition:
+		at(police) == place &
+		alive(police);
+	effect:
+		searched(place) = 1 &
+		if(clue(crime, item, place))
+			believes(police, clue(crime, item, place));
+	consenting: police;
+	observing(c : character) : at(c) == place;
+};
+
+action shareClues(police1 : police, police2 : police, crime : crime, item : item, place : place){
+	precondition:
+		police1 != police2 &
+		at(police1) == place &
+		alive(police1) &
+		at(police2) == place &
+		alive(police2) &
+		clue(crime, item, place);
+	effect:
+		believes(police2, clue(crime, item, place));
+	consenting: police1;
+	observing(c : character) : at(c) == place;
+};
+ 
+action suspectOfCrime(police : police, citizen : citizen, crime : crime, item : item, place : place){
+	precondition:
+		police != citizen &
+		at(police) == place &
+		alive(police) &
+		at(citizen) == place &
+		alive(citizen) &
+		has(item) == citizen &
+		exists(p : place) clue(crime, item, p);
+	effect:
+		suspect(citizen, crime);
+	consenting: police;
+	observing(c : character) : at(c) == place;
+};
+
+trigger see_has(character : character, other : character, item : item, place : place){
+	precondition:
+		at(character) == place &
+		at(other) == place &
+		has(item) == other &
+		believes(character, has(item) != other);
+	effect:
+		believes(character, has(item) = other);
+};
+
+trigger see_hasnt(character : character, other : character, item : item, place : place){
+	precondition:
+		at(character) == place &
+		at(other) == place &
+		has(item) != other & 
+		believes(character, has(item) == other);
+	effect:
+		believes(character, has(item) = ?);
+};
+
+trigger see_at(character : character, other : character, place : place){
+	precondition:
+		at(character) == place &
+		at(other) == place &
+		believes(character, at(other) != place);
+	effect:
+		believes(character, at(other) = place);
+};
+
+trigger see_gone(character : character, other : character, place : place){
+	precondition:
+		at(character) == place &
+		at(other) != place &
+		believes(character, at(other) == place);
+	effect:
+		believes(character, at(other) = ?);
+};
+
+utility():
+	(if((sum(c : citizen) underArrest(c)) > 0) 1 else 0) +
+	(if((sum(c : citizen) angry(c)) < 2) 1 else 0);
+
+utility(Alice): 1 - angry(Alice);
+
+utility(Bob): 3 - (sum(c : citizen) angry(c));
+
+utility(Charlie): if(!alive(Alice)) 1 else 0;
+
+utility(Sherlock): (sum(c : citizen) underArrest(c)) + (sum(p : place) searched(p));

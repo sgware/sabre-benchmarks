@@ -1,0 +1,6 @@
+travel(Talia, Village, Cave)
+| pickup(Talia, Treasure, Cave)
+| goal(Talia, alive(Talia) == True & happiness(Talia) == 0 & wealth(Talia) == 1)
+pickup(Talia, Treasure, Cave)
+| goal(Talia, alive(Talia) == True & happiness(Talia) == 0 & wealth(Talia) == 1)
+goal(happiness(Talia) == 0 & wealth(Talia) == 1)

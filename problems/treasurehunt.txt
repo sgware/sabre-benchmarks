@@ -1,0 +1,106 @@
+/**
+ * Treasure Hunt
+ *
+ * This domain demonstrates a simple example of a character planning to learn.
+ * Blackbeard wants the treasure, but he does not know which island it is on.
+ * Fortunately, he is in a library where he can research the treasure's
+ * location. This domain was written by Stephen G. Ware in 2023 as a simple
+ * example of some basic Sabre design patterns.
+ *
+ * In general, characters in Sabre cannot plan to learn, because this requires
+ * them to form a partial plan. Ideally, characters would reason like this: "I
+ * don't know where the treasure is, but I know where I can read about its
+ * location. I will research the treasure's location, and once I know where it
+ * is, I will go there and get the treasure." This is a partial plan because the
+ * location of the treasure is not known in advance, so the second part of the
+ * plan will need to be created or refined based on the research. Sabre does not
+ * support this kind of complex reasoning, but we can get something similar to
+ * it using the method demonstrated in this domain. The research action in this
+ * domain means "I will do some research and discover the treasure is at some
+ * specific location." The precondition requires that the treasure actually be
+ * at that location or that its location be unknown. Blackbeard can imagine the
+ * treasure being at any location (even the wrong location) and form a plan to
+ * go there and get the treasure. When Blackbeard imagines the action
+ * "research(Blackbeard, Treasure, SkullIsland)" it changes the location of the
+ * treasure from unknown to SkullIsland. When we consider the actual state of
+ * the world, this action appears to have no effect (since the precondition is
+ * that the treasure be at Skull Island and the effect is that the treasure is
+ * at Skull Island), though it does modify Blackbeard's beliefs, since he
+ * observes the action.
+ *
+ * Shortest solution (author temporal limit 3; character temporal limit 3;
+ * epistemic limit 1):
+ *   research(Blackbeard, Treasure, SkullIsland)
+ *   travel(Blackbeard, Library, SkullIsland)
+ *   take(Blackbeard, Treasure, SkullIsland)
+ */
+
+type location;
+type character : location;
+type place : location;
+type item;
+
+entity Blackbeard : character;
+entity Library : place;
+entity SkullIsland : place;
+entity BoneIsland : place;
+entity Treasure : item;
+
+property at(character : character) : place;
+property at(item : item) : location;
+
+at(Blackbeard) = Library;
+at(Treasure) = SkullIsland;
+believes(Blackbeard, at(Treasure) = ?);
+
+action research(character : character, item : item, place : place) {
+	precondition:
+		at(character) == Library &
+		(at(item) == ? | at(item) == place);
+	effect:
+		at(item) = place;
+	consenting: character;
+	observing(c : character): c == character;
+};
+
+action travel(character : character, from : place, to : place) {
+	precondition:
+		from != to &
+		at(character) == from;
+	effect:
+		at(character) = to;
+	consenting: character;
+	observing(c : character): at(c) == from | at(c) == to;
+};
+
+action take(character : character, item : item, place : place) {
+	precondition:
+		at(character) == place &
+		at(item) == place;
+	effect:
+		at(item) = character;
+	consenting: character;
+	observing(c : character): at(c) == place;
+};
+
+trigger see_item_at(character : character, item : item, place : place) {
+	precondition:
+		at(character) == place &
+		at(item) == place &
+		believes(character, at(item) != place);
+	effect:
+		believes(character, at(item) = place);
+};
+
+trigger see_item_not_at(character : character, item : item, place : place) {
+	precondition:
+		at(character) == place &
+		at(item) != place &
+		believes(character, at(item) == place);
+	effect:
+		believes(character, at(item) = ?);
+};
+
+utility(): at(Treasure) == Blackbeard;
+
+utility(Blackbeard): at(Treasure) == Blackbeard;

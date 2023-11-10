@@ -1,0 +1,297 @@
+/**
+ * Lovers
+ *
+ * In this domain, three characters inhabit a 2x2 grid of rooms and seek their
+ * favorite items. Each character also loves one other character. A character is
+ * happy when it has its favorite item. Every character wants to be happy and
+ * for its lover to be happy. This domain was designed by Stephen G. Ware and
+ * Rachelyn Farrell in 2019 to be a minimal multi-agent planning domain with
+ * partial observability (characters only see actions in their room),
+ * intentionality, wrong beliefs, communication, and deception. The domain was
+ * originally a testbed for doing belief and intention recognition, where some
+ * actions by a character are observed and a narrative planner is used to infer
+ * the beliefs and intentions that would explain the character's actions.
+ *
+ * The domain was designed such that many random variations could be generated.
+ * The following things are constant (i.e. true in all variations):
+ *   - There are 4 rooms that form a grid:
+ *     +---+---+
+ *     |R11|R12|
+ *     +---+---+
+ *     |R21|R22|
+ *     +---+---+
+ *   - There are 3 characters (C1...C3) and 3 items (I1...I3).
+ *   - Each character wants one of the items.
+ *   - A character gets 1 point of utility for having the item it wants.
+ *   - Each character loves one other character.
+ *   - A character gets 1 point of utility when the character it loves has the
+ *     item they want.
+ * The following things were randomized in each problem instance:
+ *   - Each character wants one random item. Characters may want the same item.
+ *   - Each character randomly loves one other character. Characters may love
+ *     the same character.
+ *   - Each character starts in a random room.
+ *   - Each item starts at a random location (either in a room or being held
+ *     by a character).
+ *   - The author's goal is for two random characters to have the items they
+ *     want. Both must be happy; the author gets no utility when one is happy.
+ * Characters may randomly have wrong beliefs in the initial state:
+ *   - Characters may have wrong beliefs about which items other characters
+ *     want.
+ *   - Characters may have wrong beliefs about where other character are.
+ *   - Characters may have wrong beliefs about where items are.
+ *
+ * The initial state reflected in this version of the domain is one meant to
+ * demonstrate deception:
+ *   - Characters want their own items: C1 wants I1; C2 wants I2; C3 wants I3.
+ *   - Love triangle: C1 loves C3; C2 loves C1; C3 loves C2.
+ *   - C1 starts in R11 with nothing.
+ *   - C2 starts in R12 holding I3 (the item C3 wants).
+ *   - C3 starts in R22 holding I1 (the item C1 wants).
+ *   - I2 (the thing C2 wants) is in R21.
+ *   - C2 wrongly believes that I1 is in R12, the same room C2 is in. This is
+ *     not true, so C2 will believe (via a trigger) I1's location is unknown.
+ *   - C2 wrongly believes that I2 is in R12, and thus by the same process will
+ *     believe I2's location is unknown.
+ *   - C3 wrongly believes that I3 is in R22, the same room C3 is in, so by the
+ *     same process C3 will believe I3's location is unknown.
+ *   - The author requires that both C1 and C3 have their items by the end.
+ *
+ * Shortest solution (author temporal limit 5; character temporal limit 5;
+ * epistemic limit 2):
+ *   move(C1, R11, R12)
+ *   tell(C1, C2, I3, R12)
+ *   give(C2, I3, C1, R12)
+ *   move(C1, R12, R22)
+ *   trade(C1, I3, C3, I1, R22)
+ *
+ * Note that the second action is a lie. C1 says they want I3 because it will
+ * cause C2 to give it to C1 (since C2 loves C1), but C1 only wants I3 so that
+ * they can give it to C3 (since C1 loves C3). Most (maybe all) solvable
+ * instances of this problem can be solved without deception, because characters
+ * are not required to travel the shortest paths to their destinations. If
+ * characters take longer-than-necessary paths, they can eventually find where
+ * everyone and everything is, correcting their mistaken beliefs. However, this
+ * version of the domain should not contain any plans of length 5 or fewer that
+ * do not use deception.
+ *
+ * The preferred citation for the origin of this domain is: 
+ *   Rachelyn Farrell and Stephen G. Ware, "Narrative planning for belief and
+ *   intention recognition," in Proceedings of the 16th AAAI conference on
+ *   Artificial Intelligence and Interactive Digital Entertainment, pp. 52-58,
+ *   2020.
+ */
+
+type location;
+type character : location;
+type room : location;
+type item;
+
+entity C1 : character;
+entity C2 : character;
+entity C3 : character;
+entity R11 : room;
+entity R12 : room;
+entity R21 : room;
+entity R22 : room;
+entity I1 : item;
+entity I2 : item;
+entity I3 : item;
+
+property at(character : character) : room;
+property at(item : item) : location;
+property wants(character : character) : item;
+property happy(character : character) : boolean;
+property path(from : room, to : room) : boolean;
+property loves(lover : character, lover : character) : boolean;
+property pair(c1 : character, c2 : character) : boolean;
+
+pair(C1, C2);
+pair(C1, C3);
+pair(C2, C3);
+path(R11, R12);
+path(R11, R21);
+path(R12, R22);
+path(R21, R22);
+wants(C1) = I1;
+wants(C2) = I2;
+wants(C3) = I3;
+at(C1) = R11;
+at(C2) = R12;
+at(C3) = R22;
+at(I1) = C3;
+at(I2) = R21;
+at(I3) = C2;
+believes(C2, at(I1) = R12);
+believes(C2, at(I2) = R12);
+believes(C1, believes(C2, at(I2) = R12));
+believes(C3, at(I3) = R22);
+
+action tell(speaker : character, hearer : character, item : item, room : room) {
+	precondition:
+		speaker != hearer &
+		believes(hearer, wants(speaker)) != item &
+		at(speaker) == room &
+		at(hearer) == room;
+	effect:
+		believes(hearer, wants(speaker)) = item;
+	consenting: speaker;
+	observing(c : character): at(c) == room;
+};
+
+action pick_up(character : character, item : item, room : room) {
+	precondition:
+		at(character) == room &
+		at(item) == room &
+		!exists(i : item)
+			at(i) == character;
+	effect:
+		at(item) = character;
+	consenting: character;
+	observing(c : character): at(c) == room;
+};
+
+action put_down(character : character, item : item, room : room) {
+	precondition:
+		at(character) == room &
+		at(item) == character;
+	effect:
+		at(item) = room;
+	consenting: character;
+	observing(c : character): at(c) == room;
+};
+
+action give(giver : character, item : item, receiver : character, room : room) {
+	precondition:
+		giver != receiver &
+		at(giver) == room &
+		at(item) == giver &
+		at(receiver) == room &
+		!exists(i : item)
+			at(i) == receiver;
+	effect:
+		at(item) = receiver;
+	consenting: giver, receiver;
+	observing(c : character): at(c) == room;
+};
+
+action trade(c1 : character, i1 : item, c2 : character, i2 : item, room : room) {
+	precondition:
+		pair(c1, c2) &
+		i1 != i2 &
+		at(c1) == room &
+		at(i1) == c1 &
+		at(c2) == room &
+		at(i2) == c2;
+	effect:
+		at(i1) = c2 &
+		at(i2) = c1;
+	consenting: c1, c2;
+	observing(c : character): at(c) == room;
+};
+
+action move(character : character, from : room, to : room) {
+	precondition:
+		(path(from, to) | path(to, from)) &
+		at(character) == from;
+	effect:
+		at(character) = to;
+	consenting: character;
+	observing(c : character): at(c) == from | at(c) == to;
+};
+
+trigger know_wants(character : character, item : item) {
+	precondition:
+		wants(character) == item &
+		believes(character, wants(character)) != item;
+	effect:
+		believes(character, wants(character)) = item;
+};
+
+trigger see_at(character : character, other : character, room : room) {
+	precondition:
+		at(character) == room &
+		at(other) == room &
+		believes(character, at(other)) != room;
+	effect:
+		believes(character, at(other)) = room;
+};
+
+trigger see_not_at(character : character, other : character, room : room) {
+	precondition:
+		at(character) == room &
+		at(other) != room &
+		believes(character, at(other)) == room;
+	effect:
+		believes(character, at(other)) = ?;
+};
+
+trigger see_at(character : character, item : item, room : room) {
+	precondition:
+		at(character) == room &
+		at(item) == room &
+		believes(character, at(item)) != room;
+	effect:
+		believes(character, at(item)) = room;
+};
+
+trigger see_not_at(character : character, item : item, room : room) {
+	precondition:
+		at(character) == room &
+		at(item) != room &
+		believes(character, at(item)) == room;
+	effect:
+		believes(character, at(item)) = ?;
+};
+
+trigger see_on(character : character, item : item, other : character, room : room) {
+	precondition:
+		at(character) == room &
+		at(item) == other &
+		believes(character, at(item)) != other &
+		at(other) == room;
+	effect:
+		believes(character, at(item)) = other;
+};
+
+trigger see_not_on(character : character, item : item, other : character, room : room) {
+	precondition:
+		at(character) == room &
+		at(item) != other &
+		believes(character, at(item)) == other &
+		at(other) == room;
+	effect:
+		believes(character, at(item)) = ?;
+};
+
+trigger happy(character : character, item : item) {
+	precondition:
+		wants(character) == item &
+		at(item) == character &
+		!happy(character);
+	effect:
+		happy(character);
+};
+
+trigger unhappy(character : character, item : item) {
+	precondition:
+		wants(character) == item &
+		at(item) != character &
+		happy(character);
+	effect:
+		!happy(character);
+};
+
+utility(): happy(C1) & happy(C3);
+
+utility(C1):
+	(if(happy(C1)) 1 else 0) +
+	(if(happy(C3)) 1 else 0);
+
+utility(C2):
+	(if(happy(C2)) 1 else 0) +
+	(if(happy(C1)) 1 else 0);
+
+utility(C3):
+	(if(happy(C3)) 1 else 0) +
+	(if(happy(C2)) 1 else 0);

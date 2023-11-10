@@ -1,0 +1,260 @@
+/**
+ * Hospital
+ * 
+ * This domain represents stories in the medical drama genre. A doctor can
+ * admit, assess, and treat sick patients. If the doctor is overworked, they
+ * can make mistakes. Tihs domain was originally designed by Porteous et al. in
+ * 2013 for a system that tracked characters' relationships to govern their
+ * behavior. This version of the domain was adapted for Sabre by Stephen G.
+ * Ware and Rachelyn Farrell and  in 2023. Intentionality and beliefs were not
+ * included in the original domain, so the domain has been adapted to include
+ * them in the following ways:
+ * (1) When a patient's symptom is set to anything but Healthy, the patient is
+ *     sick. Initially, the doctor believes all patients have unknown (?)
+ *     symptoms. The doctor can learn more with the assess action. The assess
+ *     action causes all characters who observe it to believe the patient has a
+ *     specific symptom. Note that the assess action can go wrong, causing the
+ *     doctor and patient to both believe the patient has the wrong symptom.
+ *     This mistaken belief can lead to the wrong treatment which can lead to
+ *     the patient's death.
+ * (2) In the original domain, the die and recover actions were separate from
+ *     the treat action. Patients could only die or recover after receiving a
+ *     correct assessment; the effects of the mistake-assess action were never
+ *     used by any other action. This meant that patients could only be treated
+ *     with the correct treatment, but patients who got the correct treatment
+ *     could still die. The mistake-assess action has been merged with the
+ *     assess action. The die and recover actions have been merged with the
+ *     treat action; if the patient is treated incorrectly, they die; if they
+ *     are treated correctly they recover.
+ * (3) The author's get 1 point of utility if the doctor heals at least one
+ *     patient. The author gets 1 point of utility if the doctor makes a
+ *     mistake. The doctor wants to be alive and for all patients to be
+ *     healthy. Patients all want to be alive and healthy.
+ * (4) The get-work-help action, the ability for patients to fall unconscious,
+ *     and the move action have been removed because they did not contribute to
+ *     the above mentioned utilities.
+ * 
+ * Shortest solution (author utility 1; author temporal limit 4, character
+ * temporal limit 3; epistemic limit 3):
+ *   admit(Hathaway, Jones, PatientRoomA)
+ *   walk(Jones, Admissions, PatientRoomA)
+ *   assess(Hathaway, Jones, SymptomA, PatientRoomA)
+ *   treat(Hathaway, Jones, TreatmentA, PatientRoomA)
+ * 
+ * Shortest solution where the doctor makes a mistake (author utility 1; author
+ * temporal limit 6; character temporal limit 5; epistemic limit 3):
+ *   admit(Hathaway, Jones, PatientRoomA)
+ *   admit(Hathaway, Ross, PatientRoomB)
+ *   admit(Hathaway, Young, PatientRoomC)
+ *   walk(Jones, Admissions, PatientRoomA)
+ *   assess(Hathaway, Jones, SymptomB, PatientRoomA)
+ *   treat(Hathaway, Jones, TreatmentB, PatientRoomA)
+ *
+ * Shortest solution where the doctor makes a mistake and heals a patient
+ * (author utility 2; author temporal limit 11; character temporal limit 5;
+ * epistemic limit 3):
+ *   admit(Hathaway, Jones, PatientRoomA)
+ *   admit(Hathaway, Ross, PatientRoomB)
+ *   admit(Hathaway, Young, PatientRoomC)
+ *   walk(Jones, Admissions, PatientRoomA)
+ *   assess(Hathaway, Jones, SymptomB, PatientRoomA)
+ *   treat(Hathaway, Jones, TreatmentB, PatientRoomA)
+ *   walk(Ross, Admissions, PatientRoomA)
+ *   walk(Ross, PatientRoomA, PatientRoomB)
+ *   walk(Hathaway, PatientRoomA, PatientRoomB)
+ *   assess(Hathaway, Ross, SymptomA, PatientRoomB)
+ *   treat(Hathaway, Ross, TreatmentA, PatientRoomB)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Julie Porteous, Fred Charles, and Marc Cavazza, "NetworkING: using
+ *   character relationships for interactive narrative generation", in
+ *   Proceedings of the international conference on Autonomous Agents and
+ *   Multi-Agent Systems, 2013, pp. 595--602.
+ */
+
+type doctor : character;
+type patient : character;
+type room;
+type examroom : room;
+type symptom;
+type treatment;
+
+property treats(symptom : symptom) : treatment;
+property alive(character : character) : boolean;
+property symptom(character : character) : symptom;
+property at(character : character) : room;
+property assigned(examroom : examroom) : patient;
+property workload(doctor : doctor) : number;
+
+entity Hathaway : doctor;
+entity Jones : patient;
+entity Ross : patient;
+entity Young : patient;
+entity Admissions : room;
+entity PatientRoomA : examroom;
+entity PatientRoomB : examroom;
+entity PatientRoomC : examroom;
+entity Healthy : symptom;
+entity SymptomA : symptom;
+entity SymptomB : symptom;
+entity TreatmentA : treatment;
+entity TreatmentB : treatment;
+
+treats(SymptomA) = TreatmentA;
+treats(SymptomB) = TreatmentB;
+alive(Hathaway);
+at(Hathaway) = PatientRoomA;
+alive(Jones);
+symptom(Jones) = SymptomA;
+at(Jones) = Admissions;
+alive(Ross);
+symptom(Ross) = SymptomA;
+at(Ross) = Admissions;
+alive(Young);
+symptom(Young) = SymptomB;
+at(Young) = Admissions;
+believes(Hathaway, symptom(Jones)) = ?;
+believes(Jones, believes(Hathaway, symptom(Jones))) = ?;
+believes(Hathaway, symptom(Ross)) = ?;
+believes(Ross, believes(Hathaway, symptom(Ross))) = ?;
+believes(Hathaway, symptom(Young)) = ?;
+believes(Young, believes(Hathaway, symptom(Young))) = ?;
+
+action admit(doctor : doctor, patient : patient, room : examroom) {
+	precondition:
+		alive(doctor) &
+		alive(patient) &
+		assigned(room) == ?;
+	effect:
+		assigned(room) = patient &
+		workload(doctor) = workload(doctor) + 1;
+	consenting: doctor;
+	observing(c : character): alive(c) & (c == doctor | at(c) == Admissions);
+};
+
+action walk(character : character, from : room, to : room) {
+	precondition:
+		from != to &
+		alive(character) &
+		at(character) == from;
+	effect:
+		at(character) = to;
+	consenting: character;
+	observing(c : character): alive(c) & (at(c) == from | at(c) == to);
+};
+
+action assess(doctor : doctor, patient : patient, symptom : symptom, room : examroom) {
+	precondition:
+		alive(doctor) &
+		alive(patient) &
+		(
+			symptom(patient) == ? |
+			symptom(patient) == symptom |
+			workload(doctor) > 2
+		) &
+		at(doctor) == room &
+		at(patient) == room &
+		assigned(room) == patient;
+	effect:
+		if(symptom(patient) == ?)
+			symptom(patient) = symptom &
+		believes(doctor, symptom(patient)) = symptom &
+		believes(patient, symptom(patient)) = symptom;
+	consenting: doctor;
+	observing(c : character): alive(c) & at(c) == room;
+};
+
+action treat(doctor : doctor, patient : patient, treatment : treatment, room : examroom) {
+	precondition:
+		alive(doctor) &
+		alive(patient) &
+		symptom(patient) != ? &
+		at(doctor) == room &
+		at(patient) == room &
+		assigned(room) == patient;
+	effect:
+		assigned(room) = ? &
+		workload(doctor) = workload(doctor) - 1 &
+		if(exists(s : symptom) (symptom(patient) == s & treats(s) == treatment))
+			symptom(patient) = Healthy
+		else
+			!alive(patient);
+	consenting: doctor, patient;
+	observing(c : character): alive(c) & at(c) == room;
+};
+
+trigger see_alive(character : character, other : character, room : room) {
+	precondition:
+		alive(character) &
+		at(character) == room &
+		alive(other) &
+		at(other) == room &
+		believes(character, !alive(other));
+	effect:
+		believes(character, alive(other));
+};
+
+trigger see_dead(character : character, other : character, room : room) {
+	precondition:
+		alive(character) &
+		at(character) == room &
+		!alive(other) &
+		at(other) == room &
+		believes(character, alive(other));
+	effect:
+		believes(character, !alive(other));
+};
+
+trigger see_at(character : character, other : character, room : room) {
+	precondition:
+		alive(character) &
+		at(character) == room &
+		at(other) == room &
+		believes(character, at(other)) != room;
+	effect:
+		believes(character, at(other)) = room;
+};
+
+trigger see_gone(character : character, other : character, room : room) {
+	precondition:
+		alive(character) &
+		at(character) == room &
+		at(other) != room &
+		believes(character, at(other)) == room;
+	effect:
+		believes(character, at(other)) = ?;
+};
+
+utility():
+	(if(exists(p : patient) symptom(p) == Healthy) 1 else 0) +
+	(if(exists(p : patient) !alive(p)) 1 else 0);
+
+utility(Hathaway):
+	if(!alive(Hathaway))
+		0
+	else
+		1 + (sum(p : patient) if(symptom(p) == Healthy) 1 else 0);
+
+utility(Jones):
+	if(alive(Jones) & symptom(Jones) == Healthy)
+		2
+	elseif(alive(Jones))
+		1
+	else
+		0;
+
+utility(Ross):
+	if(alive(Ross) & symptom(Ross) == Healthy)
+		2
+	elseif(alive(Ross))
+		1
+	else
+		0;
+
+utility(Young):
+	if(alive(Young) & symptom(Young) == Healthy)
+		2
+	elseif(alive(Young))
+		1
+	else
+		0;

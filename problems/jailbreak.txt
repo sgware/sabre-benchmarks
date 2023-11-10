@@ -1,0 +1,301 @@
+/**
+ * Jailbreak
+ *
+ * This domain represents a short interactive story designed by Rachelyn
+ * Farrell in 2016 to test the Indexter model of narrative salience. The domain
+ * was originally used in hand-authored stories; this version for Sabre was
+ * designed by Stephen G. Ware and Rachelyn Farrell in 2023. The story has two
+ * possible protagonists, Earnest and Roy, friends who are in prison. By
+ * stealing a pack of cigarettes, they anger the prison bully who threatens to
+ * kill them. There are two ways around this threat: they can steal some
+ * civilian clothes from the laundry room and escape via the highway (the
+ * "escape" ending) or they can steal a knife from the kitchen, lock the bully
+ * in the gym, and stab him (the "revenge" ending). In the original stories,
+ * Earnest forms the escape plan and Roy the revenge plan, but in this domain
+ * either character can participate in either plan. Both plans can be pursued,
+ * and in the original stories the characters steal both items (the clothes and
+ * the knife). They both meet in the hall and decide which plan to go through
+ * with. If they decide on escape, they don the clothes. If they decide
+ * revenge, they lock the bully in the gym. Then they climb into the prison
+ * vents (either to escape to the highway or to enter the now locked gym). The
+ * guards hear them and one character gets arrested, allowing the other to
+ * execute his plan.
+ *
+ * There are many variations on the story that share (or not) 4 Indexter
+ * dimensions with one of the two endings:
+ * (1) Protagonist: the character (Earner or Roy) who does more actions is
+ *     considered the protagonist of the story.
+ * (2) Time: one character can prepare for his plan on the second day, the same
+ *     day as the ending.
+ * (3) Space: a character can be caught, have a contraban item confiscated, and
+ *     then be punished by either picking up trash on the highway (the
+ *     location of the escape ending) or cleaning the gym (the location of the
+ *     revenge ending).
+ * (4) Intentionality: the characters can either prepare for the escape ending
+ *     by donning the disguises or by locking the bully in the gym.
+ *
+ * Shortest solution where bully kills a protagonist (author utility 1; author
+ * temporal limit 4; character temporal limit 1; epistemic limit 1):
+ *   steal(Ernest, Cigarettes, Cells)
+ *   confiscate(Ernest, Cigarettes, Cells, Gym)
+ *   recreation(Bully, Gym)
+ *   kill(Bully, Ernest, Gym)
+ *
+ * Shortest solution with the escape ending (author utility 3; author temporal
+ * limit 6; character temporal limit 6, epistemic limit 1):
+ *   steal(Ernest, Cigarettes, Cells)
+ *   chores(Ernest, Laundry)
+ *   steal(Ernest, Clothes, Laundry)
+ *   confiscate(Ernest, Cigarettes, Laundry, Highway)
+ *   disguise(Ernest, Clothes, Highway)
+ *   escape(Ernest, Highway)
+ *
+ * Shortest solution with the revenge ending (author utility 6; author temporal
+ * limit 7; character temporal limit 6, epistemic limit 1):
+ *   steal(Roy, Cigarettes, Cells)
+ *   recreation(Bully, Gym)
+ *   chores(Roy, Kitchen)
+ *   steal(Roy, Knife, Kitchen)
+ *   confiscate(Roy, Cigarettes, Kitchen, Gym)
+ *   lock_gym(Roy, Gym)
+ *   revenge(Roy, Bully, Gym)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Rachelyn Farrell, Stephen G. Ware, and Lewis J. Baker, "Manipulating
+ *   narrative salience in interactive stories using Indexter's Pairwise Event
+ *   Salience Hypothesis," in IEEE Transactions on Games, vol. 12, num. 1,
+ *   pp. 74-85, 2020.
+ */
+
+type location;
+type character : location;
+type place : location;
+type main : character;
+type item;
+type time;
+
+entity Ernest : main;
+entity Roy : main;
+entity Bully : character;
+entity Day1 : time;
+entity Day2 : time;
+entity Cells : place;
+entity Laundry : place;
+entity Kitchen : place;
+entity Gym : place;
+entity Hall : place;
+entity Highway : place;
+entity Cigarettes : item;
+entity Clothes : item;
+entity Knife : item;
+
+property time() : time;
+property alive(character : character) : boolean;
+property location(character : character) : place;
+property location(item : item) : location;
+property threatened(main : main) : boolean;
+property chores(main : main) : boolean;
+property locked(Gym) : boolean;
+property disguised(main : main) : boolean;
+
+action confiscate(main : main, item : item, place : place, punishment : place) {
+	precondition:
+		(punishment == Highway | punishment == Gym) &
+		alive(main) &
+		location(item) == main &
+		location(main) == place;
+	effect:
+		location(main) = punishment &
+		location(item) = ?;
+	observing(c : character): c : main | location(c) == place;
+};
+
+action chores(main : main, place : place) {
+	precondition:
+		(place == Laundry | place == Kitchen) &
+		alive(main);
+	effect:
+		location(main) = place &
+		chores(main);
+	consenting: main;
+};
+
+action disguise(main : main, Clothes, place : place) {
+	precondition:
+		(place == Hall | place == Highway) &
+		alive(main) &
+		location(main) == place &
+		location(Clothes) == main;
+	effect:
+		disguised(main);
+	consenting: main;
+	observing(c : character): location(c) == place | location(c) == Highway;
+};
+
+action escape(main : main, Highway) {
+	precondition:
+		alive(main) &
+		location(main) == Highway &
+		disguised(main);
+	effect:
+		!threatened(main);
+	consenting: main;
+	observing(c : character): location(c) == Highway;
+};
+
+action go(main : main, Hall) {
+	precondition:
+		alive(main);
+	effect:
+		location(main) = Hall;
+	consenting: main;
+	observing(c : character): c == main | location(c) == Hall;
+};
+
+action kill(Bully, main : main, place : place) {
+	precondition:
+		place != Cells &
+		alive(Bully) &
+		location(Bully) == place &
+		alive(main) &
+		location(main) == place &
+		threatened(main);
+	effect:
+		!alive(main);
+	consenting: Bully;
+};
+
+action lock_gym(main : main, place : place) {
+	precondition:
+		(place == Hall | place == Gym) &
+		alive(main) &
+		location(main) == place &
+		!locked(Gym);
+	effect:
+		locked(Gym);
+	consenting: main;
+	observing(c : character): location(c) == place | location(c) == Gym;
+};
+
+action next_day() {
+	precondition:
+		time() == Day1;
+	effect:
+		time() = Day2 &
+		location(Ernest) = Cells &
+		!chores(Ernest) &
+		location(Roy) = Cells &
+		!chores(Roy) &
+		location(Bully) = Cells;
+};
+
+action recreation(Bully, Gym) {
+	precondition:
+		alive(Bully) &
+		!locked(Gym);
+	effect:
+		location(Bully) = Gym;
+	consenting: Bully;
+};
+
+action revenge(main : main, Bully, Gym) {
+	precondition:
+		alive(main) &
+		location(main) == Gym &
+		locked(Gym)&
+		location(Knife) == main &
+		alive(Bully) &
+		location(Bully) == Gym;
+	effect:
+		!alive(Bully) &
+		!threatened(Ernest) &
+		!threatened(Roy);
+	consenting: main;
+	observing(c : character): location(c) == Gym;
+};
+
+action steal(main : main, item : item, place : place) {
+	precondition:
+		alive(main) &
+		location(main) == place &
+		location(item) == place;
+	effect:
+		location(item) = main &
+		if(item == Cigarettes)
+			(threatened(Ernest) & threatened(Roy));
+	consenting: main;
+	observing(c : character): c : main | (c == Bully & item == Cigarettes);
+};
+
+action thwart(main : main, Hall) {
+	precondition:
+		alive(main) &
+		location(main) == Hall &
+		(location(Clothes) == main) | (location(Knife) == main);
+	effect:
+		!alive(main);
+	observing(c : character): location(c) == Hall;
+};
+
+action vent(main : main, place : place) {
+	precondition:
+		(place == Highway | place == Gym) &
+		alive(main) &
+		location(main) == Hall;
+	effect:
+		location(main) = place;
+	consenting: main;
+	observing(c : character): location(c) == Hall | location(c) == place;
+};
+
+trigger see_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		location(character) == place &
+		location(other) != place &
+		believes(character, location(other)) == place;
+	effect:
+		believes(character, location(other)) = ?;
+};
+
+trigger see_not_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		location(character) == place &
+		location(other) == place &
+		believes(character, location(other)) != place;
+	effect:
+		believes(character, location(other)) = place;
+};
+
+alive(Ernest);
+alive(Roy);
+alive(Bully);
+location(Ernest) = Cells;
+location(Roy) = Cells;
+location(Bully) = Cells;
+location(Cigarettes) = Cells;
+location(Clothes) = Laundry;
+location(Knife) = Kitchen;
+time() = Day1;
+
+utility():
+	(if(location(Cigarettes) != Cells & !threatened(Ernest)) 3 else 0) +
+	(if(location(Cigarettes) != Cells & !threatened(Roy)) 3 else 0) +
+	(if(!alive(Ernest)) 1 else 0) +
+	(if(!alive(Roy)) 1 else 0);
+
+utility(Ernest):
+	(if(!alive(Ernest)) -3 else 0) +
+	(if(threatened(Ernest)) -1 else 0) +
+	(if(location(Cigarettes) == Ernest) 2 else 0);
+
+utility(Roy):
+	(if(!alive(Roy)) -3 else 0) +
+	(if(threatened(Roy)) -1 else 0) +
+	(if(location(Cigarettes) == Roy) 2 else 0);
+
+utility(Bully):
+	(if(alive(Ernest) & threatened(Ernest)) -1 else 0) +
+	(if(alive(Roy) & threatened(Roy)) -1 else 0) +
+	(if(location(Bully) == Gym) 1 else 0);

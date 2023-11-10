@@ -1,0 +1,436 @@
+/**
+ * The Snakebite
+ *
+ * This domain tells a story in the American old West of a father who steals
+ * medicine to save his son from a snakebite and is imprisoned for the theft.
+ * The domain was originally written by Stephen G. Ware in 2012 for an
+ * experiment to validate a plan-based model of narrative conflict. It was used
+ * in the CPOCL and Glaive narrative planners, sometimes under the name
+ * 'western.' It was adapted for Sabre by the same author in 2023. A few
+ * changes have been made to rule out unintended stories:
+ * (1) Will is the sheriff. This was a mistake in the original domain, which
+ *     failed to specify who the sheriff was.
+ * (2) All actions specify a location in which they happen. This is needed
+ *     because actions are usually only observed by characters who are also at
+ *     that location.
+ * (3) The sheriff always knows when the 'take' action occurs. Otherwise,
+ *     the sheriff would only be aware of crimes that happen at his location.
+ * (4) The original domain had many examples of actions causing characters to
+ *     adopt goals (e.g. when an item is stolen, the sheriff adopts a goal to
+ *     return it to the original owner). These intentions proved challenging
+ *     to translate into Sabre's utility functions, because while they can
+ *     eventually be simplified down to manageable formulas, the original
+ *     unsimplified ground formulas can be very large. Instead, this domain
+ *     defines a number of numeric fluents which may or may not be included in
+ *     each character's utility. These fluents are updated using triggers:
+ *       (a) relationship(c1, c2) is always 0 except when character c1 loves
+ *           character c2. If c1 loves c2, this value is 2 when character c2
+ *           is alive and healthy, 1 when c2 is sick, and 0 when c2 is dead.
+ *       (b) possession(c, i) is -1 when character c owns item i but does not
+ *           have it, and 0 otherwise.
+ *       (c) stolen(c, i) is -1 when character c has an item i they do not own
+ *           (and c is not the sheriff). This value returns to 0 when c is at
+ *           the Jailhouse and is not free.
+ *     All characters love themselves (and thus want to be alive and healthy).
+ *     Hank loves Timmy. All characters want to have the items they own. The
+ *     sheriff wants all characters to have the items they own and wants to
+ *     imprison thieves.
+ * (5) The travel and force_travel actions no longer include the original
+ *     location of the traveling characters in their parameters. This change
+ *     prevents characters from taking unnecessarily long routes to their
+ *     destinations which happen to be convenient for the author (i.e.
+ *     Hank cannot travel back to the Ranch by way of the Jailhouse).
+ *
+ * Shortest solution (author temporal limit 8, character temporal limit 5;
+ * epistemic limit 2):
+ *   snakebite(Timmy, Ranch)
+ *   travel(Hank, GeneralStore)
+ *   tie_up(Hank, Carl, GeneralStore)
+ *   take(Hank, Antivenom, Carl, GeneralStore)
+ *   travel(Will, GeneralStore)
+ *   tie_up(Will, Hank, GeneralStore)
+ *   force_travel(Will, Hank, Jailhouse)
+ *   die(Timmy, Snakebite, Ranch)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Stephen G. Ware, R. Michael Young, Brent Harrison, David L. Roberts, "A
+ *   computational model of narrative conflict at the fabula level," in IEEE
+ *   Transactions on Computational Intelligence and Artificial Intelligence in
+ *   Games, vol. 6, num. 3, pp. 271-288, 2014.
+ */
+
+type location;
+type character : location;
+type place : location;
+type item : entity;
+type sickness : entity;
+
+entity Hank : character;
+entity Timmy : character;
+entity Will : character;
+entity Carl : character;
+entity Ranch : place;
+entity Saloon : place;
+entity Jailhouse : place;
+entity GeneralStore : place;
+entity Antivenom : item;
+entity Snakebite : sickness;
+
+property loves(lover : character, loved : character) : boolean;
+property sheriff(character : character) : boolean;
+property alive(character : character) : boolean;
+property sick(character : character, sickness : sickness) : boolean;
+property free(character : character) : boolean;
+property at(character : character) : place;
+property relationship(first : character, second : character) : number;
+property cures(item : item, sickness : sickness) : boolean;
+property owner(item : item) : character;
+property at(item : item) : location;
+property posession(character : character, item : item) : number;
+property stolen(character : character, item : item) : number;
+
+loves(Hank, Hank);
+loves(Hank, Timmy);
+alive(Hank);
+free(Hank);
+at(Hank) = Ranch;
+loves(Timmy, Timmy);
+loves(Timmy, Hank);
+alive(Timmy);
+free(Timmy);
+at(Timmy) = Ranch;
+loves(Will, Will);
+sheriff(Will);
+alive(Will);
+free(Will);
+at(Will) = Saloon;
+loves(Carl, Carl);
+alive(Carl);
+free(Carl);
+at(Carl) = GeneralStore;
+cures(Antivenom, Snakebite);
+owner(Antivenom) = Carl;
+at(Antivenom) = Carl;
+
+action snakebite(victim : character, place : place) {
+	precondition: alive(victim) &
+				  at(victim) == place;
+	effect: sick(victim, Snakebite);
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action die(victim : character, cause : sickness, place : place) {
+	precondition:
+		alive(victim) &
+		at(victim) == place &
+		sick(victim, cause);
+	effect:
+		!alive(victim) &
+		forall(s : sickness)
+			!sick(victim, s);
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action travel(character : character, place : place) {
+	precondition:
+		alive(character) &
+		free(character) &
+		at(character) != place;
+	effect:
+		at(character) = place;
+	consenting: character;
+	observing(c : character): alive(c) & (at(c) == at(character) | at(c) == place);
+};
+
+action give(giver : character, item : item, receiver : character, place : place) {
+	precondition:
+		giver != receiver &
+		alive(giver) &
+		free(giver) &
+		at(giver) == place &
+		at(item) == giver &
+		alive(receiver) &
+		free(receiver) &
+		at(receiver) == place;
+	effect:
+		at(item) = receiver &
+		if(owner(item) == giver)
+			owner(item) = receiver;
+	consenting: giver, receiver;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action tie_up(character : character, victim : character, place : place) {
+	precondition:
+		character != victim &
+		alive(character) &
+		free(character) &
+		at(character) == place &
+		alive(victim) &
+		free(victim) &
+		at(victim) == place;
+	effect:
+		!free(victim);
+	consenting: character;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action untie(character : character, victim : character, place : place) {
+	precondition:
+		alive(character) &
+		free(character) &
+		at(character) == place &
+		alive(victim) &
+		!free(victim) &
+		at(victim) == place;
+	effect:
+		free(victim);
+	consenting: character;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action force_travel(character : character, victim : character, place : place) {
+	precondition:
+		alive(character) &
+		free(character) &
+		alive(victim) &
+		!free(victim) &
+		at(character) != place &
+		at(character) == at(victim);
+	effect:
+		at(character) = place &
+		at(victim) = place;
+	consenting: character;
+	observing(c : character): alive(c) & (at(c) == at(character) | at(c) == place);
+};
+
+action take(taker : character, item : item, victim : character, place : place) {
+	precondition:
+		taker != victim &
+		alive(taker) &
+		free(taker) &
+		at(taker) == place &
+		at(item) == victim &
+		(!alive(victim) | !free(victim)) &
+		at(victim) == place;
+	effect:
+		at(item) = taker;
+	consenting: taker;
+	observing(c : character): alive(c) & (at(c) == place | sheriff(c));
+};
+
+action heal(healer : character, patient : character, sickness : sickness, medicine : item, place : place) {
+	precondition:
+		alive(healer) &
+		at(healer) == place &
+		alive(patient) &
+		at(patient) == place &
+		sick(patient, sickness) &
+		cures(medicine, sickness) &
+		at(medicine) == healer;
+	effect:
+		!sick(patient, sickness) &
+		at(medicine) = ?;
+	consenting: healer, patient;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+trigger see_alive(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		alive(other) &
+		at(other) == place &
+		believes(character, !alive(other));
+	effect:
+		believes(character, alive(other));
+};
+
+trigger see_dead(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		!alive(other) &
+		at(other) == place &
+		believes(character, alive(other));
+	effect:
+		believes(character, !alive(other));
+};
+
+trigger see_healthy(character : character, other : character, sickness : sickness, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		!sick(other, sickness) &
+		at(other) == place &
+		believes(character, sick(other, sickness));
+	effect:
+		believes(character, !sick(other, sickness));
+};
+
+trigger see_sick(character : character, other : character, sickness : sickness, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		sick(other, sickness) &
+		at(other) == place &
+		believes(character, !sick(other, sickness));
+	effect:
+		believes(character, sick(other, sickness));
+};
+
+trigger see_free(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		free(other) &
+		at(other) == place &
+		believes(character, !free(other));
+	effect:
+		believes(character, free(other));
+};
+
+trigger see_tied(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		!free(other) &
+		at(other) == place &
+		believes(character, free(other));
+	effect:
+		believes(character, !free(other));
+};
+
+trigger see_character_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		believes(character, at(other) != place);
+	effect:
+		believes(character, at(other) = place);
+};
+
+trigger see_character_not_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) != place &
+		believes(character, at(other) == place);
+	effect:
+		believes(character, at(other) = ?);
+};
+
+trigger see_item_at(character : character, other : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		at(item) == other &
+		believes(character, at(item) != other);
+	effect:
+		believes(character, at(item) = other);
+};
+
+trigger see_item_not_at(character : character, other : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		at(item) != other &
+		believes(character, at(item) == other);
+	effect:
+		believes(character, at(item) = ?);
+};
+
+trigger healthy_loved_one(character : character, other : character) {
+	precondition:
+		loves(character, other) &
+		alive(other) &
+		!exists(s : sickness) sick(other, s) &
+			relationship(character, other) != 2;
+	effect:
+		relationship(character, other) = 2;
+};
+
+trigger sick_loved_one(character : character, other : character) {
+	precondition:
+		loves(character, other) &
+		alive(other) &
+		exists(s : sickness) sick(other, s) &
+			relationship(character, other) != 1;
+	effect:
+		relationship(character, other) = 1;
+};
+
+trigger dead_loved_one(character : character, other : character) {
+	precondition:
+		loves(character, other) &
+		!alive(other) &
+		relationship(character, other) != 0;
+	effect:
+		relationship(character, other) = 0;
+};
+
+trigger have_owned_item(character : character, item : item) {
+	precondition:
+		owner(item) == character &
+		at(item) == character &
+		posession(character, item) != 0;
+	effect:
+		posession(character, item) = 0;
+};
+
+trigger lost_owned_item(character : character, item : item) {
+	precondition:
+		owner(item) == character &
+		at(item) != character &
+		posession(character, item) != -1;
+	effect:
+		posession(character, item) = -1;
+};
+
+trigger stolen(character : character, item : item) {
+	precondition:
+		owner(item) != character &
+		at(item) == character &
+		!sheriff(character) &
+		stolen(character, item) != -1;
+	effect:
+		stolen(character, item) = -1;
+};
+
+trigger imprisoned_for_theft(character : character, item : item) {
+	precondition:
+		!free(character) &
+		at(character) == Jailhouse &
+		at(item) != character &
+		stolen(character, item) == -1;
+	effect:
+		stolen(character, item) = 0;
+};
+
+utility():
+	!alive(Timmy) &
+	!free(Hank) &
+	at(Hank) == Jailhouse;
+
+utility(Hank):
+	(sum(c : character) relationship(Hank, c)) +
+	(sum(c : character) sum(i : item) if(c == Hank | sheriff(Hank)) posession(c, i) else 0) +
+	(if(sheriff(Hank)) (sum(c : character) sum(i : item) stolen(c, i)) else 0);
+
+utility(Timmy):
+	(sum(c : character) relationship(Timmy, c)) +
+	(sum(c : character) sum(i : item) if(c == Timmy | sheriff(Timmy)) posession(c, i) else 0) +
+	(if(sheriff(Timmy)) (sum(c : character) sum(i : item) stolen(c, i)) else 0);
+
+utility(Will):
+	(sum(c : character) relationship(Will, c)) +
+	(sum(c : character) sum(i : item) if(c == Will | sheriff(Will)) posession(c, i) else 0) +
+	(if(sheriff(Will)) (sum(c : character) sum(i : item) stolen(c, i)) else 0);
+
+utility(Carl):
+	(sum(c : character) relationship(Carl, c)) +
+	(sum(c : character) sum(i : item) if(c == Carl | sheriff(Carl)) posession(c, i) else 0) +
+	(if(sheriff(Carl)) (sum(c : character) sum(i : item) stolen(c, i)) else 0);

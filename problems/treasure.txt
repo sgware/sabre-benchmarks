@@ -1,0 +1,99 @@
+/**
+ * Treasure Island
+ *
+ * This domain represents a high-level summary of the 1883 novel of the same
+ * name by Robert Louis Stevenson. It was originally designed by Stephen G.
+ * Ware in 2017 as a minimal example of a story containing theory of mind and
+ * conflict. The original version of the domain, as it appeared in the paper
+ * cited below, was developed before a planner that could solve it, and it was
+ * later discovered that the domain contained two mistakes that make it
+ * unsolvable. Those mistakes has been corrected in this version:
+ * (1) In the original, Silver believes the treasure is nowhere, but it must
+ *     also be the case that Hawkins believes Silver believes the treasure is
+ *     nowhere, or else Hawkins will not realize the need for the rumor action.
+ * (2) In the original, Hawkins was the only observing character for the rumor
+ *     action, but Silver must also observe it so that he will believe that
+ *     Hawkins believes the treasure is buried; otherwise, Silver will not be
+ *     able to anticipate Hawkins digging up the treasure.
+ *
+ * Shortest solution (author temporal limit 4; character temporal limit 4;
+ * epistemic limit 3):
+ *   rumor()
+ *   sail()
+ *   dig()
+ *   take(Hawkins, Treasure)
+ *
+ * The preferred citation for the origin of this domain is:
+ *   Alireza Shirvani, Stephen G. Ware, and Rachelyn Farrell, "A possible
+ *   worlds model of belief for state-space narrative planning," in Proceedings
+ *   of the 13th AAAI conference on Artificial Intelligence and Interactive
+ *   Digital Entertainment, pp. 101-107, 2017.
+ */
+
+type location;
+type character : location;
+type place : location;
+type status : location;
+type item;
+
+entity Hawkins : character;
+entity Silver : character;
+entity Port : place;
+entity Island : place;
+entity Treasure : item;
+entity Buried : status;
+
+property at(character : character) : place;
+property at(item : item) : location;
+
+at(Hawkins) = Port;
+at(Silver) = Port;
+at(Treasure) = Buried;
+believes(Silver, at(Treasure) = ?);
+believes(Hawkins, believes(Silver, at(Treasure) = ?));
+
+action rumor() {
+	precondition:
+		at(Treasure) == Buried;
+	effect:
+		believes(Silver, at(Treasure) = Buried);
+	consenting: Hawkins;
+	observing(c : character): c == Hawkins | c == Silver;
+};
+
+action sail() {
+	precondition:
+		at(Hawkins) == Port &
+		at(Silver) == Port;
+	effect:
+		at(Hawkins) = Island &
+		at(Silver) = Island;
+	consenting: Hawkins, Silver;
+	observing(c : character): at(c) == Port | at(c) == Island;
+};
+
+action dig() {
+	precondition:
+		at(Hawkins) == Island &
+		at(Treasure) == Buried;
+	effect:
+		at(Treasure) = Island;
+	consenting: Hawkins;
+	observing(c : character): at(c) == Island;
+};
+
+action take(character : character, Treasure) {
+	precondition:
+		at(character) == Island &
+		at(Treasure) == Island;
+	effect:
+		at(Treasure) = character;
+	consenting: character;
+	observing(c : character): at(c) == Island;
+};
+
+utility(): at(Treasure) == Hawkins;
+
+utility(Hawkins): at(Treasure) == Hawkins;
+
+utility(Silver): at(Treasure) == Silver;

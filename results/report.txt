@@ -1,0 +1,263 @@
+== Sabre Benchmark Results ==
+
+Sabre Version: 0.7
+JRE Vendor:    Eclipse Adoptium
+JRE Version:   17.0.8.1
+OS Name:       Windows 10
+OS Version:    10.0
+Start:         2023-11-09T13:11:42.876-05:00[America/New_York]
+End:           2023-11-09T13:14:40.023-05:00[America/New_York]
+Duration:      177147ms
+
+= Problems =
+
++----------------+------------+----------+---------+---------+----------+------+-----+-----+----+
+| Name           | Characters | Entities | Fluents | Actions | Triggers | Goal | ATL | CTL | EL |
++----------------+------------+----------+---------+---------+----------+------+-----+-----+----+
+| bribery        |          3 |        5 |       4 |       5 |        0 | 1.00 |   5 |   5 |  2 |
+| deerhunter_any |          3 |        8 |       7 |       8 |        7 | 1.00 |  10 |   6 |  1 |
++----------------+------------+----------+---------+---------+----------+------+-----+-----+----+
+
+= Compiled Problems =
+
++----------------+------------+----------+---------+---------+----------+------+-----+-----+----+
+| Name           | Characters | Entities | Fluents | Actions | Triggers | Goal | ATL | CTL | EL |
++----------------+------------+----------+---------+---------+----------+------+-----+-----+----+
+| bribery        |          3 |        5 |      16 |      27 |        0 | 1.00 |   5 |   5 |  2 |
+| deerhunter_any |          3 |        8 |      35 |      28 |       76 | 1.00 |  10 |   6 |  1 |
++----------------+------------+----------+---------+---------+----------+------+-----+-----+----+
+
+= Planners =
+
++--------+-------------------+----------+-------------------------------------+
+| Name   | Search Method     | Cost     | Heuristic                           |
++--------+-------------------+----------+-------------------------------------+
+| BFS    | best-first        | temporal | reachability                        |
+| EFS    | explanation-first | temporal | reachability                        |
+| GFS    | goal-first        | temporal | reachability                        |
+| A* h+  | best-first        | temporal | sum graph with no repeated roots    |
+| A* rp  | best-first        | temporal | relaxed plan with no repeated roots |
+| EFS h+ | explanation-first | temporal | sum graph with no repeated roots    |
+| EFS rp | explanation-first | temporal | relaxed plan with no repeated roots |
+| GFS h+ | goal-first        | temporal | sum graph with no repeated roots    |
+| GFS rp | goal-first        | temporal | relaxed plan with no repeated roots |
++--------+-------------------+----------+-------------------------------------+
+
+= Results =
+
++----------------+---------+-----+----------+-------------+---------------+-----------------+-----------+
+| Problem        | Planner | Run | Success? | Plan Length | Nodes Visited | Nodes Generated | Time (ms) |
++----------------+---------+-----+----------+-------------+---------------+-----------------+-----------+
+| bribery        | BFS     |   1 | true     |           2 |             7 |             125 |         2 |
+| bribery        | BFS     |   2 | true     |           2 |             7 |             125 |         1 |
+| bribery        | BFS     |   3 | true     |           2 |             6 |             109 |         1 |
+| bribery        | BFS     |   4 | true     |           2 |             7 |             125 |         1 |
+| bribery        | BFS     |   5 | true     |           2 |             6 |             109 |         2 |
+| bribery        | BFS     |   6 | true     |           2 |             7 |             125 |         2 |
+| bribery        | BFS     |   7 | true     |           2 |             7 |             125 |         1 |
+| bribery        | BFS     |   8 | true     |           2 |             7 |             125 |         1 |
+| bribery        | BFS     |   9 | true     |           2 |             6 |             109 |         2 |
+| bribery        | BFS     |  10 | true     |           2 |             6 |             109 |         1 |
+| bribery        | EFS     |   1 | true     |           2 |         23493 |           23871 |       299 |
+| bribery        | EFS     |   2 | true     |           2 |         23519 |           23949 |       251 |
+| bribery        | EFS     |   3 | true     |           2 |         23519 |           23949 |       212 |
+| bribery        | EFS     |   4 | true     |           2 |         23519 |           23949 |       207 |
+| bribery        | EFS     |   5 | true     |           2 |         23518 |           23949 |       223 |
+| bribery        | EFS     |   6 | true     |           2 |         23494 |           23871 |       200 |
+| bribery        | EFS     |   7 | true     |           2 |         23493 |           23871 |       179 |
+| bribery        | EFS     |   8 | true     |           2 |         23493 |           23871 |       186 |
+| bribery        | EFS     |   9 | true     |           2 |         23494 |           23871 |       181 |
+| bribery        | EFS     |  10 | true     |           2 |         23518 |           23949 |       181 |
+| bribery        | GFS     |   1 | true     |           2 |            88 |             968 |         2 |
+| bribery        | GFS     |   2 | true     |           2 |            78 |             858 |         2 |
+| bribery        | GFS     |   3 | true     |           2 |            99 |            1088 |         3 |
+| bribery        | GFS     |   4 | true     |           2 |            99 |            1088 |         2 |
+| bribery        | GFS     |   5 | true     |           2 |            78 |             858 |         2 |
+| bribery        | GFS     |   6 | true     |           2 |            90 |             988 |         1 |
+| bribery        | GFS     |   7 | true     |           2 |            97 |            1068 |         2 |
+| bribery        | GFS     |   8 | true     |           2 |           100 |            1098 |         2 |
+| bribery        | GFS     |   9 | true     |           2 |            79 |             868 |         2 |
+| bribery        | GFS     |  10 | true     |           2 |            87 |             958 |         1 |
+| bribery        | A* h+   |   1 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* h+   |   2 | true     |           2 |             2 |              37 |         0 |
+| bribery        | A* h+   |   3 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* h+   |   4 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* h+   |   5 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* h+   |   6 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* h+   |   7 | true     |           2 |             2 |              37 |         0 |
+| bribery        | A* h+   |   8 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* h+   |   9 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* h+   |  10 | true     |           2 |             2 |              37 |         0 |
+| bribery        | A* rp   |   1 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* rp   |   2 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* rp   |   3 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* rp   |   4 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* rp   |   5 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* rp   |   6 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* rp   |   7 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* rp   |   8 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* rp   |   9 | true     |           2 |             2 |              37 |         1 |
+| bribery        | A* rp   |  10 | true     |           2 |             2 |              37 |         1 |
+| bribery        | EFS h+  |   1 | true     |           2 |          5697 |           10669 |       155 |
+| bribery        | EFS h+  |   2 | true     |           2 |          5697 |           10669 |       146 |
+| bribery        | EFS h+  |   3 | true     |           2 |          5698 |           10669 |       140 |
+| bribery        | EFS h+  |   4 | true     |           2 |          5697 |           10669 |       131 |
+| bribery        | EFS h+  |   5 | true     |           2 |          5698 |           10669 |       131 |
+| bribery        | EFS h+  |   6 | true     |           2 |          5698 |           10669 |       129 |
+| bribery        | EFS h+  |   7 | true     |           2 |          5698 |           10669 |       138 |
+| bribery        | EFS h+  |   8 | true     |           2 |          5698 |           10669 |       138 |
+| bribery        | EFS h+  |   9 | true     |           2 |          5698 |           10669 |       139 |
+| bribery        | EFS h+  |  10 | true     |           2 |          5698 |           10669 |       133 |
+| bribery        | EFS rp  |   1 | true     |           2 |          5697 |           10669 |       199 |
+| bribery        | EFS rp  |   2 | true     |           2 |          5697 |           10669 |       166 |
+| bribery        | EFS rp  |   3 | true     |           2 |          5697 |           10669 |       167 |
+| bribery        | EFS rp  |   4 | true     |           2 |          5697 |           10669 |       168 |
+| bribery        | EFS rp  |   5 | true     |           2 |          5698 |           10669 |       164 |
+| bribery        | EFS rp  |   6 | true     |           2 |          5697 |           10669 |       169 |
+| bribery        | EFS rp  |   7 | true     |           2 |          5697 |           10669 |       163 |
+| bribery        | EFS rp  |   8 | true     |           2 |          5698 |           10669 |       192 |
+| bribery        | EFS rp  |   9 | true     |           2 |          5697 |           10669 |       197 |
+| bribery        | EFS rp  |  10 | true     |           2 |          5698 |           10669 |       179 |
+| bribery        | GFS h+  |   1 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS h+  |   2 | true     |           2 |             3 |              32 |         1 |
+| bribery        | GFS h+  |   3 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS h+  |   4 | true     |           2 |             3 |              32 |         1 |
+| bribery        | GFS h+  |   5 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS h+  |   6 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS h+  |   7 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS h+  |   8 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS h+  |   9 | true     |           2 |             3 |              32 |         1 |
+| bribery        | GFS h+  |  10 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS rp  |   1 | true     |           2 |             3 |              32 |         1 |
+| bribery        | GFS rp  |   2 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS rp  |   3 | true     |           2 |             3 |              32 |         1 |
+| bribery        | GFS rp  |   4 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS rp  |   5 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS rp  |   6 | true     |           2 |             3 |              32 |         1 |
+| bribery        | GFS rp  |   7 | true     |           2 |             3 |              32 |         1 |
+| bribery        | GFS rp  |   8 | true     |           2 |             3 |              32 |         1 |
+| bribery        | GFS rp  |   9 | true     |           2 |             3 |              32 |         0 |
+| bribery        | GFS rp  |  10 | true     |           2 |             3 |              32 |         1 |
+| deerhunter_any | BFS     |   1 | true     |           6 |         11679 |           17271 |       672 |
+| deerhunter_any | BFS     |   2 | true     |           6 |         11679 |           17271 |       638 |
+| deerhunter_any | BFS     |   3 | true     |           6 |         11574 |           17071 |       613 |
+| deerhunter_any | BFS     |   4 | true     |           6 |         11574 |           17071 |       630 |
+| deerhunter_any | BFS     |   5 | true     |           6 |         11574 |           17071 |       623 |
+| deerhunter_any | BFS     |   6 | true     |           6 |         11679 |           17271 |       612 |
+| deerhunter_any | BFS     |   7 | true     |           6 |         11574 |           17071 |       580 |
+| deerhunter_any | BFS     |   8 | true     |           6 |         11574 |           17071 |       579 |
+| deerhunter_any | BFS     |   9 | true     |           6 |         11574 |           17071 |       574 |
+| deerhunter_any | BFS     |  10 | true     |           6 |         11679 |           17271 |       590 |
+| deerhunter_any | EFS     |   1 | true     |           6 |         17342 |           13595 |       466 |
+| deerhunter_any | EFS     |   2 | true     |           6 |         17533 |           13634 |       451 |
+| deerhunter_any | EFS     |   3 | true     |           6 |         17342 |           13595 |       452 |
+| deerhunter_any | EFS     |   4 | true     |           6 |         17533 |           13634 |       447 |
+| deerhunter_any | EFS     |   5 | true     |           6 |         17533 |           13634 |       457 |
+| deerhunter_any | EFS     |   6 | true     |           6 |         17533 |           13634 |       461 |
+| deerhunter_any | EFS     |   7 | true     |           6 |         17533 |           13634 |       457 |
+| deerhunter_any | EFS     |   8 | true     |           6 |         17533 |           13634 |       451 |
+| deerhunter_any | EFS     |   9 | true     |           6 |         17533 |           13634 |       464 |
+| deerhunter_any | EFS     |  10 | true     |           6 |         17533 |           13634 |       458 |
+| deerhunter_any | GFS     |   1 | true     |           6 |         61186 |          512193 |      8720 |
+| deerhunter_any | GFS     |   2 | true     |           6 |         61186 |          512193 |      9094 |
+| deerhunter_any | GFS     |   3 | true     |           6 |         61249 |          512872 |      8902 |
+| deerhunter_any | GFS     |   4 | true     |           6 |         61186 |          512193 |      8875 |
+| deerhunter_any | GFS     |   5 | true     |           6 |         61249 |          512872 |      8858 |
+| deerhunter_any | GFS     |   6 | true     |           6 |         61186 |          512193 |      8830 |
+| deerhunter_any | GFS     |   7 | true     |           6 |         61249 |          512872 |      9014 |
+| deerhunter_any | GFS     |   8 | true     |           6 |         61186 |          512193 |      9079 |
+| deerhunter_any | GFS     |   9 | true     |           6 |         61186 |          512193 |      9110 |
+| deerhunter_any | GFS     |  10 | true     |           6 |         61186 |          512193 |      9156 |
+| deerhunter_any | A* h+   |   1 | true     |           6 |            10 |             145 |         8 |
+| deerhunter_any | A* h+   |   2 | true     |           6 |            10 |             145 |         7 |
+| deerhunter_any | A* h+   |   3 | true     |           6 |            10 |             145 |         7 |
+| deerhunter_any | A* h+   |   4 | true     |           6 |            10 |             145 |         8 |
+| deerhunter_any | A* h+   |   5 | true     |           6 |            10 |             145 |         7 |
+| deerhunter_any | A* h+   |   6 | true     |           6 |            10 |             145 |         8 |
+| deerhunter_any | A* h+   |   7 | true     |           6 |            10 |             145 |         8 |
+| deerhunter_any | A* h+   |   8 | true     |           6 |            10 |             145 |         7 |
+| deerhunter_any | A* h+   |   9 | true     |           6 |            10 |             145 |         8 |
+| deerhunter_any | A* h+   |  10 | true     |           6 |            10 |             145 |         8 |
+| deerhunter_any | A* rp   |   1 | true     |           6 |            54 |             370 |        24 |
+| deerhunter_any | A* rp   |   2 | true     |           6 |            59 |             397 |        23 |
+| deerhunter_any | A* rp   |   3 | true     |           6 |            68 |             395 |        25 |
+| deerhunter_any | A* rp   |   4 | true     |           6 |            59 |             397 |        24 |
+| deerhunter_any | A* rp   |   5 | true     |           6 |            54 |             370 |        23 |
+| deerhunter_any | A* rp   |   6 | true     |           6 |            59 |             397 |        23 |
+| deerhunter_any | A* rp   |   7 | true     |           6 |            59 |             397 |        24 |
+| deerhunter_any | A* rp   |   8 | true     |           6 |            54 |             370 |        24 |
+| deerhunter_any | A* rp   |   9 | true     |           6 |            75 |             426 |        27 |
+| deerhunter_any | A* rp   |  10 | true     |           6 |            59 |             397 |        23 |
+| deerhunter_any | EFS h+  |   1 | true     |           6 |            65 |             281 |        18 |
+| deerhunter_any | EFS h+  |   2 | true     |           6 |            65 |             281 |        18 |
+| deerhunter_any | EFS h+  |   3 | true     |           6 |            65 |             281 |        18 |
+| deerhunter_any | EFS h+  |   4 | true     |           6 |            65 |             281 |        18 |
+| deerhunter_any | EFS h+  |   5 | true     |           6 |            65 |             281 |        20 |
+| deerhunter_any | EFS h+  |   6 | true     |           6 |            65 |             281 |        19 |
+| deerhunter_any | EFS h+  |   7 | true     |           6 |            65 |             281 |        18 |
+| deerhunter_any | EFS h+  |   8 | true     |           6 |            65 |             281 |        19 |
+| deerhunter_any | EFS h+  |   9 | true     |           6 |            65 |             281 |        18 |
+| deerhunter_any | EFS h+  |  10 | true     |           6 |            65 |             281 |        18 |
+| deerhunter_any | EFS rp  |   1 | true     |           6 |           157 |             595 |        38 |
+| deerhunter_any | EFS rp  |   2 | true     |           6 |           103 |             461 |        31 |
+| deerhunter_any | EFS rp  |   3 | true     |           6 |           143 |             533 |        37 |
+| deerhunter_any | EFS rp  |   4 | true     |           6 |           117 |             523 |        33 |
+| deerhunter_any | EFS rp  |   5 | true     |           6 |           103 |             461 |        28 |
+| deerhunter_any | EFS rp  |   6 | true     |           6 |           145 |             543 |        35 |
+| deerhunter_any | EFS rp  |   7 | true     |           6 |           143 |             533 |        34 |
+| deerhunter_any | EFS rp  |   8 | true     |           6 |           143 |             533 |        34 |
+| deerhunter_any | EFS rp  |   9 | true     |           6 |           117 |             523 |        32 |
+| deerhunter_any | EFS rp  |  10 | true     |           6 |           103 |             461 |        29 |
+| deerhunter_any | GFS h+  |   1 | true     |           6 |          9469 |           64654 |      4332 |
+| deerhunter_any | GFS h+  |   2 | true     |           6 |          9469 |           64654 |      4322 |
+| deerhunter_any | GFS h+  |   3 | true     |           6 |          9469 |           64654 |      4335 |
+| deerhunter_any | GFS h+  |   4 | true     |           6 |          9469 |           64654 |      4329 |
+| deerhunter_any | GFS h+  |   5 | true     |           6 |          9469 |           64654 |      4345 |
+| deerhunter_any | GFS h+  |   6 | true     |           6 |          9469 |           64654 |      4299 |
+| deerhunter_any | GFS h+  |   7 | true     |           6 |          9469 |           64654 |      4428 |
+| deerhunter_any | GFS h+  |   8 | true     |           6 |          9469 |           64654 |      4469 |
+| deerhunter_any | GFS h+  |   9 | true     |           6 |          9469 |           64654 |      4619 |
+| deerhunter_any | GFS h+  |  10 | true     |           6 |          9469 |           64654 |      4663 |
+| deerhunter_any | GFS rp  |   1 | true     |           6 |           622 |            3770 |       242 |
+| deerhunter_any | GFS rp  |   2 | true     |           6 |           622 |            3770 |       247 |
+| deerhunter_any | GFS rp  |   3 | true     |           6 |          3840 |           28928 |      2029 |
+| deerhunter_any | GFS rp  |   4 | true     |           6 |          3840 |           28928 |      1942 |
+| deerhunter_any | GFS rp  |   5 | true     |           6 |          3840 |           28928 |      1985 |
+| deerhunter_any | GFS rp  |   6 | true     |           6 |          3840 |           28928 |      1966 |
+| deerhunter_any | GFS rp  |   7 | true     |           6 |          3840 |           28928 |      1966 |
+| deerhunter_any | GFS rp  |   8 | true     |           6 |          3840 |           28928 |      1980 |
+| deerhunter_any | GFS rp  |   9 | true     |           6 |          3840 |           28928 |      1986 |
+| deerhunter_any | GFS rp  |  10 | true     |           6 |           622 |            3770 |       232 |
++----------------+---------+-----+----------+-------------+---------------+-----------------+-----------+
+
+= Summary =
+
++----------------+---------+--------------------+-------------------+-------------------+---------------------+----------------------+---------------------+---------------------+----------------------+----------------+---------------+---------------+---------------------+
+| Problem        | Planner | Avg. Nodes Visited | Min Nodes Visited | Max Nodes Visited | Nodes Visited Std.  | Avg. Nodes Generated | Min Nodes Generated | Max Nodes Generated | Nodes Generated Std. | Avg. Time (ms) | Min Time (ms) | Max Time (ms) | Time Std. (ms)      |
++----------------+---------+--------------------+-------------------+-------------------+---------------------+----------------------+---------------------+---------------------+----------------------+----------------+---------------+---------------+---------------------+
+| bribery        | BFS     |               6.60 |                 6 |                 7 |                0.49 |               118.60 |                 109 |                 125 |                 7.84 |           1.40 |             1 |             2 |                0.49 |
+| bribery        | EFS     |           23506.00 |             23493 |             23519 |               12.61 |             23910.00 |               23871 |               23949 |                39.00 |         211.90 |           179 |           299 |               36.15 |
+| bribery        | GFS     |              89.50 |                78 |               100 |                8.55 |               984.00 |                 858 |                1098 |                93.72 |           1.90 |             1 |             3 |                0.54 |
+| bribery        | A* h+   |               2.00 |                 2 |                 2 |                0.00 |                37.00 |                  37 |                  37 |                 0.00 |           0.70 |             0 |             1 |                0.46 |
+| bribery        | A* rp   |               2.00 |                 2 |                 2 |                0.00 |                37.00 |                  37 |                  37 |                 0.00 |           1.00 |             1 |             1 |                0.00 |
+| bribery        | EFS h+  |            5697.70 |              5697 |              5698 |                0.46 |             10669.00 |               10669 |               10669 |                 0.00 |         138.00 |           129 |           155 |                7.50 |
+| bribery        | EFS rp  |            5697.30 |              5697 |              5698 |                0.46 |             10669.00 |               10669 |               10669 |                 0.00 |         176.40 |           163 |           199 |               13.57 |
+| bribery        | GFS h+  |               3.00 |                 3 |                 3 |                0.00 |                32.00 |                  32 |                  32 |                 0.00 |           0.30 |             0 |             1 |                0.46 |
+| bribery        | GFS rp  |               3.00 |                 3 |                 3 |                0.00 |                32.00 |                  32 |                  32 |                 0.00 |           0.60 |             0 |             1 |                0.49 |
+| deerhunter_any | BFS     |           11616.00 |             11574 |             11679 |               51.44 |             17151.00 |               17071 |               17271 |                97.98 |         611.10 |           574 |           672 |               29.59 |
+| deerhunter_any | EFS     |           17494.80 |             17342 |             17533 |               76.40 |             13626.20 |               13595 |               13634 |                15.60 |         456.40 |           447 |           466 |                5.83 |
+| deerhunter_any | GFS     |           61204.90 |             61186 |             61249 |               28.87 |            512396.70 |              512193 |              512872 |               311.16 |        8963.80 |          8720 |          9156 |              138.31 |
+| deerhunter_any | A* h+   |              10.00 |                10 |                10 |                0.00 |               145.00 |                 145 |                 145 |                 0.00 |           7.60 |             7 |             8 |                0.49 |
+| deerhunter_any | A* rp   |              60.00 |                54 |                75 |                6.34 |               391.60 |                 370 |                 426 |                16.55 |          24.00 |            23 |            27 |                1.18 |
+| deerhunter_any | EFS h+  |              65.00 |                65 |                65 |                0.00 |               281.00 |                 281 |                 281 |                 0.00 |          18.40 |            18 |            20 |                0.66 |
+| deerhunter_any | EFS rp  |             127.40 |               103 |               157 |               19.79 |               516.60 |                 461 |                 595 |                41.24 |          33.10 |            28 |            38 |                3.05 |
+| deerhunter_any | GFS h+  |            9469.00 |              9469 |              9469 |                0.00 |             64654.00 |               64654 |               64654 |                 0.00 |        4414.10 |          4299 |          4663 |              124.05 |
+| deerhunter_any | GFS rp  |            2874.60 |               622 |              3840 |             1474.67 |             21380.60 |                3770 |               28928 |             11528.84 |        1457.50 |           232 |          2029 |              797.10 |
++----------------+---------+--------------------+-------------------+-------------------+---------------------+----------------------+---------------------+---------------------+----------------------+----------------+---------------+---------------+---------------------+
+
++----------------+------------------------+--------------------+--------------------------+----------------------+---------------------+----------------+
+| Problem        | Best Planner (Visited) | Avg. Nodes Visited | Best Planner (Generated) | Avg. Nodes Generated | Best Planner (Time) | Avg. Time (ms) |
++----------------+------------------------+--------------------+--------------------------+----------------------+---------------------+----------------+
+| bribery        | A* h+                  |               2.00 | GFS h+                   |                32.00 | GFS h+              |           0.30 |
+| deerhunter_any | A* h+                  |              10.00 | A* h+                    |               145.00 | A* h+               |           7.60 |
++----------------+------------------------+--------------------+--------------------------+----------------------+---------------------+----------------+
