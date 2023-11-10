@@ -9,7 +9,7 @@ https://github.com/sgware/sabre
 On Windows:
 
 ```
-java ...
+git clone --recurse-submodules https://github.com/sgware/sabre-benchmarks
 ```
 
 On Max/Linux:
