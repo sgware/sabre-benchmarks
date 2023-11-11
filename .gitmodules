@@ -1,0 +1,3 @@
+[submodule "sabre"]
+	path = sabre
+	url = https://github.com/sgware/sabre
