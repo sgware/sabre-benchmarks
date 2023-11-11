@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE xml>
 <project name="Sabre Benchmarks" default="build">
-	<target name="build" depends="clean,javadoc"/>
+	<target name="build" depends="clean,compile,javadoc"/>
 	<target name="clean">
+		<delete dir="bin"/>
+		<mkdir dir="bin"/>
 		<delete dir="doc"/>
+		<delete file="results.html"/>
+		<delete file="results.txt"/>
+		<delete dir="results"/>
+		<mkdir dir="results"/>
+	</target>
+	<target name="compile">
+		<javac srcdir="src" destdir="bin" classpath="sabre/lib/sabre.jar" includeantruntime="false"/>
 	</target>
     <target name="javadoc">
     	<javadoc
     		doctitle="Sabre Benchmark Tool Documentation"
-    		classpath="."
+    		classpath=".;sabre/lib/sabre.jar"
     		sourcepath="src"
     		destdir="doc"
     		packagenames="edu.uky.cs.nil.sabre.bench"

@@ -19,24 +19,62 @@ import edu.uky.cs.nil.sabre.search.Result;
 import edu.uky.cs.nil.sabre.util.Worker;
 import edu.uky.cs.nil.sabre.util.Worker.Status;
 
+/**
+ * Defines the suite of {@link Benchmark benchmark problems} and a set of {@link
+ * ProgressionPlanner planners}, runs each planner on each problem, and outputs
+ * the results.
+ * 
+ * @author Stephen G. Ware
+ */
 public class Main {
 
+	/**
+	 * The maximum number of nodes a {@link ProgressionSearch search} may {@link
+	 * ProgressionSearch#getVisited() visit} before it fails
+	 */
 	public static final long SEARCH_LIMIT = 1000000;
+	
+	/**
+	 * The maximum number of nodes a {@link ProgressionSearch search} may
+	 * {@link ProgressionSearch#getGenerated() generate} before it fails
+	 */
 	public static final long SPACE_LIMIT = Planner.UNLIMITED_NODES;
+	
+	/**
+	 * The maximum number of milliseconds a {@link ProgressionSearch search} may
+	 * take before it fails
+	 */
 	public static final long TIME_LIMIT = Planner.UNLIMITED_TIME;
+	
+	/** The number of times to run each planner on each problem */
 	public static final int RUNS = 10;
-	public static final int RANDOM_SEED = 0;
+	
+	/**
+	 * Whether or not the order of actions should be {@link ActionShuffler
+	 * shuffled} between runs
+	 */
 	public static final boolean SHUFFLE = true;
 	
-	public static final List<Benchmark> getProblems() {
+	/**
+	 * The seed used by the {@link Random random number generator} that is used
+	 * to shuffle actions between runs
+	 */
+	public static final int RANDOM_SEED = 0;
+	
+	/**
+	 * Returns a list of all the {@link Benchmark benchmark problems} to test.
+	 * 
+	 * @return a list of benchmark problems
+	 */
+	private static final List<Benchmark> getProblems() {
 		ArrayList<Benchmark> list = new ArrayList<>();
 		/*						Name				File				Goal	ATL		CTL		EL  */
 		list.add(new Benchmark("bribery", 			"bribery",			1,		5,		5,		2	));
 		list.add(new Benchmark("deerhunter_any",	"deerhunter",		1,		10,		6,		1	));
 		list.add(new Benchmark("deerhunter_both",	"deerhunter",		2,		10,		6,		1	));
 		list.add(new Benchmark("secretagent",		"secretagent",		1,		8,		8,		1	));
-		list.add(new Benchmark("aladdin_any",		"aladdin",			1,		11,		8,		3	));
-		list.add(new Benchmark("aladdin_both",		"aladdin",			2,		11,		8,		3	));
+		list.add(new Benchmark("aladdin_any",		"aladdin",			1,		13,		10,		3	));
+		list.add(new Benchmark("aladdin_both",		"aladdin",			2,		13,		10,		3	));
 		list.add(new Benchmark("hospital_any",		"hospital",			1,		11,		5,		3	));
 		list.add(new Benchmark("hospital_both",		"hospital",			2,		11,		5,		3	));
 		list.add(new Benchmark("basketball_any",	"basketball",		1,		7,		5,		3	));
@@ -58,6 +96,12 @@ public class Main {
 		return list;
 	}
 	
+	/**
+	 * Returns a list of {@link ProgressionPlanner progression planners} to test
+	 * each problem on.
+	 * 
+	 * @return a list of planners
+	 */
 	private static final List<ProgressionPlanner> getPlanners() {
 		ArrayList<ProgressionPlanner> list = new ArrayList<>();
 		ProgressionCostFactory t = ProgressionCostFactory.TEMPORAL;
@@ -77,6 +121,15 @@ public class Main {
 		return list;
 	}
 	
+	/**
+	 * Configures a planner with a given list of settings.
+	 * 
+	 * @param name the planner's unique name to identify it in the results
+	 * @param method the {@link Method search method} the planner will use
+	 * @param cost the cost function the planner will use
+	 * @param heuristic the heuristic function the planner will use
+	 * @return a planner configured with these settings
+	 */
 	private static final ProgressionPlanner getPlanner(
 		String name,
 		Method method,
@@ -93,15 +146,22 @@ public class Main {
 		return planner;
 	}
 	
+	/** The random number generator used to shuffle actions */
 	private static final Random RANDOM = new Random(RANDOM_SEED);
 	
+	/**
+	 * Runs every planner on every benchmark problem and outputs the results.
+	 * 
+	 * @param args not used
+	 * @throws Exception if an exception occurs while the tests are running
+	 */
 	public static void main(String[] args) throws Exception {
 		Report report = Worker.get(status -> run(status), 1, TimeUnit.MINUTES);
 		System.out.println("\n\n" + report);
-		try(TextReportPrinter printer = new TextReportPrinter(new File("results/report.txt"))) {
+		try(TextReportPrinter printer = new TextReportPrinter(new File("results.txt"))) {
 			printer.print(report);
 		}
-		try(HTMLReportPrinter printer = new HTMLReportPrinter(new File("results/report.html"))) {
+		try(HTMLReportPrinter printer = new HTMLReportPrinter(new File("results.html"))) {
 			printer.print(report);
 		}
 		try(CSVReportPrinter printer = new CSVReportPrinter(new File("results/"))) {
@@ -109,7 +169,15 @@ public class Main {
 		}
 	}
 	
-	public static Report run(Status status) throws Exception {
+	/**
+	 * Runs every planner on every benchmark problem and returns a {@link Report
+	 * report} of the results.
+	 * 
+	 * @param status a status object to update while tests are running
+	 * @return a report of the results
+	 * @throws Exception if an exception occurs while the tests are running
+	 */
+	private static Report run(Status status) throws Exception {
 		System.out.println("Sabre Benchmark tests started on " + ZonedDateTime.now());
 		Report report = new Report();
 		Printer printer = new DefaultPrinter();
@@ -168,6 +236,19 @@ public class Main {
 		return report;
 	}
 	
+	/**
+	 * Uses a planner to {@link
+	 * ProgressionPlanner#getSearch(edu.uky.cs.nil.sabre.Problem, Status) create
+	 * a search} for a given {@link Benchmark problem} configured according to
+	 * that problem's settings.
+	 * 
+	 * @param problem the problem to solve
+	 * @param planner the planner that will create the search
+	 * @param shuffle whether or not the order of actions in the problem should
+	 * be shuffled before the search is created
+	 * @param status a status object to update while the search is created
+	 * @return a search created by that planner for that problem
+	 */
 	private static final ProgressionSearch getSearch(Benchmark problem, ProgressionPlanner planner, boolean shuffle, Status status) {
 		planner.setAuthorTemporalLimit(problem.atl);
 		planner.setCharacterTemporalLimit(problem.ctl);

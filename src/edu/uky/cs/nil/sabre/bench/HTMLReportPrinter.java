@@ -13,16 +13,41 @@ import java.util.concurrent.TimeUnit;
 
 import edu.uky.cs.nil.sabre.Settings;
 
+/**
+ * A {@link ReportPrinter report printer} that writes a {@link Report report} to
+ * an HTML file.
+ * 
+ * @author Stephen G. Ware
+ */
 public class HTMLReportPrinter implements ReportPrinter {
 
+	/**
+	 * The number of decimal places to display when writing a non-integer number
+	 */
 	public static final int DECIMAL_PLACES = 2;
+	
+	/** The format to use when writing a date and time */
 	public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("MMMM dd, yyyy 'at' HH:mm:ss z");
+	
 	private final Writer writer;
 	
+	/**
+	 * Constructs a new HTML report printer that prints to a given {@link Writer
+	 * writer}.
+	 * 
+	 * @param writer a writer that writes to this printer's destination
+	 */
 	public HTMLReportPrinter(Writer writer) {
 		this.writer = writer;
 	}
 	
+	/**
+	 * Constructs a new HTML report printer that prints to a given file.
+	 * 
+	 * @param file the file to which the report should be printed
+	 * @throws IOException if an exception occurs while opening a writer to the
+	 * file
+	 */
 	public HTMLReportPrinter(File file) throws IOException {
 		this(new BufferedWriter(new FileWriter(file)));
 	}

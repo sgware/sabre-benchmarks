@@ -11,20 +11,42 @@ import java.time.ZonedDateTime;
 
 import edu.uky.cs.nil.sabre.Settings;
 
+/**
+ * A {@link ReportPrinter report printer} that writes a {@link Report report} in
+ * plain text.
+ * 
+ * @author Stephen G. Ware
+ */
 public class TextReportPrinter implements ReportPrinter {
 
+	/**
+	 * The number of decimal places to display when writing a non-integer number
+	 */
 	public static final int DECIMAL_PLACES = 2;
 	
 	private final Writer writer;
 	
+	/**
+	 * Constructs a new text report printer that prints to a given {@link Writer
+	 * writer}.
+	 * 
+	 * @param writer a writer that writes to this printer's destination
+	 */
 	public TextReportPrinter(Writer writer) {
 		this.writer = writer;
 	}
 	
+	/**
+	 * Constructs a new text report printer that prints to a given file.
+	 * 
+	 * @param file the file to which the report should be printed
+	 * @throws IOException if an exception occurs while opening a writer to the
+	 * file
+	 */
 	public TextReportPrinter(File file) throws IOException {
 		this(new BufferedWriter(new FileWriter(file)));
 	}
-
+	
 	@Override
 	public void print(Report report) throws IOException {
 		print("== Sabre Benchmark Results ==\n\n");
@@ -50,6 +72,13 @@ public class TextReportPrinter implements ReportPrinter {
 		print(report.best);
 	}
 	
+	/**
+	 * Prints a {@link Table table} in plain text to this printer's destination.
+	 * 
+	 * @param table the table to print
+	 * @throws IOException if an exception occurs while writing the table to
+	 * this printer's destination
+	 */
 	public void print(Table table) throws IOException {
 		int[] width = new int[table.columns.size()];
 		for(Table.Column column : table.columns)
