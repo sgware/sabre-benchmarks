@@ -130,6 +130,7 @@ BibTeX entry:
   institution={Narrative Intelligence Lab},
   address={University of Kentucky},
   year={2023},
-  month={November}
+  month={November},
+  howpublished={\url{https://github.com/sgware/sabre-benchmarks/report.pdf}}
 }
 ```
