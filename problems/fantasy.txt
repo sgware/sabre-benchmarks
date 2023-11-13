@@ -41,19 +41,19 @@
  *   pickup(Talia, Treasure, Cave)
  *
  * Another solution with author utility 1 (author temporal limit 3, character
- * temporal limit 3; epistemic limit 3):
+ * temporal limit 3; epistemic limit 2):
  *   propose(Rory, Talia, Village)
  *   accept(Talia, Rory, Village)
  *   marry(Rory, Talia, Village)
  *
  * Another solution with author utility 1 (author temporal limit 3, character
- * temporal limit 3; epistemic limit 3):
+ * temporal limit 3; epistemic limit 2):
  *   propose(Vince, Talia, Village)
  *   accept(Talia, Vince, Village)
  *   marry(Vince, Talia, Village)
  *
  * Shortest solution with author utility 2 (author temporal limit 5, character
- * temporal limit 3; epistemic limit 3):
+ * temporal limit 3; epistemic limit 2):
  *   propose(Rory, Talia, Village)
  *   accept(Talia, Rory, Village)
  *   marry(Rory, Talia, Village)
@@ -61,7 +61,7 @@
  *   pickup(Talia, Treasure, Cave)
  *
  * Shortest solution with author utility 3 (author temporal limit 9, character
- * temporal limit 3; epistemic limit 3):
+ * temporal limit 3; epistemic limit 2):
  *   propose(Rory, Talia, Village)
  *   accept(Talia, Rory, Village)
  *   marry(Rory, Talia, Village)

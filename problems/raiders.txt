@@ -10,7 +10,7 @@
  * which was not available in Glaive).
  * 
  * Shortest solution (author temporal limit 6, character temporal limit 4;
- * epistemic limit 2):
+ * epistemic limit 1):
  *   travel(Jones, USA, Tanis)
  *   dig(Jones, Ark, Tanis)
  *   take(Nazis, Ark, Jones, Tanis)
@@ -19,7 +19,7 @@
  *   take(USArmy, Ark, Nazis, USA)
  * 
  * Longer solution that mirrors the plot of the film (author temporal limit 7;
- * character temporal limit 4; epistemic limit 2):
+ * character temporal limit 4; epistemic limit 1):
  *   travel(Jones, USA, Tanis)
  *   dig(Jones, Ark, Tanis)
  *   take(Nazis, Ark, Jones, Tanis)

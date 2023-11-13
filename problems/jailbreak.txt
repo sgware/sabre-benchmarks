@@ -35,7 +35,7 @@
  *     by donning the disguises or by locking the bully in the gym.
  *
  * Shortest solution where bully kills a protagonist (author utility 1; author
- * temporal limit 4; character temporal limit 1; epistemic limit 1):
+ * temporal limit 4; character temporal limit 1; epistemic limit 0):
  *   steal(Ernest, Cigarettes, Cells)
  *   confiscate(Ernest, Cigarettes, Cells, Gym)
  *   recreation(Bully, Gym)

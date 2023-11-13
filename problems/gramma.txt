@@ -15,13 +15,13 @@
  * the potion back to his cottage, or Tom dies during his quest.
  *
  * Shortest solution where Tom dies (author temporal limit 3; character temporal
- * limit 4; epistemic limit 2):
+ * limit 5; epistemic limit 1):
  *   walk(Tom, Cottage, Crossroads)
  *   walk(Bandit, Camp, Crossroads)
  *   attack(Bandit, Tom, Crossroads)
  *
  * Shortest solution where Tom wins (author temporal limit 5; character temporal
- * limit 4; epistemic limit 2):
+ * limit 5; epistemic limit 1):
  *   walk(Tom, Cottage, Crossroads)
  *   walk(Tom, Crossroads, Market)
  *   buy(Tom, Medicine, TomCoin, Market)

@@ -58,7 +58,7 @@
  *   - The author requires that both C1 and C3 have their items by the end.
  *
  * Shortest solution (author temporal limit 5; character temporal limit 5;
- * epistemic limit 2):
+ * epistemic limit 1):
  *   move(C1, R11, R12)
  *   tell(C1, C2, I3, R12)
  *   give(C2, I3, C1, R12)

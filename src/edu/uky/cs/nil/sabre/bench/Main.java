@@ -73,26 +73,26 @@ public class Main {
 		list.add(new Benchmark("deerhunter_any",	"deerhunter",		1,		10,		6,		1	));
 		list.add(new Benchmark("deerhunter_both",	"deerhunter",		2,		10,		6,		1	));
 		list.add(new Benchmark("secretagent",		"secretagent",		1,		8,		8,		1	));
-		list.add(new Benchmark("aladdin_any",		"aladdin",			1,		13,		10,		3	));
-		list.add(new Benchmark("aladdin_both",		"aladdin",			2,		13,		10,		3	));
+		list.add(new Benchmark("aladdin_any",		"aladdin",			1,		13,		10,		2	));
+		list.add(new Benchmark("aladdin_both",		"aladdin",			2,		13,		10,		2	));
 		list.add(new Benchmark("hospital_any",		"hospital",			1,		11,		5,		3	));
 		list.add(new Benchmark("hospital_both",		"hospital",			2,		11,		5,		3	));
-		list.add(new Benchmark("basketball_any",	"basketball",		1,		7,		5,		3	));
-		list.add(new Benchmark("basketball_both",	"basketball",		2,		7,		5,		3	));
-		list.add(new Benchmark("snakebite",			"snakebite",		1,		8,		5,		2	));
-		list.add(new Benchmark("fantasy_any",		"fantasy",			1,		9,		3,		3	));
-		list.add(new Benchmark("fantasy_two",		"fantasy",			2,		9,		3,		3	));
-		list.add(new Benchmark("fantasy_all",		"fantasy",			3,		9,		3,		3	));
-		list.add(new Benchmark("space_lose",		"space",			2,		5,		3,		2	));
-		list.add(new Benchmark("space_win",			"space",			3,		5,		3,		2	));
-		list.add(new Benchmark("raiders",			"raiders",			1,		7,		4,		2	));
+		list.add(new Benchmark("basketball_any",	"basketball",		1,		7,		5,		2	));
+		list.add(new Benchmark("basketball_both",	"basketball",		2,		7,		5,		2	));
+		list.add(new Benchmark("snakebite",			"snakebite",		1,		8,		5,		1	));
+		list.add(new Benchmark("fantasy_any",		"fantasy",			1,		9,		3,		2	));
+		list.add(new Benchmark("fantasy_two",		"fantasy",			2,		9,		3,		2	));
+		list.add(new Benchmark("fantasy_all",		"fantasy",			3,		9,		3,		2	));
+		list.add(new Benchmark("space_lose",		"space",			2,		5,		3,		1	));
+		list.add(new Benchmark("space_win",			"space",			3,		5,		3,		1	));
+		list.add(new Benchmark("raiders",			"raiders",			1,		7,		4,		1	));
 		list.add(new Benchmark("treasure",			"treasure",			1,		4,		4,		3	));
-		list.add(new Benchmark("gramma_lose",		"gramma",			1,		5,		4,		2	));
-		list.add(new Benchmark("gramma_win",		"gramma",			2,		5,		4,		2	));
+		list.add(new Benchmark("gramma_lose",		"gramma",			1,		5,		5,		1	));
+		list.add(new Benchmark("gramma_win",		"gramma",			2,		5,		5,		1	));
 		list.add(new Benchmark("jailbreak_lose",	"jailbreak",		1,		7,		6,		1	));
 		list.add(new Benchmark("jailbreak_escape",	"jailbreak",		3,		7,		6,		1	));
 		list.add(new Benchmark("jailbreak_revenge",	"jailbreak",		6,		7,		6,		1	));
-		list.add(new Benchmark("lovers",			"lovers",			1,		5,		5,		2	));
+		list.add(new Benchmark("lovers",			"lovers",			1,		5,		5,		1	));
 		return list;
 	}
 	
@@ -224,9 +224,9 @@ public class Main {
 					Result<CompiledAction> result = search.get(status);
 					report.addResult(problem, planner, run, result);
 					if(result.getSuccess())
-						System.out.println(result.solution);
+						System.out.println("\n" + result.solution);
 					else
-						System.out.println(result.message);
+						System.out.println("\n" + result.message);
 					System.out.println("\n" + report.results);
 				}
 			}

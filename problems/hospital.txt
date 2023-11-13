@@ -35,7 +35,7 @@
  *     the above mentioned utilities.
  * 
  * Shortest solution (author utility 1; author temporal limit 4, character
- * temporal limit 3; epistemic limit 3):
+ * temporal limit 3; epistemic limit 2):
  *   admit(Hathaway, Jones, PatientRoomA)
  *   walk(Jones, Admissions, PatientRoomA)
  *   assess(Hathaway, Jones, SymptomA, PatientRoomA)

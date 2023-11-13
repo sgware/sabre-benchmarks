@@ -47,19 +47,19 @@
  *   erupt(Surface)
  *
  * Shortest solution for author utility 2 (author temporal limit 3; character
- * temporal limit 3; epistemic limit 2):
+ * temporal limit 3; epistemic limit 1):
  *   teleport_from_ship(Zoe, Ship, Surface)
  *   begin_erupt(Surface)
  *   erupt(Surface)
  *
  * Shortest solution for author utility 3 (author temporal limit 3; character
- * temporal limit 3; epistemic limit 2):
+ * temporal limit 3; epistemic limit 1):
  *   teleport_from_ship(Zoe, Ship, Surface)
  *   walk(Zoe, Surface, Cave)
  *   make_peace(Zoe, Lizard, Cave)
  *
  * Shortest solution for author utility 4 (author temporal limit 5; character
- * temporal limit 3; epistemic limit 2):
+ * temporal limit 3; epistemic limit 1):
  *   teleport_from_ship(Zoe, Ship, Surface)
  *   walk(Zoe, Surface, Cave)
  *   make_peace(Zoe, Lizard, Cave)

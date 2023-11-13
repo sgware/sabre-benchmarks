@@ -55,7 +55,7 @@
  * this is rarely useful to the story.
  *
  * Shortest solution for author utility 1 (author temporal limit 7; character
- * temporal limit 8; epistemic limit 2):
+ * temporal limit 8; epistemic limit 1):
  *   fall_in_love(Aladdin, Jasmine, Castle)
  *   travel(Aladdin, Castle, Mountain)
  *   slay(Aladdin, Dragon, Mountain)
@@ -65,7 +65,7 @@
  *   slay(Aladdin, Genie, Mountain)
  *
  * Shortest solution for author utility 2 (author temporal limit 11; character
- * temporal limit 8; epistemic limit 3):
+ * temporal limit 8; epistemic limit 1):
  *   fall_in_love(Jafar, Jasmine, Castle)
  *   travel(Jafar, Castle, Mountain)
  *   slay(Jafar, Dragon, Mountain)

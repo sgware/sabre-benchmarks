@@ -608,12 +608,18 @@ public class Report {
 			}
 			best.addRow(problem);
 			best.set(problem, BEST_PROBLEM, problem.name);
-			best.set(problem, BEST_PLANNER_VISITED, bestVisitedPlanner.name);
-			best.set(problem, BEST_AVG_VISITED, bestVisited);
-			best.set(problem, BEST_PLANNER_GENERATED, bestGeneratedPlanner.name);
-			best.set(problem, BEST_AVG_GENERATED, bestGenerated);
-			best.set(problem, BEST_PLANNER_TIME, bestTimePlanner.name);
-			best.set(problem, BEST_AVG_TIME, bestTime);
+			if(bestVisitedPlanner != null) {
+				best.set(problem, BEST_PLANNER_VISITED, bestVisitedPlanner.name);
+				best.set(problem, BEST_AVG_VISITED, bestVisited);
+			}
+			if(bestGeneratedPlanner != null) {
+				best.set(problem, BEST_PLANNER_GENERATED, bestGeneratedPlanner.name);
+				best.set(problem, BEST_AVG_GENERATED, bestGenerated);
+			}
+			if(bestTimePlanner != null) {
+				best.set(problem, BEST_PLANNER_TIME, bestTimePlanner.name);
+				best.set(problem, BEST_AVG_TIME, bestTime);
+			}
 		}
 	}
 	

@@ -15,7 +15,7 @@
  * citizens who have been arrested.
  * 
  * Shortest solution (author temporal limit 3, character temporal limit 5;
- * epistemic limit 3):
+ * epistemic limit 2):
  *   travel(Bob, HomeB, BasketballCourt)
  *   travel(Alice, Downtown, BasketballCourt)
  *   playBasketball(Bob, Alice, BasketballCourt)
@@ -28,7 +28,7 @@
  *   arrest(Sherlock, Charlie, Downtown, Murder)
  *
  * Shortest solution where characters play basketball and a citizen is arrested
- * (author temporal limit 7; character temporal limit 5; epistemic limit 3):
+ * (author temporal limit 7; character temporal limit 5; epistemic limit 2):
  *   travel(Bob, HomeB, BasketballCourt)
  *   travel(Alice, Downtown, BasketballCourt)
  *   travel(Sherlock, Downtown, BasketballCourt)
