@@ -1,9 +1,9 @@
 # Sabre Benchmark Tool
 
-This is tool for testing many configurations of the
-[Sabre Narrative Planner](https://github.com/sgware/sabre) on a varity of
+This is a tool for testing many configurations of the
+[Sabre Narrative Planner](https://github.com/sgware/sabre) on a variety of
 [benchmark story planning problems](problems) collected from several authors. It
-also severs as a repository of example Sabre problems.
+also serves as a repository of example Sabre problems.
 
 This tool automatically produces a summary of the performance of every planner
 on every problem in [HTML](results.html) and [plain text](results.txt) formats.
@@ -37,9 +37,9 @@ All relevant settings can be found at the top of
 [`Main.java`](src/edu/uky/cs/nil/sabre/bench/Main.java). You can change how many
 threads run in parallel. You can set the maximum number of nodes visited, nodes
 generated, and time spent by each search. You can change the number of times
-each planner is run on each problem and whether or not the order of actions is
-shuffled between runs. You can comment out benchmark problems or planner
-configurations you don't want to test.
+each planner is run on each problem and whether the order of actions is shuffled
+between runs. You can comment out benchmark problems or planner configurations
+you don't want to test.
 
 To add a new benchmark problem, you need to place the relevant Sabre problem
 file in the [problems](problems) directory and add a new line to
@@ -71,7 +71,7 @@ The benchmark problems included with this tool were created by various authors
 who hold the copyrights. See each problem file for authorship details.
 
 Special thanks to Rachelyn Farrell for her help compiling and translating
-benchark problems.
+benchmark problems.
 
 ## Version History
 
@@ -90,7 +90,7 @@ To have your benchmark problem included in this collection, please create a pull
 request with the following changes:
 - Add your problem file to the [problems](problems) directory.
 - Your problem file must include a block comment at the top of the file
-  explaning the story it models, the origin of the probblem, and at least one
+  explaining the story it models, the origin of the problem, and at least one
   known solution. See the [Raiders of the Lost Ark](problems/raiders.txt)
   problem for an example.
 - Add one or more lines to
@@ -104,7 +104,7 @@ request with the following changes:
 - If your problem is a translation of some existing problem, please add the
   original problem to the [originals](originals) directory.
 - Add a description of your problem to the [technical report](report/report.tex)
-  explaning this collection. Problems should be added in chronological order
+  explaining this collection. Problems should be added in chronological order
   based on the creation of the original problem, as above. You should also add
   your name to the list of authors and a preferred citation for your problem to
   the [bibliography file](report/bibliography.bib).
@@ -115,7 +115,7 @@ request with the following changes:
 
 ## Citation
 
-The [technical report](report.pdf) explaning the origin of each benchmark
+The [technical report](report.pdf) explaining the origin of each benchmark
 problem and the recommended settings for testing them can be cited as:
 
 > Stephen G. Ware and Rachelyn Farrell, "A Collection of Benchmark Problems for
