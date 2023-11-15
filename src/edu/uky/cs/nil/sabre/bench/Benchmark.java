@@ -4,16 +4,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
 
+import edu.uky.cs.nil.sabre.Number;
 import edu.uky.cs.nil.sabre.Problem;
 import edu.uky.cs.nil.sabre.ProblemBuilder;
 import edu.uky.cs.nil.sabre.Solution;
+import edu.uky.cs.nil.sabre.comp.ActionShuffler;
 import edu.uky.cs.nil.sabre.comp.CompiledAction;
 import edu.uky.cs.nil.sabre.comp.CompiledProblem;
 import edu.uky.cs.nil.sabre.io.DefaultParser;
 import edu.uky.cs.nil.sabre.io.ParseException;
 import edu.uky.cs.nil.sabre.io.Parser;
 import edu.uky.cs.nil.sabre.prog.ProgressionPlanner;
+import edu.uky.cs.nil.sabre.prog.ProgressionSearch;
 import edu.uky.cs.nil.sabre.util.Worker.Status;
 
 /**
@@ -114,10 +118,11 @@ public class Benchmark {
 		problem = new Problem(builder);
 		ProgressionPlanner planner = new ProgressionPlanner();
 		compiled = planner.compile(problem, status);
-		parser.define(compiled);
-		File url = new File("solutions/" + name + ".txt");
-		if(url.exists())
-			solution = parser.parse(url, Solution.class);
+		File solutionFile = new File("solutions/" + name + ".txt");
+		if(solutionFile.exists()) {
+			parser.define(compiled);
+			solution = parser.parse(solutionFile, Solution.class);
+		}
 	}
 	
 	/**
@@ -151,5 +156,32 @@ public class Benchmark {
 	 */
 	public Solution<CompiledAction> getSolution() {
 		return solution;
+	}
+	
+	/**
+	 * Creates a {@link ProgressionSearch progression search} for this benchmark
+	 * problem using the given planner with this benchmark's settings. If the
+	 * run is higher than 1 and {@link Main#SHUFFLE} is true, the problem will
+	 * be recompiled to shuffle the order of its actions.
+	 * 
+	 * @param planner the planner that will create the search
+	 * @param run the number of times this planner has attempted this problem
+	 * (starting at 1)
+	 * @param status a status object to update while the search is created
+	 * @return the search
+	 */
+	public ProgressionSearch getSearch(ProgressionPlanner planner, int run, Status status) {
+		CompiledProblem compiled = getCompiledProblem();
+		if(run > 1 && Main.SHUFFLE)
+			compiled = ActionShuffler.compile(compiled, new Random(run), status);
+		ProgressionSearch search = null;
+		synchronized(planner) {
+			planner.setAuthorTemporalLimit(atl);
+			planner.setCharacterTemporalLimit(ctl);
+			planner.setEpistemicLimit(el);
+			search = planner.getSearch(compiled, status);
+		}
+		search.setGoal(Number.get(goal));
+		return search;
 	}
 }

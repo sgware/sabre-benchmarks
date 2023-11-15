@@ -478,6 +478,19 @@ public class Report {
 	}
 	
 	/**
+	 * Returns the sum of all {@link Result#time time spent} on all tests across
+	 * all threads.
+	 * 
+	 * @return the total time for all tests in milliseconds
+	 */
+	public long getComputeTime() {
+		long time = 0;
+		for(Table.Row row : results.rows)
+			time += (Long) row.get(RESULTS_TIME).get();
+		return time;
+	}
+	
+	/**
 	 * Adds details for a new benchmark problem to the {@link #problems
 	 * problems} and {@link #compiled compiled problems} tables.
 	 * 
@@ -517,16 +530,17 @@ public class Report {
 	}
 	
 	/**
-	 * Adds the results of one search by one planner on one problem to the
-	 * {@link #results results table}.
+	 * Adds the results of one {@link TestSuite.Test test} to the {@link
+	 * #results results table}.
 	 * 
-	 * @param problem the benchmark problem being solved
-	 * @param planner the planner attempting to solve the problem
-	 * @param run the index in the number of runs that planner has attempted
-	 * this problem
-	 * @param result the result of the planner's search on that problem
+	 * @param test a completed test
+	 * @throws IllegalStateException if the test has not completed
 	 */
-	public void addResult(Benchmark problem, ProgressionPlanner planner, int run, Result<CompiledAction> result) {
+	public void addResult(TestSuite.Test test) {
+		addResult(test.problem, test.planner, test.run, test.getResult());
+	}
+	
+	private final void addResult(Benchmark problem, ProgressionPlanner planner, int run, Result<CompiledAction> result) {
 		results.addRow(result);
 		results.set(result, RESULTS_PROBLEM, problem.name);
 		results.set(result, RESULTS_PLANNER, planner.name);

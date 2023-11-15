@@ -4,12 +4,10 @@ import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import edu.uky.cs.nil.sabre.comp.ActionShuffler;
 import edu.uky.cs.nil.sabre.comp.CompiledAction;
-import edu.uky.cs.nil.sabre.comp.CompiledProblem;
 import edu.uky.cs.nil.sabre.io.DefaultPrinter;
 import edu.uky.cs.nil.sabre.io.Printer;
 import edu.uky.cs.nil.sabre.prog.*;
@@ -27,6 +25,9 @@ import edu.uky.cs.nil.sabre.util.Worker.Status;
  * @author Stephen G. Ware
  */
 public class Main {
+	
+	/** The number of parallel processes to run tests on */
+	public static final int THREADS = 5;
 
 	/**
 	 * The maximum number of nodes a {@link ProgressionSearch search} may {@link
@@ -54,12 +55,6 @@ public class Main {
 	 * shuffled} between runs
 	 */
 	public static final boolean SHUFFLE = true;
-	
-	/**
-	 * The seed used by the {@link Random random number generator} that is used
-	 * to shuffle actions between runs
-	 */
-	public static final int RANDOM_SEED = 0;
 	
 	/**
 	 * Returns a list of all the {@link Benchmark benchmark problems} to test.
@@ -149,9 +144,6 @@ public class Main {
 		return planner;
 	}
 	
-	/** The random number generator used to shuffle actions */
-	private static final Random RANDOM = new Random(RANDOM_SEED);
-	
 	/**
 	 * Runs every planner on every benchmark problem and outputs the results.
 	 * 
@@ -206,7 +198,7 @@ public class Main {
 				else {
 					ProgressionCostFactory heuristic = planner.getHeuristic();
 					planner.setHeuristic(new VerificationHeuristic.Factory(heuristic, problem.getSolution()));
-					ProgressionSearch search = getSearch(problem, planner, false, status);
+					ProgressionSearch search = problem.getSearch(planner, 1, status);
 					Result<CompiledAction> result = search.get(status);
 					if(result.getSuccess())
 						System.out.println("\nPlanner \"" + planner.name + "\" verified this solution to problem \"" + problem.name + "\":\n" + result.solution);
@@ -217,50 +209,11 @@ public class Main {
 			}
 		}
 		// Run each planner on each problem.
+		TestSuite suite = new TestSuite(problems, planners, report);
 		report.setStart();
-		for(Benchmark problem : problems) {
-			for(ProgressionPlanner planner : planners) {
-				for(int run=1; run<=RUNS; run++) {
-					ProgressionSearch search = getSearch(problem, planner, run > 1 && SHUFFLE, status);
-					System.out.println("\nRun " + run + " for planner \"" + planner.name + "\" on problem \"" + problem.name + "\":");
-					System.gc();
-					Result<CompiledAction> result = search.get(status);
-					report.addResult(problem, planner, run, result);
-					if(result.getSuccess())
-						System.out.println("\n" + result.solution);
-					else
-						System.out.println("\n" + result.message);
-					System.out.println("\n" + report.results);
-				}
-			}
-		}
+		suite.run(status);
 		report.setEnd();
 		System.out.println("Sabre Benchmark tests ended on " + ZonedDateTime.now());
 		return report;
-	}
-	
-	/**
-	 * Uses a planner to {@link
-	 * ProgressionPlanner#getSearch(edu.uky.cs.nil.sabre.Problem, Status) create
-	 * a search} for a given {@link Benchmark problem} configured according to
-	 * that problem's settings.
-	 * 
-	 * @param problem the problem to solve
-	 * @param planner the planner that will create the search
-	 * @param shuffle whether or not the order of actions in the problem should
-	 * be shuffled before the search is created
-	 * @param status a status object to update while the search is created
-	 * @return a search created by that planner for that problem
-	 */
-	private static final ProgressionSearch getSearch(Benchmark problem, ProgressionPlanner planner, boolean shuffle, Status status) {
-		planner.setAuthorTemporalLimit(problem.atl);
-		planner.setCharacterTemporalLimit(problem.ctl);
-		planner.setEpistemicLimit(problem.el);
-		CompiledProblem compiled = problem.getCompiledProblem();
-		if(shuffle)
-			compiled = ActionShuffler.compile(compiled, RANDOM, status);
-		ProgressionSearch search = planner.getSearch(compiled, status);
-		search.setGoal(edu.uky.cs.nil.sabre.Number.get(problem.goal));
-		return search;
 	}
 }

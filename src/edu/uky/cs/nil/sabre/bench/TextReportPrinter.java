@@ -55,9 +55,13 @@ public class TextReportPrinter implements ReportPrinter {
 		print("JRE Version:   " + System.getProperty("java.version") + "\n");
 		print("OS Name:       " + System.getProperty("os.name") + "\n");
 		print("OS Version:    " + System.getProperty("os.version") + "\n");
+		print("Threads:       " + Main.THREADS + "\n");
+		print("Runs:          " + Main.RUNS + "\n");
+		print("Shuffle:       " + Main.SHUFFLE + "\n");
 		print("Start:         " + ZonedDateTime.ofInstant(Instant.ofEpochMilli(report.getStart()), ZoneId.systemDefault()) + "\n");
 		print("End:           " + ZonedDateTime.ofInstant(Instant.ofEpochMilli(report.getEnd()), ZoneId.systemDefault()) + "\n");
 		print("Duration:      " + (report.getEnd() - report.getStart()) + "ms\n");
+		print("Compute Time:  " + report.getComputeTime() + "ms\n");
 		print("\n= Problems =\n\n");
 		print(report.problems);
 		print("\n\n= Compiled Problems =\n\n");

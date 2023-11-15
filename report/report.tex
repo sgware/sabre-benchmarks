@@ -51,10 +51,10 @@ syntax, and gives recommended settings when searching for solutions.
 
 Storytelling algorithms have existed since at least Meehan's seminal
 1977 paper on \emph{Tale-Spin}~\cite{meehan1977tale}, which generated
-short stores similar to Aesop's Fables. These algorithms can be classified
-according several features~\cite{kybartas2016survey}. For this report,
-we focus on story planning algorithms. Planning algorithms perform
-a search to determine whether a story meeting certain requirements
+short stories similar to Aesop's Fables. These algorithms can be classified
+according to several features~\cite{kybartas2016survey}. For this
+report, we focus on story planning algorithms. Planning algorithms
+perform a search to determine whether a story meeting certain requirements
 is possible. Story \emph{planning} algorithms can be contrasted with
 \emph{reactive} algorithms (like ABL~\cite{mateas2004behavior} and
 other descendants of the Oz Project~\cite{mateas2001oz}), which
@@ -88,7 +88,7 @@ was not designed for storytelling. This approach is often used by
 Marc Cavazza and his academic descendants~\cite{cavazza2002character,porteous2010applying}.
 
 The second approach modifies planning algorithms to reason directly
-about narrative phenomenon. In this approach, the preconditions and
+about narrative phenomena. In this approach, the preconditions and
 effects of actions are limited to the most basic constraints; other
 features of the planner decide when they should occur based on explicit
 narrative reasoning. Their advantage is a richer set of storytelling
@@ -123,13 +123,13 @@ the most desirable in general.
 
 Sabre begins at the initial state of a storytelling problem and performs
 a forward heuristic search through the space of states until it finds
-a state where they author's goal for the story is achieved. Every
-action taken on the way to that goal must be \emph{explained} for
-each of the characters\footnote{Sabre uses the term \emph{character}, instead of \emph{agent}, because
-they are not independent decision-makers. The planner is the
-only agent. It acts like a puppetmaster, omniscient but attempting
-to make each character seem like it has its own goals and limited,
-possibly wrong beliefs.} who takes the action (called the \emph{consenting characters}). An
+a state where the author's goal for the story is achieved. Every action
+taken on the way to that goal must be \emph{explained} for each of
+the characters\footnote{Sabre uses the term \emph{character}, instead of \emph{agent}, because
+they are not independent decision-makers. The planner is the only
+agent. It acts like a puppetmaster, omniscient but attempting to make
+each character seem like it has its own goals and limited, possibly
+wrong beliefs.} who takes the action (called the \emph{consenting characters}). An
 action is \emph{explained for a character} when that character can
 imagine a plan that starts with the action and which, according to
 that character's beliefs, will lead to a better state for that character
@@ -276,7 +276,7 @@ The original problem has a goal with two parts: Jasmine is married
 to Jafar and the Genie is dead. In our version of the problem, the
 author gains 1 point of utility for each of these. The benchmark problem
 \texttt{aladdin\_any} can be solved by any story that marries Jasmine
-to Jafar or kills the Genie, whereas both goals much be achieved in
+to Jafar or kills the genie, whereas both goals must be achieved in
 \texttt{aladdin\_both}.
 
 Some problems, like \emph{Hospital}, \emph{Basketball}, and \emph{Lovers},
@@ -334,7 +334,7 @@ characters}, who must have a reason to take the action. A Sabre plan
 can only contain an action if it is explained for all its consenting
 characters. An action is explained for a character if that action
 is the first in a sequence of actions which that character believes
-they can take, will result in a higher utility, and and is composed
+they can take, will result in a higher utility for them, and is composed
 only of actions which that character believes are also explained for
 all their consenting characters. Note that intention is linked to
 belief---characters can take actions they think will help, but wrong
@@ -403,7 +403,7 @@ There are three important limits that can be imposed on Sabre's search.
 The \emph{author temporal limit} is the maximum number of actions
 in the author's plan---that is, the actual actions that will be executed
 to raise the author's utility. The \emph{character temporal limit}
-is the maximum number of actions in a plan a characters imagines when
+is the maximum number of actions in a plan a character imagines when
 justifying an action. Consider this solution to the \emph{Save Gramma}
 problem:
 
@@ -414,7 +414,7 @@ Tom walks to the crossroads.
 
 The bandit walks to the crossroads.
 
-The bandit kill Tom.%
+The bandit kills Tom.%
 \end{minipage}}
 
 \medskip{}
@@ -431,11 +431,11 @@ Tom walks to the crossroads.
 
 Tom walks to the market.
 
-Tom buy the medicine from the merchant.
+Tom buys the medicine from the merchant.
 
 Tom walks to the crossroads.
 
-Tom walk to the cottage.%
+Tom walks to the cottage.%
 \end{minipage}}
 
 \medskip{}
@@ -588,7 +588,7 @@ or not being hungry. This allowed the planner to choose either or
 both goals for the story. We have preserved that structure by changing
 the \texttt{decide\_to\_get\_money} action to increase Bubba's greed
 (allowing him to raise his utility by stealing money) and the \texttt{decide\_to\_eat}
-action to make Bubba hungry (lowing his utility, and allowing him
+action to make Bubba hungry (lowering his utility, and allowing him
 to raise it again by eating). The author gains 1 point of utility
 when Bubba gets money and 1 point when the deer is eaten.
 
@@ -779,8 +779,8 @@ Support for conflict was added in a later algorithm by Ware et al.~\cite{ware201
 which enabled new solutions to this problem.
 
 Riedl's and Young's planner models intention but not belief. It also
-had a feature that allows one character to delegate its goals to another,
-which is used in the original \texttt{order} and \texttt{command}
+has a feature that allows one character to delegate its goals to another,
+which was used in the original \texttt{order} and \texttt{command}
 actions. There is no easy way to translate this notion of goal delegation
 into Sabre's utility functions. To maintain their spirit, we have
 replaced them with the \texttt{command\_kill}, \texttt{command\_love},
@@ -951,8 +951,8 @@ Porteous et al. use an off-the-shelf planner which does not reason
 about intention or belief. We have added these concepts based on our
 understanding of medical dramas. Because Sabre models belief, we were
 able to combine the \texttt{assess} and \texttt{mistake-asses} action
-into a single action. The doctor can diagnosis a patient with the
-wrong illness if they are overworked. The effects of our \texttt{assess}
+into a single action. The doctor can diagnose a patient with the wrong
+illness if they are overworked. The effects of our \texttt{assess}
 action are that the doctor and patient believe the patient has a certain
 illness, but these beliefs can be wrong.
 
@@ -1014,7 +1014,7 @@ Jones.
 
 \medskip{}
 \noindent\shadowbox{\begin{minipage}[t]{1\columnwidth - 2\fboxsep - 2\fboxrule - \shadowsize}%
-Solution 3: Dr. Hathaway make one incorrect and one correct diagnosis.
+Solution 3: Dr. Hathaway makes one incorrect and one correct diagnosis.
 
 (Shortest known plan for author utility 2)
 
@@ -1080,9 +1080,9 @@ planning-based story generation.
 
 \noindent It describes a crime drama where characters can commit theft
 and murder while investigators search for clues and arrest criminals.
-Character get angry when their items are stolen but can let off steam
+Characters get angry when their items are stolen but can let off steam
 by playing basketball. The version of the problem we translated was
-provided by Porteous on her website.
+provided by Julie Porteous on her website.
 
 \begin{quote}
 	\url{https://porteousjulie.bitbucket.io/}
@@ -1096,15 +1096,14 @@ states are similar but whose goals specify a variety of outcomes,
 like what crimes should be committed, who should be angry, who should
 be arrested, etc. We used a small set of objects: three civilians,
 one detective, three locations, and two items. We did not include
-\texttt{earthquake}, since this was meant to be an non-believable
-action, and we did not include vehicles. Though we implemented the
-\texttt{shareClues} action, there is only one inspector, so this action
-will never occur.
+\texttt{earthquake}, since this was meant to be an unbelievable action,
+and we did not include vehicles. Though we implemented the \texttt{shareClues}
+action, there is only one inspector, so this action will never occur.
 
 The original problem was created for a traditional planner, so it
 did not include character goals. We gave each of the citizens different
-utility functions: Alice starts angry and wants not to be calm. Bob
-is calm and wants everyone to be calm. Charlie starts angry and wants
+utility functions: Alice starts angry and wants to be calm. Bob is
+calm and wants everyone to be calm. Charlie starts angry and wants
 Alice to be dead. The author gains 1 point of utility if fewer than
 two citizens are angry and 1 point if someone has been arrested.
 
@@ -1232,7 +1231,7 @@ the character loves is sick, the relationship has a value of 1. Otherwise,
 relationships have a value of 0. All characters love themselves. Thus,
 when a character is bitten by a snake, their utility goes down, as
 does the utility of everyone who loves them. That utility can be restored
-by healing the sick loved one, or permanently lost if the loved on
+by healing the sick loved one, or permanently lost if the loved one
 dies. The author's utility is 1 if Timmy is dead and Hank is tied
 up in the jailhouse, otherwise the author utility is 0.
 
@@ -1299,9 +1298,9 @@ stories.
 \end{quote}
 
 \noindent It tells a Medieval story of princess Talia and two potential
-suitors: the poor Rory who she loves and the rich Vince who she does
-not love. There is also a nearby dragon who has treasure that can
-be stolen but is on the lookout to increase her hoard.
+suitors: the poor Rory whom she loves and the rich Vince whom she
+does not love. There is also a nearby dragon who has treasure that
+can be stolen but is on the lookout to increase her hoard.
 
 This planning domain and its one associated problem were created for
 Ware's and Young's Glaive narrative planner~\cite{ware2014glaive}.
@@ -1461,8 +1460,8 @@ stories.
 	\bibentry{ware2014thesis}
 \end{quote}
 
-\noindent It is tells the story of starship captain Zoe who wants
-to befriend the reptilian guardian of an alien planet which features
+\noindent It tells the story of starship captain Zoe who wants to
+befriend the reptilian guardian of an alien planet which features
 a volcano that might erupt at any time. Zoe does not know that the
 guardian will get angry if she walks on the planet's surface, and
 conflict may ensue.
@@ -1795,7 +1794,7 @@ so that he thinks the treasure is buried on the island. However, if
 Silver does not also observe the action, Silver will not believe that
 Hawkins believes the treasure is on the island. Silver can only expect
 Hawkins to sail with him to the island if Silver believes Hawkins
-believe there is treasure to be had there. In our translation, Silver
+believes there is treasure to be had there. In our translation, Silver
 also observes \texttt{rumor}.
 
 Utility functions are simple. Characters get 1 point for having the
@@ -2051,9 +2050,9 @@ an interactive story.
 \end{quote}
 
 \noindent The authors later implemented the story in Sabre. It is
-about two prison inmates, Earnest and Roy. They steal a pack of cigarettes
+about two prison inmates, Ernest and Roy. They steal a pack of cigarettes
 and become the target of the prison bully who threatens to kill them.
-Earnest plans escape by stealing some civilian clothes to flee down
+Ernest plans escape by stealing some civilian clothes to flee down
 the highway. Roy plans revenge on the bully by stealing a knife to
 stab him in the gym. In the original experiment, both make preparations
 for their plans and meet at the air vents. The vents lead both to
@@ -2062,15 +2061,15 @@ running, and one inmate must give himself up so the other can succeed.
 The experiment altered the characters, timing, and locations of events
 to measure which events players remembered and which ending they chose.
 
-Both Earnest and Roy gain 2 points of utility for stealing the cigarettes.
+Both Ernest and Roy gain 2 points of utility for stealing the cigarettes.
 They each take a -1 penalty if they have been threatened by the bully.
 They can avoid that penalty by escaping or killing the bully. They
-also gain a -3 penalty for being dead. The bully gains 1 points for
+also gain a -3 penalty for being dead. The bully gains 1 point for
 being in the gym, his preferred location. He takes a -1 penalty if
 someone he has threatened is alive. He can remove that penalty by
 killing the people he has threatened. The author gains 1 point for
 each dead inmate. The author also gains 3 points when the cigarettes
-have been stolen and the threat to the inmate has been neutralized.
+have been stolen and the threat to each inmate has been neutralized.
 
 \medskip{}
 \noindent\shadowbox{\begin{minipage}[t]{1\columnwidth - 2\fboxsep - 2\fboxrule - \shadowsize}%
@@ -2089,7 +2088,7 @@ Solution 1: The bully kills an inmate.
 
 \medskip{}
 \noindent\shadowbox{\begin{minipage}[t]{1\columnwidth - 2\fboxsep - 2\fboxrule - \shadowsize}%
-Solution 2: Earnest escapes.
+Solution 2: Ernest escapes.
 
 (Shortest known plan for author utility 3)
 
@@ -2167,7 +2166,7 @@ Epistemic Limit & 1\tabularnewline
 
 \subsection{Lovers}
 
-This problem was proposed by Ware and Farrell as a randomizable setting
+This problem was proposed by Farrell and Ware as a randomizable setting
 for testing belief and intention recognition using an early version
 of Sabre.
 
@@ -2183,10 +2182,10 @@ the character they love is happy. The author picks two characters.
 If both are happy, the author gets 1 point; otherwise the author utility
 is 0.
 
-The initial locations of agents and items can be randomized. Who characters
-love and which two the author wants to be happy can be randomized.
-Characters can also have random wrong beliefs about where items are
-or who wants which items.
+The initial locations of agents and items can be randomized. Whom
+characters love and which two the author wants to be happy can be
+randomized. Characters can also have random wrong beliefs about where
+items are or who wants which items.
 
 Characters can move around, pick up items, trade items with others,
 and tell other characters they want an item. Characters can lie about

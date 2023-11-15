@@ -34,11 +34,12 @@ gigabytes. You can adjust these numbers up or down depending on how much memory
 is available.
 
 All relevant settings can be found at the top of
-[`Main.java`](src/edu/uky/cs/nil/sabre/bench/Main.java). You can set the maximum
-number of nodes visited, nodes generated, and time spent. You can change the
-number of times each planner is run on each problem and whether or not the order
-of actions is shuffled between runs. You can comment out benchmark problems or
-planner configurations you don't want to test.
+[`Main.java`](src/edu/uky/cs/nil/sabre/bench/Main.java). You can change how many
+threads run in parallel. You can set the maximum number of nodes visited, nodes
+generated, and time spent by each search. You can change the number of times
+each planner is run on each problem and whether or not the order of actions is
+shuffled between runs. You can comment out benchmark problems or planner
+configurations you don't want to test.
 
 To add a new benchmark problem, you need to place the relevant Sabre problem
 file in the [problems](problems) directory and add a new line to
