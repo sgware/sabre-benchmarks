@@ -1,0 +1,66 @@
+(define (action go)
+  :parameters (?mover ?dest ?from)
+  :actors (?mover)
+  :constraints ((mobile-person ?mover) (place ?dest) (place ?from))
+  :precondition ((at ?mover ?from) (path ?from ?dest) (:neq ?dest ?from))
+  :primitive t
+  :effect ((at ?mover ?dest) (:not (at ?mover ?from))))
+
+(define (action shoot)
+  :parameters (?shooter ?target ?gun ?place)
+  :actors (?shooter)
+  :constraints ((person ?shooter) (animal ?target) (gun ?gun) (place ?place))
+  :precondition ((at ?shooter ?place) (at ?target ?place) (has ?shooter ?gun) (loaded ?gun))
+  :primitive t
+  :effect ((:not (alive ?target))))
+
+(define (action eat)
+  :parameters (?eater ?food ?place)
+  :actors (?eater)
+  :constraints ((person ?eater) (animal ?food) (place ?place))
+  :precondition ((at ?eater ?place) (at ?food ?place) (:not (alive ?food)))
+  :primitive t
+  :effect ((:not (hungry ?eater))))
+
+(define (action pick-up)
+  :parameters (?person ?thing ?place)
+  :actors (?person)
+  :constraints ((person ?person) (thing ?thing) (place ?place))
+  :precondition ((at ?person ?place) (at ?thing ?place))
+  :primitive t
+  :effect ((has ?person ?thing) (:not (at ?thing ?place))))
+
+(define (action steal)
+  :parameters (?thief ?victim ?thing ?gun ?place)
+  :actors (?thief)
+  :constraints ((person ?thief) (person ?victim) (thing ?thing) (place ?place) (gun ?gun))
+  :precondition ((at ?thief ?place) (at ?victim ?place) (has ?victim ?thing) (has ?thief ?gun) 
+                 (loaded ?gun) (:neq ?thief ?victim))
+  :primitive t
+  :effect ((has ?thief ?thing) (:not (has ?victim ?thing))))
+
+(define (action load)
+  :parameters (?person ?gun ?ammo)
+  :actors (?person)
+  :constraints ((person ?person) (gun ?gun) (ammo ?ammo))
+  :precondition ((has ?person ?gun) (has ?person ?ammo) (ammo-for ?ammo ?gun))
+  :primitive t
+  :effect ((loaded ?gun) (in ?ammo ?gun) (:not (has ?person ?ammo))))
+
+(define (action decide-to-eat)
+  :parameters (?person)
+  :actors (?person)
+  :constraints ((person ?person))
+  :precondition ((hungry ?person))
+  :primitive t
+  :not-needs-intention t
+  :effect ((intends ?person (:not (hungry ?person)))))
+
+(define (action decide-to-get-money)
+  :parameters (?person ?money)
+  :actors (?person)
+  :constraints ((person ?person) (money ?money))
+  :precondition ((:not (has ?person ?money)))
+  :primitive t
+  :not-needs-intention t
+  :effect ((intends ?person (has ?person ?money))))

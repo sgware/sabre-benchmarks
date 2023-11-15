@@ -1,0 +1,18 @@
+(define (problem test)
+  :rank-fun assassin-rank-plan
+  :inits ((place start) (place dropbox) (place lobby) (place office) (place cache)
+          (connection start dropbox) (guarded-connection dropbox lobby) (connection lobby cache)
+          (connection lobby office) (connection cache office)  
+          
+          (papers-required dropbox lobby dox)
+          
+          (person hero) (mobile hero) (at hero start) (alive hero)
+          (person saddam) (at saddam office) (alive saddam)
+          
+          (thing dox) (papers dox) (at dox dropbox)
+          
+          (weapon gun) (at gun cache) (loaded gun)
+
+          (intends hero (:not (alive saddam)))
+          )
+  :goal ((:not (alive saddam))))

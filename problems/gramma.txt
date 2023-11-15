@@ -7,12 +7,12 @@
  * narrative planner. The original domain was designed by Stephen G. Ware, and
  * this subset has been adapted by the same author for Sabre in 2018. It
  * focuses on a protagonist, Tom (originally the goblin in BLP) who has been
- * tasked with obtaining a potion (oringally the hair tonic) for his sick
+ * tasked with obtaining some medicine (oringally the hair tonic) for his sick
  * grandmother (originally the Dark Overlord). This smaller domain was used
  * to create a prototype interactive narrative in the Camelot game engine that
  * adapted the narrative in real time, though all planning was done offline
  * before the game ran. The game has two possible endings: Tom wins by bringing
- * the potion back to his cottage, or Tom dies during his quest.
+ * the medicine back to his cottage, or Tom dies during his quest.
  *
  * Shortest solution where Tom dies (author temporal limit 3; character temporal
  * limit 5; epistemic limit 1):
@@ -28,11 +28,60 @@
  *   walk(Tom, Market, Crossroads)
  *   walk(Tom, Crossroads, Cottage)
  *
+ * Tom turns to crime and gets killed by the guard (author temporal limit 5,
+ * character temporal limit 5; epistemic limit 1):
+ *   walk(Tom, Cottage, Crossroads)
+ *   walk(Tom, Crossroads, Market)
+ *   buy(Tom, MerchantSword, TomCoin, Market)
+ *   rob(Tom, Medicine, Merchant, Market)
+ *   attack(Guard, Tom, Market)
+ *
+ * Tom wins with crime (author temporal limit 6, character temporal limit 5;
+ * epistemic limit 1):
+ *   walk(Tom, Cottage, Crossroads)
+ *   walk(Tom, Crossroads, Market)
+ *   buy(Tom, MerchantSword, TomCoin, Market)
+ *   rob(Tom, Medicine, Merchant, Market)
+ *   walk(Tom, Market, Crossroads)
+ *   walk(Tom, Crossroads, Cottage)
+ *
+ * Many other plans achieve the author's goals using explained actions but are
+ * not minimal. Here are some examples.
+ *
+ * The guard saves Tom (author temporal limit 10; character temporal limit 6;
+ * epistemic limit 2):
+ *   walk(Tom, Cottage, Crossroads)
+ *   walk(Bandit, Camp, Crossroads)
+ *   rob(Bandit, TomCoin, Tom, Crossroads)
+ *   walk(Bandit, Crossroads, Market)
+ *   attack(Guard, Bandit, Market)
+ *   walk(Tom, Crossroads, Market)
+ *   loot(Tom, TomCoin, Bandit, Market)
+ *   buy(Tom, Medicine, TomCoin, Market)
+ *   walk(Tom, Market, Crossroads)
+ *   walk(Tom, Crossroads, Cottage)
+ *
+ * Tom get helps from the guard (author temporal limit 13; character temporal
+ * limit 9; epistemic limit 2):
+ *   walk(Tom, Cottage, Crossroads)
+ *   walk(Bandit, Camp, Crossroads)
+ *   rob(Bandit, TomCoin, Tom, Crossroads)
+ *   walk(Tom, Crossroads, Market)
+ *   report(Tom, Crossroads, Market)
+ *   walk(Guard, Market, Crossroads)
+ *   attack(Guard, Bandit, Crossroads)
+ *   walk(Tom, Market, Crossroads)
+ *   loot(Tom, TomCoin, Bandit, Crossroads)
+ *   walk(Tom, Crossroads, Market)
+ *   buy(Tom, Medicine, TomCoin, Market)
+ *   walk(Tom, Market, Crossroads)
+ *   walk(Tom, Crossroads, Cottage)
+ *
  * The preferred citation for the origin of this domain is:
- *   Stephen G. Ware, Edward T. Garcia, Alireza Shirvani, and Rachelyn Farrell,
- *   "Multi-agent narrative experience management as story graph pruning," in
- *   Proceedings of the 15th AAAI conference on Artificial Intelligence and
- *   Interactive Digital Entertainment, pp. 87-93, 2019.
+ *   Stephen G. Ware, Edward T. Garcia, Mira Fisher, Alireza Shirvani, and
+ *   Rachelyn Farrell, "Multi-agent narrative experience management as story
+ *   graph pruning," in IEEE Transactions on Games, vol 15, num. 3, pp.
+ *   378-387, 2022.
  */
 
 type location;
@@ -56,7 +105,7 @@ entity TomCoin : coin;
 entity BanditCoin : coin;
 entity GuardSword : weapon;
 entity BanditSword : weapon;
-entity MerhcantSword : weapon;
+entity MerchantSword : weapon;
 entity Chest : container;
 
 property alive(character : character) : boolean;
@@ -65,6 +114,28 @@ property criminal(character : character) : boolean;
 property location(character : character) : place;
 property location(item : item) : location;
 property path(from : place, to : place) : boolean;
+
+forall(character : character)
+	alive(character);
+criminal(Bandit);
+location(Tom) = Cottage;
+location(Merchant) = Market;
+location(Guard) = Market;
+location(Bandit) = Camp;
+location(Medicine) = Merchant;
+location(TomCoin) = Tom;
+location(BanditCoin) = Chest;
+location(GuardSword) = Guard;
+location(BanditSword) = Bandit;
+location(MerchantSword) = Merchant;
+path(Crossroads, Cottage);
+path(Crossroads, Market);
+path(Crossroads, Camp);
+believes(Tom, location(Bandit)) = ?;
+believes(Merchant, location(TomCoin)) = ?;
+believes(Merchant, location(BanditCoin)) = ?;
+believes(Guard, location(Bandit)) = ?;
+believes(Bandit, location(Tom)) = Crossroads;
 
 action attack(character : character, other : character, place : place) {
 	precondition:
@@ -252,28 +323,6 @@ trigger path_to(from : place, to : place) {
 	effect:
 		path(to, from);
 };
-
-forall(character : character)
-	alive(character);
-criminal(Bandit);
-location(Tom) = Cottage;
-location(Merchant) = Market;
-location(Guard) = Market;
-location(Bandit) = Camp;
-location(Medicine) = Merchant;
-location(TomCoin) = Tom;
-location(BanditCoin) = Chest;
-location(GuardSword) = Guard;
-location(BanditSword) = Bandit;
-location(MerhcantSword) = Merchant;
-path(Crossroads, Cottage);
-path(Crossroads, Market);
-path(Crossroads, Camp);
-believes(Tom, location(Bandit)) = ?;
-believes(Merchant, location(TomCoin)) = ?;
-believes(Merchant, location(BanditCoin)) = ?;
-believes(Guard, location(Bandit)) = ?;
-believes(Bandit, location(Tom)) = Crossroads;
 
 utility():
 	if(location(Tom) == Cottage & location(Medicine) == Tom)

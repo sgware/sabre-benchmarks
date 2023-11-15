@@ -74,7 +74,7 @@ benchark problems.
 
 ## Version History
 
-- Version 1.0 - First public release testing 24 versions of 14 problems using
+- Version 1.0 - First public release testing 27 versions of 14 problems using
   Sabre version 0.7.
 
 ## Contributions

@@ -1,0 +1,11 @@
+(define (problem test)
+  :rank-fun my-rank-plan
+  :inits ((person frank)
+          (building b1)
+          (place b1)
+          (bomb bomb1)
+          (thing bomb1)
+          (activated bomb1)
+          (has frank bomb1)
+          (at frank b1))
+  :goal ((collapsed b1)))

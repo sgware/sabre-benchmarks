@@ -35,11 +35,16 @@
  *     - If a character is at a safe location, +1 to utility.
  *     - If a character c1 is friends with c2 (i.e. relationship(c1, c2) == 1)
  *       then c1 gets +1 per friend. Characters become friends via the
- *       make_piece action.
+ *       make_peace action.
  *     - If a character c1 has an enemy c2 (i.e. relationship(c1, c2) == -1)
  *       then c1 gets -1 per enemy. A character becomes the enemy of a
  *       guardian when they are at the location guarded by that guardian.
  *     - Friend and enemy relationships end if either character dies.
+ * (7) The story used in the original experiment by Ware et al. is a valid
+ *     sequence of actions in this version, but it is not considered a solution
+ *     because of Sabre's minimality constraint. The interactions between Zoe
+ *     and the Lizard can be removed (making the plan shorter) without
+ *     decreasing the author's utility.
  *
  * Shortest solution for author utility 1 (author temporal limit 2; character
  * temporal limit 0; epistemic limit 0):
@@ -64,6 +69,28 @@
  *   walk(Zoe, Surface, Cave)
  *   make_peace(Zoe, Lizard, Cave)
  *   begin_erupt(Surface)
+ *   erupt(Surface)
+ *
+ * Shortest solution for author utility 5 (author temporal limit 6; character
+ * temporal limit 3; epistemic limit 1):
+ *   teleport_from_ship(Zoe, Ship, Surface)
+ *   walk(Lizard, Cave, Surface)
+ *   make_peace(Zoe, Lizard, Surface)
+ *   begin_erupt(Surface)
+ *   teleport_to_ship(Zoe, Surface, Ship)
+ *   erupt(Surface)
+ *
+ * The solution used in the study by Ware et al. which is not a solution in
+ * Sabre because it is not minimal (author utility 1; author temporal limit 9;
+ * character temporal limt 3; epistemic limit 1):
+ *   teleport_from_ship(Zoe, Ship, Surface)
+ *   walk(Lizard, Cave, Surface)
+ *   attack(Lizard, Zoe, Surface)
+ *   stun(Zoe, Lizard, Surface)
+ *   begin_erupt(Surface)
+ *   teleport_to_ship(Zoe, Surface, Ship)
+ *   break_free(Lizard, Surface)
+ *   walk(Lizard, Surface, Cave)
  *   erupt(Surface)
  *
  * The preferred citation for the origin of this domain is:
@@ -321,14 +348,14 @@ trigger anger_guardian(character : character, guardian : character, place : land
 		at(character) == place &
 		guardian(guardian, place) &
 		status(guardian) != Dead &
-		relationship(guardian, character) >= 0;
+		relationship(guardian, character) == 0;
 	effect:
 		relationship(guardian, character) = -1;
 };
 
 trigger end_relationship(character : character, other : character) {
 	precondition:
-		status(other) == Dead &
+		status(character) == Dead &
 		relationship(character, other) != 0;
 	effect:
 		relationship(character, other) = 0;

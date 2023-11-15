@@ -1,0 +1,3 @@
+begin_erupt(Surface)
+erupt(Surface)
+goal(relationship(Zoe, Lizard) <= 0 & status(Zoe) != Dead & status(Lizard) != Dead & status(Surface) == Uninhabitable)

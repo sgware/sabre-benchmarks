@@ -1,0 +1,13 @@
+(define (problem test)
+  :rank-fun genie-rank-plan
+  :inits ((character hero) (male hero) (knight hero) (at hero castle) (alive hero) (single hero) (loyal-to hero king)
+          (character king) (male king) (king king) (at king castle) (alive king) (single king)
+          (character jasmine) (female jasmine) (at jasmine castle) (alive jasmine) (single jasmine) (beautiful jasmine)
+          (character dragon) (monster dragon) (dragon dragon) (at dragon mountain) (alive dragon) (scary dragon)
+          (character genie) (monster genie) (genie genie) (in genie lamp) (confined genie) (alive genie) (scary genie)
+          (place castle)
+          (place mountain)
+          (thing lamp) (magic-lamp lamp)
+          (has dragon lamp)
+          )
+  :goal ((not (alive genie)) (married-to king jasmine)))

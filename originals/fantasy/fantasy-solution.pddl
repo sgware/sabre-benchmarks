@@ -1,0 +1,8 @@
+(define (plan marriage-solution)
+  (:problem marriage)
+  (:steps (propose rory talia village)
+          (accept talia rory village)
+          (travel rory village cave)
+          (steal rory gargax treasure cave)
+          (travel rory cave village)
+          (marry rory talia village)))

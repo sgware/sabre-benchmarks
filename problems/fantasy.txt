@@ -15,20 +15,20 @@
  *     location, regardless of who owns it. A character can take an item from
  *     another character if that character is dead.
  * (2) When an item was stolen, the owner only wanted to get it back if they
- *     witnesses the theft. Now, any character who desires wealth can improve
+ *     witnessed the theft. Now, any character who desires wealth can improve
  *     their utility by having valuable items, regardless of who owns them.
  *     Thus the dragon will always want the treasure, but will also want
  *     Vince's money.
- * (3) The goals of the problem has been translated into numeric utility
+ * (3) The goals of the problem have been translated into numeric utility
  *     functions. Any character who is dead automatically has a utility of 0.
  *     Characters become happy by being married to someone they love.
  *     Characters are wealthy when they have valuable items or when their 
- *     spouse has valuable items. Move valuable items means higher wealth.
+ *     spouse has valuable items. More valuable items means higher wealth.
  *     Characters alleviate hunger by eating others.
  * (4) Each character has a slightly different utility function to add variety:
  *     - Talia wants to be happy and wealthy; she does not care about hunger.
- *     - Rory wants to be happy and fed; he does not care about wealth.
- *     - Vince wants to be happy, wealthy, and fed.
+ *     - Rory wants to be happy, wealthy, and fed.
+ *     - Vince wants to be happy and fed; he does not care about wealth.
  *     - Gargax wants to be wealthy and fed; she does not care about happiness.
  * (5) The author's utility is the sum of Talia's happiness and wealth. This
  *     allows for various solutions with utilities ranging from 1 to 3. The
@@ -59,6 +59,15 @@
  *   marry(Rory, Talia, Village)
  *   travel(Talia, Village, Cave)
  *   pickup(Talia, Treasure, Cave)
+ *
+ * The solution used in the study by Ware et al. (author utility 2; author
+ * temporal limit 6, character temporal limit 3; epistemic limit 2):
+ *   propose(Rory, Talia, Village)
+ *   accept(Talia, Rory, Village)
+ *   travel(Rory, Village, Cave)
+ *   pickup(Rory, Treasure, Cave)
+ *   travel(Rory, Cave, Village)
+ *   marry(Rory, Talia, Village)
  *
  * Shortest solution with author utility 3 (author temporal limit 9, character
  * temporal limit 3; epistemic limit 2):
@@ -359,13 +368,13 @@ utility(Rory):
 	if(!alive(Rory))
 		0
 	else
-		happiness(Rory) - hunger(Rory);
+		happiness(Rory) + wealth(Rory) - hunger(Rory);
 
 utility(Vince):
 	if(!alive(Vince))
 		0
 	else
-		happiness(Vince) + wealth(Vince) - hunger(Vince);
+		happiness(Vince) - hunger(Vince);
 
 utility(Gargax):
 	if(!alive(Gargax))

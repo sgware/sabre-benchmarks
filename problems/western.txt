@@ -1,13 +1,13 @@
 /**
- * The Snakebite
+ * Western
  *
  * This domain tells a story in the American old West of a father who steals
  * medicine to save his son from a snakebite and is imprisoned for the theft.
  * The domain was originally written by Stephen G. Ware in 2012 for an
  * experiment to validate a plan-based model of narrative conflict. It was used
- * in the CPOCL and Glaive narrative planners, sometimes under the name
- * 'western.' It was adapted for Sabre by the same author in 2023. A few
- * changes have been made to rule out unintended stories:
+ * in the CPOCL and Glaive narrative planners. It was adapted for Sabre by the
+ * same author in 2023. A few changes have been made to rule out unintended
+ * stories:
  * (1) Will is the sheriff. This was a mistake in the original domain, which
  *     failed to specify who the sheriff was in the initial state.
  * (2) All actions specify a location in which they happen. This is needed

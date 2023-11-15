@@ -98,6 +98,17 @@ property chores(main : main) : boolean;
 property locked(Gym) : boolean;
 property disguised(main : main) : boolean;
 
+alive(Ernest);
+alive(Roy);
+alive(Bully);
+location(Ernest) = Cells;
+location(Roy) = Cells;
+location(Bully) = Cells;
+location(Cigarettes) = Cells;
+location(Clothes) = Laundry;
+location(Knife) = Kitchen;
+time() = Day1;
+
 action confiscate(main : main, item : item, place : place, punishment : place) {
 	precondition:
 		(punishment == Highway | punishment == Gym) &
@@ -267,17 +278,6 @@ trigger see_not_at(character : character, other : character, place : place) {
 	effect:
 		believes(character, location(other)) = place;
 };
-
-alive(Ernest);
-alive(Roy);
-alive(Bully);
-location(Ernest) = Cells;
-location(Roy) = Cells;
-location(Bully) = Cells;
-location(Cigarettes) = Cells;
-location(Clothes) = Laundry;
-location(Knife) = Kitchen;
-time() = Day1;
 
 utility():
 	(if(location(Cigarettes) != Cells & !threatened(Ernest)) 3 else 0) +

@@ -79,20 +79,23 @@ public class Main {
 		list.add(new Benchmark("hospital_both",		"hospital",			2,		11,		5,		3	));
 		list.add(new Benchmark("basketball_any",	"basketball",		1,		7,		5,		2	));
 		list.add(new Benchmark("basketball_both",	"basketball",		2,		7,		5,		2	));
-		list.add(new Benchmark("snakebite",			"snakebite",		1,		8,		5,		1	));
+		list.add(new Benchmark("western",			"western",			1,		8,		5,		1	));
 		list.add(new Benchmark("fantasy_any",		"fantasy",			1,		9,		3,		2	));
 		list.add(new Benchmark("fantasy_two",		"fantasy",			2,		9,		3,		2	));
 		list.add(new Benchmark("fantasy_all",		"fantasy",			3,		9,		3,		2	));
-		list.add(new Benchmark("space_lose",		"space",			2,		5,		3,		1	));
-		list.add(new Benchmark("space_win",			"space",			3,		5,		3,		1	));
+		list.add(new Benchmark("space_any",			"space",			1,		9,		3,		1	));
+		list.add(new Benchmark("space_two",			"space",			2,		9,		3,		1	));
+		list.add(new Benchmark("space_three",		"space",			3,		9,		3,		1	));
+		list.add(new Benchmark("space_four",		"space",			4,		9,		3,		1	));
+		list.add(new Benchmark("space_all",			"space",			5,		9,		3,		1	));
 		list.add(new Benchmark("raiders",			"raiders",			1,		7,		4,		1	));
 		list.add(new Benchmark("treasure",			"treasure",			1,		4,		4,		3	));
-		list.add(new Benchmark("gramma_lose",		"gramma",			1,		5,		5,		1	));
-		list.add(new Benchmark("gramma_win",		"gramma",			2,		5,		5,		1	));
+		list.add(new Benchmark("gramma_any",		"gramma",			1,		6,		5,		2	));
+		list.add(new Benchmark("gramma_win",		"gramma",			2,		6,		5,		2	));
 		list.add(new Benchmark("jailbreak_lose",	"jailbreak",		1,		7,		6,		1	));
 		list.add(new Benchmark("jailbreak_escape",	"jailbreak",		3,		7,		6,		1	));
 		list.add(new Benchmark("jailbreak_revenge",	"jailbreak",		6,		7,		6,		1	));
-		list.add(new Benchmark("lovers",			"lovers",			1,		5,		5,		1	));
+		list.add(new Benchmark("lovers",			"lovers",			1,		5,		5,		2	));
 		return list;
 	}
 	
@@ -202,7 +205,7 @@ public class Main {
 					System.out.println("\nWarning: Problem \"" + problem.name + "\" does not have an assoicated solution to verify.");
 				else {
 					ProgressionCostFactory heuristic = planner.getHeuristic();
-					planner.setHeuristic(new VerifyHeuristic.Factory(heuristic, problem.getSolution()));
+					planner.setHeuristic(new VerificationHeuristic.Factory(heuristic, problem.getSolution()));
 					ProgressionSearch search = getSearch(problem, planner, false, status);
 					Result<CompiledAction> result = search.get(status);
 					if(result.getSuccess())

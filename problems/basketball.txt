@@ -18,13 +18,13 @@
  * epistemic limit 2):
  *   travel(Bob, HomeB, BasketballCourt)
  *   travel(Alice, Downtown, BasketballCourt)
- *   playBasketball(Bob, Alice, BasketballCourt)
+ *   play_basketball(Bob, Alice, BasketballCourt)
  * 
  * Shortest solution where a citizen is arrested (author temporal limit 4;
  * character temporal limit 2; epistemic limit 1):
  *   kill(Charlie, Alice, Bat, Downtown)
- *   findClues(Sherlock, Murder, Bat, Downtown)
- *   suspectOfCrime(Sherlock, Charlie, Murder, Bat, Downtown)
+ *   find_clues(Sherlock, Murder, Bat, Downtown)
+ *   suspect_of_crime(Sherlock, Charlie, Murder, Bat, Downtown)
  *   arrest(Sherlock, Charlie, Downtown, Murder)
  *
  * Shortest solution where characters play basketball and a citizen is arrested
@@ -33,8 +33,8 @@
  *   travel(Alice, Downtown, BasketballCourt)
  *   travel(Sherlock, Downtown, BasketballCourt)
  *   steal(Alice, Bob, Basketball, BasketballCourt)
- *   playBasketball(Alice, Bob, BasketballCourt)
- *   suspectOfCrime(Sherlock, Alice, Theft, Basketball, BasketballCourt)
+ *   play_basketball(Alice, Bob, BasketballCourt)
+ *   suspect_of_crime(Sherlock, Alice, Theft, Basketball, BasketballCourt)
  *   arrest(Sherlock, Alice, BasketballCourt, Theft)
  *
  * The preferred citation for the origin of this domain is:
@@ -128,7 +128,7 @@ action steal(thief : citizen, victim : citizen, item : item, place : place){
 	observing(c : character) : (c == thief | c == victim) | (at(c) == place & place != Downtown); // crimes downtown aren't observed
 };
 
-action playBasketball(player1 : citizen, player2 : citizen, place : basketballPlace){
+action play_basketball(player1 : citizen, player2 : citizen, place : basketballPlace){
 	precondition:
 		player1 != player2 &
 		at(player1) == place &
@@ -159,7 +159,7 @@ action kill(killer : citizen, victim : citizen, item : item, place : place){
 	observing(c : character) : c == killer | (at(c) == place & place != Downtown); 
 };
 	
-action findClues(police : police, crime : crime, item : item, place : place){
+action find_clues(police : police, crime : crime, item : item, place : place){
 	precondition:
 		at(police) == place &
 		alive(police);
@@ -171,7 +171,7 @@ action findClues(police : police, crime : crime, item : item, place : place){
 	observing(c : character) : at(c) == place;
 };
 
-action shareClues(police1 : police, police2 : police, crime : crime, item : item, place : place){
+action share_clues(police1 : police, police2 : police, crime : crime, item : item, place : place){
 	precondition:
 		police1 != police2 &
 		at(police1) == place &
@@ -185,7 +185,7 @@ action shareClues(police1 : police, police2 : police, crime : crime, item : item
 	observing(c : character) : at(c) == place;
 };
  
-action suspectOfCrime(police : police, citizen : citizen, crime : crime, item : item, place : place){
+action suspect_of_crime(police : police, citizen : citizen, crime : crime, item : item, place : place){
 	precondition:
 		police != citizen &
 		at(police) == place &

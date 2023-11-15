@@ -1,0 +1,46 @@
+(define (action bribe)
+  :parameters (?person ?target ?money)
+  :actors (?person)
+  :constraints ((person ?person) (person ?target) (money ?money) (evil ?person))
+  :precondition ((has ?person ?money) (:neq ?person ?target))
+  :primitive t
+  :effect ((corrupt ?target) (controls ?person ?target)
+           (:not (has ?person ?money)) (has ?target ?money)))
+
+(define (action give)
+  :parameters (?person ?target ?thing)
+  :actors (?person)
+  :constraints ((person ?person) (person ?target) (thing ?thing))
+  :precondition ((has ?person ?thing) (:neq ?person ?target))
+  :primitive t
+  :effect ((:not (has ?person ?thing)) (has ?target ?thing)))
+
+(define (action coerce)
+  :parameters (?person ?victim ?objective)
+  :actors (?person)
+  :constraints ((person ?person) (person ?victim))
+  :precondition ((afraid-of ?victim ?person) (:neq ?person ?victim))
+  :primitive t
+  :effect ((intends ?victim ?objective)))
+
+(define (action threaten)
+  :parameters (?person ?victim)
+  :actors (?person)
+  :constraints ((person ?person) (person ?victim) (evil ?person))
+  :precondition nil
+  :primitive t
+  :effect ((afraid-of ?victim ?person)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;(define (interesting-conditions bribe)
+;    :conditions (bribed-by has corrupt controls))
+
+;(define (interesting-conditions threaten)
+;    :conditions (afraid-of))
+
+;(define (interesting-conditions give)
+;    :conditions (has))
+
+;(define (interesting-conditions nil)
+;    :conditions (has))

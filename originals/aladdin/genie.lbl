@@ -1,0 +1,123 @@
+(define (action travel)
+  :parameters (?traveller ?from ?dest)
+  :actors (?traveller)
+  :constraints ((character ?traveller) (place ?from) (place ?dest))
+  :precondition ((at ?traveller ?from) (alive ?traveller) (:neq ?from ?dest))
+  :primitive t
+  :effect ((not (at ?traveller ?from)) (at ?traveller ?dest)))
+
+(define (action slay)
+  :parameters (?slayer ?monster ?place)
+  :actors (?slayer)
+  :constraints ((knight ?slayer) (monster ?monster) (place ?place))
+  :precondition ((at ?slayer ?place) (at ?monster ?place) (alive ?slayer) (alive ?monster))
+  :primitive t
+  :effect ((not (alive ?monster))))
+
+(define (action pillage)
+  :parameters (?pillager ?body ?thing ?place)
+  :actors (?pillager)
+  :constraints ((character ?pillager) (character ?body) (thing ?thing) (place ?place))
+  :precondition ((at ?pillager ?place) (at ?body ?place) (has ?body ?thing) (not (alive ?body)) (alive ?pillager) 
+                 (:neq ?pillager ?body))
+  :primitive t
+  :effect ((not (has ?body ?thing)) (has ?pillager ?thing)))
+
+(define (action give)
+  :parameters (?giver ?givee ?thing ?place)
+  :actors (?giver)
+  :constraints ((character ?giver) (character ?givee) (thing ?thing) (place ?place))
+  :precondition ((at ?giver ?place) (at ?givee ?place) (has ?giver ?thing) (alive ?giver) (alive ?givee)
+                 (:neq ?giver ?givee))
+  :primitive t
+  :effect ((not (has ?giver ?thing)) (has ?givee ?thing)))
+
+(define (action summon)
+  :parameters (?char ?genie ?lamp ?place)
+  :actors (?char)
+  :constraints ((character ?char) (genie ?genie) (magic-lamp ?lamp) (place ?place))
+  :precondition ((at ?char ?place) (has ?char ?lamp) (in ?genie ?lamp) (alive ?char) (alive ?genie)
+                 (:neq ?char ?genie))
+  :primitive t
+  :effect ((at ?genie ?place) (not (in ?genie ?lamp)) (not (confined ?genie)) (controls ?char ?genie ?lamp)))
+
+(define (action love-spell)
+  :parameters (?genie ?target ?lover)
+  :actors (?genie)
+  :constraints ((genie ?genie) (character ?target) (character ?lover))
+  :precondition ((not (confined ?genie)) (not (loves ?target ?lover)) (alive ?genie) (alive ?target) (alive ?lover)
+                 (:neq ?genie ?target) (:neq ?genie ?lover) (:neq ?target ?lover))
+  :primitive t
+  :effect ((loves ?target ?lover)
+           (intends ?target (married-to ?target ?lover))))
+
+(define (action marry)
+  :parameters (?groom ?bride ?place)
+  :actors (?groom ?bride)
+  :constraints ((male ?groom) (female ?bride) (place ?place))
+  :precondition ((at ?groom ?place) (at ?bride ?place) (loves ?groom ?bride) (loves ?bride ?groom)
+                 (alive ?groom) (alive ?bride))
+  :primitive t
+  :effect ((married ?groom) (married ?bride) 
+           (not (single ?groom)) (not (single ?bride))
+           (married-to ?groom ?bride) (married-to ?bride ?groom)))
+
+(define (action fall-in-love)
+  :parameters (?male ?female ?place)
+  :actors (?male)
+  :not-needs-intention t
+  :constraints ((male ?male) (female ?female) (place ?place))
+  :precondition ((at ?male ?place) (at ?female ?place) (single ?male) (alive ?male) (alive ?female)
+                 (not (loves ?male ?female)) (not (loves ?female ?male)) (beautiful ?female))
+  :primitive t
+  :effect ((loves ?male ?female)
+           (intends ?male (married-to ?male ?female))))
+
+(define (action order)
+  :parameters (?king ?knight ?place ?objective)
+  :actors (?king)
+  :constraints ((king ?king) (knight ?knight) (place ?place))
+  :precondition ((at ?king ?place) (at ?knight ?place) (alive ?king) (alive ?knight) (loyal-to ?knight ?king))
+  :primitive t
+  :effect ((intends ?knight ?objective)))
+
+(define (action command)
+  :parameters (?char ?genie ?lamp ?objective)
+  :actors (?char)
+  :constraints ((character ?char) (genie ?genie) (magic-lamp ?lamp))
+  :precondition ((has ?char ?lamp) (controls ?char ?genie ?lamp) (alive ?char) (alive ?genie)
+                 (:neq ?char ?genie))
+  :primitive t
+  :effect ((intends ?genie ?objective)))
+
+(define (action appear-threatening)
+  :parameters (?monster ?char ?place)
+  :actors (?monster)
+  :not-needs-intention t
+  :constraints ((monster ?monster) (character ?char) (place ?place))
+  :precondition ((at ?monster ?place) (at ?char ?place) (scary ?monster) (:neq ?monster ?char))
+  :primitive t
+  :effect ((intends ?char (not (alive ?monster)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (interesting-conditions nil)
+  :conditions (has dragon genie magic-lamp knight king in male female monster loves (:not loves)))
+
+(define (interesting-conditions pillage)
+  :conditions ((:not alive)))
+
+(define (interesting-conditions love-spell)
+  :conditions (loves (:not loves)))
+
+(define (interesting-conditions summon)
+  :conditions (in (:not in) controls (:not confined)))
+
+(define (interesting-conditions fall-in-love)
+  :conditions (single beautiful))
+
+(define (interesting-conditions order)
+  :conditions (loyal-to))
+
+(define (interesting-conditions appear-threatening)
+  :conditions (scary))

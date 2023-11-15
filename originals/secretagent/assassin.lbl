@@ -1,0 +1,44 @@
+(define (action move)
+  :parameters (?person ?start ?dest)
+  :actors (?person)
+  :constraints ((person ?person) (place ?start) (place ?dest))
+  :precondition ((at ?person ?start) (mobile ?person) (alive ?person) (connection ?start ?dest)
+                 (:neq ?start ?dest))
+  :primitive t
+  :effect ((at ?person ?dest) (not (at ?person ?start))))
+
+(define (action move-through-guards)
+  :parameters (?person ?start ?dest ?papers)
+  :actors (?person)
+  :constraints ((person ?person) (place ?start) (place ?dest) (papers ?papers))
+  :precondition ((at ?person ?start) (mobile ?person) (alive ?person) (:not (armed ?person))
+                 (has ?person ?papers) (guarded-connection ?start ?dest) (papers-required ?start ?dest ?papers)
+                 (:neq ?start ?dest))
+  :primitive t
+  :effect ((at ?person ?dest) (not (at ?person ?start))))
+
+(define (action kill)
+  :parameters (?person ?victim ?place ?weapon)
+  :actors (?person)
+  :constraints ((person ?person) (person ?victim) (place ?place) (weapon ?weapon))
+  :precondition ((at ?person ?place) (at ?victim ?place) (armed ?person) (has ?person ?weapon) (loaded ?weapon)
+                 (:neq ?person ?victim))
+  :primitive t
+  :effect ((not (alive ?victim))))
+
+(define (action pickup)
+  :parameters (?person ?thing ?place)
+  :actors (?person)
+  :constraints ((person ?person) (thing ?thing) (place ?place))
+  :precondition ((at ?person ?place) (at ?thing ?place))
+  :primitive t
+  :effect ((has ?person ?thing) (not (at ?thing ?place))))
+
+(define (action pickup-weapon)
+  :parameters (?person ?weapon ?place)
+  :actors (?person)
+  :constraints ((person ?person) (weapon ?weapon) (place ?place))
+  :precondition ((at ?person ?place) (at ?weapon ?place))
+  :primitive t
+  :effect ((has ?person ?weapon) (armed ?person) (not (at ?weapon ?place))))
+
