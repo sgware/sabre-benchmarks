@@ -109,43 +109,24 @@ public class TestSuite {
 		/** Status object for this thread */
 		private final Status status = new Status();
 		
-		/** The exception which stopped this thread */
-		private Exception exception = null;
-		
 		@Override
 		public void run() {
+			Exception exception = new RuntimeException("One of the threads running tests did not finish correctly, perhaps due to an out of memory error.");
 			try {
-				exception = new RuntimeException("One of the threads running tests did not finish correctly, perhaps due to an out of memory error.");
 				Test test = getNext();
 				while(test != null) {
 					complete(test, test.getSearch(status).get(status));
 					test = getNext();
 				}
-				exception = null;
+				return;
 			}
 			catch(Exception e) {
 				exception = e;
 			}
-		}
-		
-		/**
-		 * Waits for this runner to finish. If it is interrupted or if an
-		 * exception causes the thread to crash, those exceptions will be thrown
-		 * by this method.
-		 * 
-		 * @throws InterruptedException if the runner is interrupted
-		 * @throws Exception if an exception occurred while the runner was
-		 * running tests
-		 */
-		public void waitToFinish() throws Exception {
-			try {
-				join();
+			catch(Throwable t) {
+				// Keep the existing run time exception.
 			}
-			catch(InterruptedException e) {
-				throw e;
-			}
-			if(exception != null)
-				throw exception;
+			TestSuite.this.exception = exception;
 		}
 	}
 	
@@ -154,6 +135,9 @@ public class TestSuite {
 	
 	/** The report to update once each test is complete */
 	private final Report report;
+	
+	/** An exception thrown by a {@link Runner runner} */
+	private Exception exception = null;
 	
 	/** The number of completed tests */
 	private int complete = 0;
@@ -181,10 +165,11 @@ public class TestSuite {
 	
 	/**
 	 * Runs all tests in parallel, printing updates as tests start and finish.
+	 * If one of the threads running tests throws an exception, that exception
+	 * will be caught and thrown again from this method.
 	 * 
 	 * @param status a status object to update as tests complete
-	 * @throws InterruptedException if one of the threads running tests is
-	 * interrupted
+	 * @throws Exception if one of the threads running tests throw an exception
 	 */
 	public void run(Status status) throws Exception {
 		status.setMessage("Running tests: %d of " + tests.length + " complete", 0);
@@ -195,11 +180,15 @@ public class TestSuite {
 			runners[i].start();
 		}
 		for(Runner runner : runners)
-			runner.waitToFinish();
-		status.setMessage("Test complete.");
+			runner.join();
+		if(exception != null)
+			throw exception;
+		status.setMessage("Tests complete.");
 	}
 	
 	private synchronized Test getNext() {
+		if(exception != null)
+			return null;
 		boolean ordered = true;
 		boolean print = false;
 		Test result = null;
