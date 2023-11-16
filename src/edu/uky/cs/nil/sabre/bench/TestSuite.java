@@ -109,13 +109,43 @@ public class TestSuite {
 		/** Status object for this thread */
 		private final Status status = new Status();
 		
+		/** The exception which stopped this thread */
+		private Exception exception = null;
+		
 		@Override
 		public void run() {
-			Test test = getNext();
-			while(test != null) {
-				complete(test, test.getSearch(status).get(status));
-				test = getNext();
+			try {
+				exception = new RuntimeException("One of the threads running tests did not finish correctly, perhaps due to an out of memory error.");
+				Test test = getNext();
+				while(test != null) {
+					complete(test, test.getSearch(status).get(status));
+					test = getNext();
+				}
+				exception = null;
 			}
+			catch(Exception e) {
+				exception = e;
+			}
+		}
+		
+		/**
+		 * Waits for this runner to finish. If it is interrupted or if an
+		 * exception causes the thread to crash, those exceptions will be thrown
+		 * by this method.
+		 * 
+		 * @throws InterruptedException if the runner is interrupted
+		 * @throws Exception if an exception occurred while the runner was
+		 * running tests
+		 */
+		public void waitToFinish() throws Exception {
+			try {
+				join();
+			}
+			catch(InterruptedException e) {
+				throw e;
+			}
+			if(exception != null)
+				throw exception;
 		}
 	}
 	
@@ -156,7 +186,7 @@ public class TestSuite {
 	 * @throws InterruptedException if one of the threads running tests is
 	 * interrupted
 	 */
-	public void run(Status status) throws InterruptedException {
+	public void run(Status status) throws Exception {
 		status.setMessage("Running tests: %d of " + tests.length + " complete", 0);
 		this.status = status;
 		Runner[] runners = new Runner[Main.THREADS];
@@ -165,7 +195,7 @@ public class TestSuite {
 			runners[i].start();
 		}
 		for(Runner runner : runners)
-			runner.join();
+			runner.waitToFinish();
 		status.setMessage("Test complete.");
 	}
 	
