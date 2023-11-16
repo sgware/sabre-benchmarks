@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import edu.uky.cs.nil.sabre.Settings;
+import edu.uky.cs.nil.sabre.search.Planner;
 
 /**
  * A {@link ReportPrinter report printer} that writes a {@link Report report} to
@@ -52,6 +53,7 @@ public class HTMLReportPrinter implements ReportPrinter {
 		this(new BufferedWriter(new FileWriter(file)));
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void print(Report report) throws IOException {
 		print("<!DOCTYPE html>\n");
@@ -71,7 +73,24 @@ public class HTMLReportPrinter implements ReportPrinter {
 		print("\t\t<h1>Sabre Benchmark Results</h1>\n");
 		print("\t\t<p>This report describes benchmark tests for the " + Settings.TITLE + " version " + Settings.VERSION_STRING + " by " + Settings.AUTHORS + ".</p>\n");
 		print("\t\t<p>Tests were run on the " + System.getProperty("java.vendor") + " Java Runtime Environment version " + System.getProperty("java.version") + ", ");
-		print("running on the " + System.getProperty("os.name") + " operating system version " + System.getProperty("os.version") + ".</p>\n");
+		print("running on the " + System.getProperty("os.name") + " operating system version " + System.getProperty("os.version") + ". ");
+		print("The JRE used " + toMemory(Runtime.getRuntime().totalMemory()) + " of memory.");
+		if(Runtime.getRuntime().maxMemory() != Long.MAX_VALUE)
+			print(" It had a maximum memory of " + toMemory(Runtime.getRuntime().maxMemory()) + ".");
+		print("</p>\n\t\t<p>");
+		if(Main.SEARCH_LIMIT == Planner.UNLIMITED_NODES)
+			print("There was no limit on the number of nodes a search could visit. ");
+		else
+			print("Each search was limited to visiting " + Main.SEARCH_LIMIT + " nodes. ");
+		if(Main.SPACE_LIMIT == Planner.UNLIMITED_NODES)
+			print("There was no limit on the number of nodes a search could generate. ");
+		else
+			print("Each search was limited to generating " + Main.SEARCH_LIMIT + " nodes. ");
+		if(Main.TIME_LIMIT == Planner.UNLIMITED_TIME)
+			print("There was no time limit on a search.");
+		else
+			print("Each search was limited to a " + Main.TIME_LIMIT + " ms run time.");
+		print("</p>\n");
 		print("\t\t<p>Tests began on ");
 		print(toDateTime(report.getStart()));
 		print(" and ended on ");
@@ -165,6 +184,45 @@ public class HTMLReportPrinter implements ReportPrinter {
 			string += " " + milliseconds + " millisecond" + (milliseconds > 1 ? "s" : "");
 		if(string.isEmpty())
 			return "0 milliseconds";
+		return string.trim();
+	}
+	
+	private static final String toMemory(long bytes) {
+		final long kilobyte = 1000;
+		final long megabyte = kilobyte * kilobyte;
+		final long gigabyte = megabyte * kilobyte;
+		final long terabyte = gigabyte * kilobyte;
+		long kilobytes = 0;
+		long megabytes = 0;
+		long gigabytes = 0;
+		long terabytes = 0;
+		while(bytes > terabyte) {
+			terabytes++;
+			bytes -= terabyte;
+		}
+		while(bytes > gigabyte) {
+			gigabytes++;
+			bytes -= gigabyte;
+		}
+		while(bytes > megabyte) {
+			megabytes++;
+			bytes -= megabyte;
+		}
+		while(bytes > kilobyte) {
+			kilobytes++;
+			bytes -= kilobyte;
+		}
+		String string = "";
+		if(terabytes > 0)
+			string += terabytes + " TB";
+		if(gigabytes > 0)
+			string += " " + gigabytes + " GB";
+		if(megabytes > 0)
+			string += " " + megabytes + " MB";
+		if(kilobytes > 0)
+			string += " " + kilobytes + " KB";
+		if(bytes > 0)
+			string += " " + bytes + " B";
 		return string.trim();
 	}
 

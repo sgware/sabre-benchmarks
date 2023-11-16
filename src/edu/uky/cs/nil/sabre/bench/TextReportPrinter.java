@@ -55,6 +55,8 @@ public class TextReportPrinter implements ReportPrinter {
 		print("JRE Version:   " + System.getProperty("java.version") + "\n");
 		print("OS Name:       " + System.getProperty("os.name") + "\n");
 		print("OS Version:    " + System.getProperty("os.version") + "\n");
+		print("Memory Used:   " + Runtime.getRuntime().totalMemory() + "B\n");
+		print("Max Memory:    " + Runtime.getRuntime().maxMemory() + "B\n");
 		print("Threads:       " + Main.THREADS + "\n");
 		print("Runs:          " + Main.RUNS + "\n");
 		print("Shuffle:       " + Main.SHUFFLE + "\n");
