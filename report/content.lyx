@@ -1,0 +1,8806 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{bibentry}
+\nobibliography*
+\usepackage[T1]{fontenc}
+\usepackage{libertine}
+\usepackage{libertinust1math}
+\usepackage[scaled=0.83]{beramono}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1.5in
+\topmargin 1.5in
+\rightmargin 1.5in
+\bottommargin 1.5in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Storytelling algorithms have existed since at least Meehan's seminal 1977
+ paper on 
+\emph on
+Tale-Spin
+\emph default
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "meehan1977tale"
+literal "false"
+
+\end_inset
+
+, which generated short stories similar to Aesop's Fables.
+ These algorithms can be classified according to several features
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "kybartas2016survey"
+literal "false"
+
+\end_inset
+
+.
+ For this report, we focus on story planning algorithms.
+ Planning algorithms perform a search to determine whether a story meeting
+ certain requirements is possible.
+ Story 
+\emph on
+planning
+\emph default
+ algorithms can be contrasted with 
+\emph on
+reactive
+\emph default
+ algorithms (like ABL
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "mateas2004behavior"
+literal "false"
+
+\end_inset
+
+ and other descendants of the Oz Project
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "mateas2001oz"
+literal "false"
+
+\end_inset
+
+), which decide on the next story event based on the current state and perform
+ little or no lookahead when making their decisions.
+ Reactive storytelling systems scale well but produce emergent stories that
+ may be hard to control.
+ Planning systems are expensive but can guarantee constraints on a story's
+ content and structure.
+\end_layout
+
+\begin_layout Standard
+Young
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "young1999notes"
+literal "false"
+
+\end_inset
+
+ was perhaps the first to suggest that AI planning algorithms would be suitable
+ for interactive storytelling in computer systems.
+ A planning algorithm is a symbolic, logical system that takes as input
+ (1) a description of the initial state, (2) a goal, and (3) a set of possible
+ actions which have preconditions that must hold before they occur and effects
+ which modify the world state.
+ A planning algorithm, or 
+\emph on
+planner
+\emph default
+, searches for a plan—a sequence of actions executable in the initial state
+ that achieves the goal
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "weld1999recent"
+literal "false"
+
+\end_inset
+
+.
+ Young observed that planners provide a formal, generative model of action
+ and can reason about narratively important properties like causality.
+\end_layout
+
+\begin_layout Subsection
+Planners for Narrative vs.
+ Narrative Planners
+\end_layout
+
+\begin_layout Standard
+To oversimplify the research landscape, there are two broad approaches to
+ planning stories.
+ The first uses off-the-shelf planners for storytelling purposes.
+ Their advantage is that advances in planning research can immediately be
+ leveraged for storytelling.
+ Their disadvantage is that all narrative reasoning must be encoded into
+ the preconditions and effects of actions, or into other features provided
+ by a planner that was not designed for storytelling.
+ This approach is often used by Marc Cavazza and his academic descendants
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "cavazza2002character,porteous2010applying"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The second approach modifies planning algorithms to reason directly about
+ narrative phenomena.
+ In this approach, the preconditions and effects of actions are limited
+ to the most basic constraints; other features of the planner decide when
+ they should occur based on explicit narrative reasoning.
+ Their advantage is a richer set of storytelling features in the algorithm;
+ their disadvantage is that it becomes difficult to integrate advances in
+ planning research into these systems.
+ This approach is often used by R.
+ Michael Young and his academic descendants
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "young2013plans"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+About Sabre
+\end_layout
+
+\begin_layout Standard
+The Sabre narrative planner
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2021sabre"
+literal "false"
+
+\end_inset
+
+ arose from the second school of thought.
+ Though none of its individual features is unique, it is the first algorithm
+ with this particular set of features:
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Intentionality:
+\emph default
+ A character can only take an action if they believe it will further their
+ goals.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Conflict:
+\emph default
+ Characters can thwart one another's plans, and stories can contain failed
+ or partially-executed character plans.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Arbitrary Theory of Mind:
+\emph default
+ It reasons about what is actually true, what character 
+\begin_inset Formula $x$
+\end_inset
+
+ believes, what 
+\begin_inset Formula $x$
+\end_inset
+
+ believes character 
+\begin_inset Formula $y$
+\end_inset
+
+ believes, what 
+\begin_inset Formula $x$
+\end_inset
+
+ believes 
+\begin_inset Formula $y$
+\end_inset
+
+ believes 
+\begin_inset Formula $z$
+\end_inset
+
+ believes, and so on, arbitrarily.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+No Uncertainty:
+\emph default
+ Beliefs can be wrong, but characters always commit to their beliefs.
+ They can believe 
+\begin_inset Formula $p$
+\end_inset
+
+ when 
+\begin_inset Formula $\neg p$
+\end_inset
+
+ is the case, but they cannot believe 
+\begin_inset Formula $p\vee q$
+\end_inset
+
+.
+ This limitation increases the size of the problems Sabre can solve at the
+ cost of a feature some might find desirable.
+\end_layout
+
+\begin_layout Standard
+\noindent
+This set of features was chosen based on the needs of the interactive narratives
+ we are developing at the Narrative Intelligence Lab at the University of
+ Kentucky.
+ We make no claim that they are the most desirable in general.
+\end_layout
+
+\begin_layout Standard
+Sabre begins at the initial state of a storytelling problem and performs
+ a forward heuristic search through the space of states until it finds a
+ state where the author's goal for the story is achieved.
+ Every action taken on the way to that goal must be 
+\emph on
+explained
+\emph default
+ for each of the characters
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Sabre uses the term 
+\emph on
+character
+\emph default
+, instead of 
+\emph on
+agent
+\emph default
+, because they are not independent decision-makers.
+ The planner is the only agent.
+ It acts like a puppetmaster, omniscient but attempting to make each character
+ seem like it has its own goals and limited, possibly wrong beliefs.
+\end_layout
+
+\end_inset
+
+ who takes the action (called the 
+\emph on
+consenting characters
+\emph default
+).
+ An action is 
+\emph on
+explained for a character
+\emph default
+ when that character can imagine a plan that starts with the action and
+ which, according to that character's beliefs, will lead to a better state
+ for that character and contains only explained actions.
+ Sabre should be cited as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2021sabre}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+About this Collection
+\end_layout
+
+\begin_layout Standard
+Sabre provides several search methods and heuristics.
+ To test them, we have written several problems.
+ We also want to compare Sabre's performance on problems written by others,
+ so we have collected what problems we can from the narrative planning literatur
+e.
+ Many of these problems were created for other planning systems, so we have
+ had to translate them into Sabre's syntax, a process which has certainly
+ introduced some bias.
+\end_layout
+
+\begin_layout Standard
+In an attempt to partially mitigate that bias, the next section details
+ the process we followed when translating problems for testing in Sabre.
+ The third section gives details about each problem and explains their origins.
+\end_layout
+
+\begin_layout Standard
+It is our hope that this collection of problems will serve as a repository
+ of benchmark problems for those interested in narrative planning.
+ However, we also want to offer a word of caution learned from the AI planning
+ community.
+ Performance on this suite of problems should not be considered an authoritative
+ measure of whether a planner is state-of-the-art.
+ A planner should not be judged uninteresting because it fails to perform
+ well on these tests.
+ In other words, we want these benchmarks to encourage comparison across
+ planners without limiting the richness of narrative planning research.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+This report can be cited as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2023collection}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Methodology
+\end_layout
+
+\begin_layout Standard
+While some of the problems in this collection were initially created for
+ Sabre, many were originally made for other systems with different features
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Most problems we translated were originally written in PDDL, the Planning
+ Domain Definition Language 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "malik1998pddl"
+literal "false"
+
+\end_inset
+
+, or something similar to it.
+\end_layout
+
+\end_inset
+
+.
+ We want to show that Sabre can generalize enough to solve problems established
+ by other systems, but we recognize that translating these problems has
+ changed them.
+ This section explains the guidelines we followed when translating problems.
+\end_layout
+
+\begin_layout Subsection
+Spirit Over Structure
+\end_layout
+
+\begin_layout Standard
+Our translations have attempted to maintain the spirit of a problem as we
+ understood it rather than its exact formal structure.
+ The goal was to write the problem as if the original author had designed
+ it for Sabre from the beginning.
+ For example, many early planning systems use only Boolean predicates, whereas
+ Sabre supports multi-valued fluents.
+ We could have 
+\begin_inset Quotes eld
+\end_inset
+
+directly
+\begin_inset Quotes erd
+\end_inset
+
+ translated these problems by using only Boolean fluents in Sabre, but this
+ makes the problem artificially harder.
+ Consider representing a character's location when there are 
+\emph on
+
+\begin_inset Formula $c=\{c_{1},c_{2},...\}$
+\end_inset
+
+
+\emph default
+ characters and 
+\emph on
+
+\begin_inset Formula $p=\{p_{1},p_{2},...\}$
+\end_inset
+
+
+\emph default
+ places.
+ A Boolean fluent like 
+\begin_inset Formula $location(c_{1},p_{1})$
+\end_inset
+
+ means 
+\begin_inset Quotes eld
+\end_inset
+
+character 
+\begin_inset Formula $c$
+\end_inset
+
+ is at place 
+\begin_inset Formula $p$
+\end_inset
+
+,
+\begin_inset Quotes erd
+\end_inset
+
+ and we need 
+\begin_inset Formula $|c|\cdot|p|$
+\end_inset
+
+ of these fluents, exactly one of which is true in any state.
+ Sabre can use a single fluent 
+\begin_inset Formula $location(c)$
+\end_inset
+
+ which can have any place as its value.
+ When possible, we used multi-valued fluents like this, even though it results
+ in a less exact translation of the problem.
+\end_layout
+
+\begin_layout Subsection
+Fixing Bugs
+\end_layout
+
+\begin_layout Standard
+Some problems had mistakes which we have fixed.
+ In some cases, we contacted the original authors (or we were the original
+ authors), so we are confident in these changes.
+ Some were judgment calls based on our understanding of the spirit of the
+ problem.
+ For example, one of the key events in the 
+\emph on
+Hospital
+\emph default
+ problem is a stressed doctor misdiagnosing a patient.
+ The effects of the 
+\family typewriter
+mistake-assess
+\family default
+ action never appear as preconditions of any other action or in the problem
+ goal; we believe this was a mistake in the original problem, and we have
+ modified it to allow a mistaken diagnosis to lead to a patient's death.
+ Similar bugs have been fixed in other problems and are noted in the details
+ for that problem in this report.
+\end_layout
+
+\begin_layout Subsection
+Goals as Utility
+\end_layout
+
+\begin_layout Standard
+Most planners use propositions to define the goals of a planning problem.
+ Sabre uses utility functions—numeric expressions to be maximized.
+ Sabre defines an author utility, which the solution plan itself should
+ maximize, and one character utility function per character, which those
+ characters each try to maximize.
+ Some narrative planners do not represent character goals at all.
+ Some do, but allow characters to adopt and drop their goals during a plan.
+ Sabre's utility functions cannot be changed during a plan, though their
+ values can be conditional.
+ For all of these reasons, translating the goals of problems into Sabre
+ utility functions required some significant interpretation.
+ Consider the 
+\emph on
+Western
+\emph default
+ problem, where a character can be bitten by a snake, causing everyone who
+ loves that character to adopt the goal of healing the snakebite.
+ When it is healed, the goal is dropped.
+ We represent this in Sabre using numeric fluents like 
+\begin_inset Formula $relationship(c_{1},c_{2})$
+\end_inset
+
+.
+ When 
+\begin_inset Formula $c_{1}$
+\end_inset
+
+ loves 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+ is healthy, the value of this fluent is 1.
+ If 
+\begin_inset Formula $c_{1}$
+\end_inset
+
+ does not love 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+, or if 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+ is sick, the value is 0.
+ Each character's relationships contribute to their utility function.
+ When 
+\begin_inset Formula $c_{1}$
+\end_inset
+
+ loves 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+ is bitten by a snake, 
+\begin_inset Formula $c_{1}$
+\end_inset
+
+'s utility decreases by 1, and any plan which restores 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+'s health raises 
+\begin_inset Formula $c_{1}$
+\end_inset
+
+'s utility by 1.
+\end_layout
+
+\begin_layout Subsection
+One Problem, Few Versions
+\end_layout
+
+\begin_layout Standard
+The benchmark problems used in the AI planning community typically distinguish
+ between a 
+\emph on
+domain
+\emph default
+ and a 
+\emph on
+problem
+\emph default
+.
+ A domain defines the actions while a problem defines a set of objects,
+ an initial state, and a goal.
+ There are typically many problems per domain.
+ There seems to be less of a need for this distinction in storytelling systems.
+ Many storytelling domains have only one associated problem, or a few very
+ similar problems.
+ There is less variation in their initial states and goals.
+ Sabre defines everything—actions, objects, initial state, and goals—in
+ the same unit, called a problem.
+ This does not mean a Sabre problem can tell only a single story.
+ Complex utility functions and disjunctive goals can give rise to many stories.
+ Consider the 
+\emph on
+Save Gramma
+\emph default
+ problem, where Tom represents the player character in an interactive narrative
+ game.
+ The author's utility is 0 in the initial state, 1 when Tom is dead, and
+ 2 when Tom achieves his goal of returning home with medicine for his grandmothe
+r.
+ There are many ways for Tom to die and for Tom to complete his goal, so
+ a wide variety of stories can still be told when solving this problem.
+\end_layout
+
+\begin_layout Standard
+We can represent several versions of a Sabre problem (what other planning
+ researchers might call many problems in the same domain) by setting a higher
+ goal for the author utility.
+ In 
+\emph on
+Save Gramma
+\emph default
+, a goal of reaching author utility 1 means any plan that ends in either
+ Tom's death or the successful completion of Tom's quest can be accepted
+ as a solution.
+ This corresponds to the benchmark problem 
+\family typewriter
+gramma_any
+\family default
+.
+ By setting a goal of author utility 2, only solutions where Tom completes
+ his quest are accepted.
+ This corresponds to the benchmark problem 
+\family typewriter
+gramma_win
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+When a problem's goal has multiple parts, we typically made each of these
+ parts contribute independently to the author's utility.
+ This allows the same Sabre problem to be used in many benchmark tasks simply
+ by settings a higher goal for the author's utility.
+ Consider 
+\emph on
+Aladdin
+\emph default
+.
+ The original problem has a goal with two parts: Jasmine is married to Jafar
+ and the Genie is dead.
+ In our version of the problem, the author gains 1 point of utility for
+ each of these.
+ The benchmark problem 
+\family typewriter
+aladdin_any
+\family default
+ can be solved by any story that marries Jasmine to Jafar or kills the genie,
+ whereas both goals must be achieved in 
+\family typewriter
+aladdin_both
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Some problems, like 
+\emph on
+Hospital
+\emph default
+, 
+\emph on
+Basketball
+\emph default
+, and 
+\emph on
+Lovers
+\emph default
+, were designed as domains with multiple problems in mind.
+ In those cases, we have chosen a single problem to implement, usually the
+ smallest and simplest.
+ This reduces the richness and variety of the original problems, but our
+ objective with this suite of benchmarks is to test many types of stories
+ rather than many stories of the same type.
+\end_layout
+
+\begin_layout Subsection
+Belief
+\end_layout
+
+\begin_layout Standard
+Sabre tracks what is actually true, what each agent believes, what they
+ believe others believe, and so on arbitrarily.
+ Sabre provides three ways that beliefs are updated.
+ First, each action has an 
+\emph on
+observation function
+\emph default
+ which defines when a character notices an action occur.
+ When a character observes an action, they update their beliefs (and their
+ beliefs about the beliefs of others who observed it, etc.).
+ Sabre also provides 
+\emph on
+triggers
+\emph default
+, which are like actions except they must occur when they can.
+ Triggers are frequently used for belief updates.
+ For example, one commonly used trigger can be read as 
+\begin_inset Quotes eld
+\end_inset
+
+When character 
+\begin_inset Formula $c_{1}$
+\end_inset
+
+ is at the same location as character 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+, but 
+\begin_inset Formula $c_{1}$
+\end_inset
+
+ believes 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+ is somewhere else, 
+\begin_inset Formula $c_{1}$
+\end_inset
+
+ now realizes that 
+\begin_inset Formula $c_{2}$
+\end_inset
+
+ is at their location.
+\begin_inset Quotes erd
+\end_inset
+
+ Finally, Sabre actions can update character beliefs directly.
+ The 
+\family typewriter
+report
+\family default
+ action in 
+\emph on
+Save Gramma
+\emph default
+, where one character tells the guard they have seen the bandit, and the
+ 
+\family typewriter
+tell
+\family default
+ action in 
+\emph on
+Lovers
+\emph default
+, where one character tells another what item they want, are two actions
+ with examples of direct belief updates.
+\end_layout
+
+\begin_layout Standard
+When translating problems that did not originally model beliefs, we tried
+ to use semantics informed by the stories being modeled.
+ Most problems have some concept of a location, so generally characters
+ observe any action that happens at their location.
+ Most problems include triggers that allow characters to observe the people,
+ places, and things, at their location.
+\end_layout
+
+\begin_layout Standard
+Some problems originally designed for planners that do no model belief occasiona
+lly used predicates that clearly represented beliefs.
+ For example, the 
+\family typewriter
+knows-location
+\family default
+ predicate in the original version of 
+\emph on
+Raiders of the Lost Ask
+\emph default
+ has been removed and replaced with Sabre's model of belief about a location.
+\end_layout
+
+\begin_layout Standard
+Any wrong beliefs that characters have in the initial state must be specified;
+ otherwise Sabre assumes their beliefs reflect the real world.
+ For most problems that did not originally model belief we assumed no wrong
+ beliefs, unless they were obvious from the semantics, such as the 
+\family typewriter
+knows-location
+\family default
+ predicate above.
+\end_layout
+
+\begin_layout Subsection
+Intention
+\end_layout
+
+\begin_layout Standard
+Intentionality is the tendency of intelligent agents to act in service of
+ their own goals, or in Sabre's case, to raise their own utilities.
+ Each Sabre action has a list of characters, called the 
+\emph on
+consenting characters
+\emph default
+, who must have a reason to take the action.
+ A Sabre plan can only contain an action if it is explained for all its
+ consenting characters.
+ An action is explained for a character if that action is the first in a
+ sequence of actions which that character believes they can take, will result
+ in a higher utility for them, and is composed only of actions which that
+ character believes are also explained for all their consenting characters.
+ Note that intention is linked to belief—characters can take actions they
+ think will help, but wrong beliefs may cause their actions to go awry.
+ In 
+\emph on
+Raiders of the Lost Ark
+\emph default
+, the Nazis believe opening the Ark of the Covenant will grant them immortality,
+ so they open it; in reality, it kills them.
+\end_layout
+
+\begin_layout Standard
+An action with no consenting characters is called an author-only action
+ and represents a 
+\emph on
+deux ex machina
+\emph default
+—an action that the author can choose for the sole reason that it advances
+ the plot.
+ Characters cannot expect them to happen.
+\end_layout
+
+\begin_layout Standard
+When translating problems that did not originally model intention, we used
+ the semantics of the verbs the actions modeled.
+ Typically any characters mentioned in an action were made consenting characters
+, with some obvious exceptions.
+ For example, in 
+\emph on
+Basketball
+\emph default
+, the thief is the only consenting character for 
+\family typewriter
+steal
+\family default
+; clearly this action is reasonable even when the victim does not want it.
+\end_layout
+
+\begin_layout Subsection
+Guided by Exemplar Stories
+\end_layout
+
+\begin_layout Standard
+Problems generally had known solutions provided by the original author.
+ While translating problems, we ensured these example solutions, or something
+ very similar in spirit, could be produced by the Sabre version of the problem.
+ These exemplar solutions are listed in the section for each problem, but
+ this does not imply that they are the only solutions that exist, or even
+ the best solutions.
+\end_layout
+
+\begin_layout Standard
+Occasionally, ensuring these solutions were possible required us to violate
+ the guidelines.
+ For example, in 
+\emph on
+Western
+\emph default
+ we assume that characters only observe actions that occur at their location.
+ This means the town sheriff (who starts at the saloon) will not notice
+ Hank's robbery of the general store.
+ To ensure the exemplar solution was still possible, we modified the 
+\family typewriter
+take
+\family default
+ action so the sheriff always observes it no matter his location.
+\end_layout
+
+\begin_layout Standard
+Occasionally it was impossible to ensure exemplar solutions were possible
+ due to Sabre's minimality constraint.
+ A plan is minimal if no actions can be left out without lowering the utility
+ it achieves or causing other actions to become unexplained.
+ Sabre requires plans for characters and the author to be minimal
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+A minimal plan does not need to be the shortest possible plan, but it cannot
+ contain any steps that could be left out.
+ In other words, if some subsequence of a plan is also explained and achieves
+ the same utility, that subsequence is the solution, not the longer plan.
+\end_layout
+
+\end_inset
+
+, but some exemplar stories were not minimal.
+ The original 
+\emph on
+Space
+\emph default
+ story is about a misunderstanding between a starship captain and an alien.
+ They battle to a stalemate and flee when a volcano starts to erupt.
+ The battle sequence can be left out without changing the outcome, so even
+ though that sequence of actions exists for Sabre and is explained, it is
+ not considered a solution.
+\end_layout
+
+\begin_layout Standard
+Just as we designed problems to produce ideal solutions, we sometimes modified
+ them to avoid producing problematic ones, even if they were valid solutions
+ to the original problem.
+ In the original 
+\emph on
+Western
+\emph default
+, after being bitten by a snake, Timmy could tie up his father, drag him
+ to the jailhouse, then walk to the general store to steal the antivenom
+ himself.
+ His path via the jailhouse, and his dragging a prisoner around with him,
+ are an unnecessarily long yet still valid and minimal path to the general
+ store.
+ It also happens to be a convenient way to achieve the author's goal.
+ We have modified the problem to rule out this strange solution.
+\end_layout
+
+\begin_layout Subsection
+Recommended Search Settings
+\end_layout
+
+\begin_layout Standard
+There are three important limits that can be imposed on Sabre's search.
+ The 
+\emph on
+author temporal limit
+\emph default
+ is the maximum number of actions in the author's plan—that is, the actual
+ actions that will be executed to raise the author's utility.
+ The 
+\emph on
+character temporal limit
+\emph default
+ is the maximum number of actions in a plan a character imagines when justifying
+ an action.
+ Consider this solution to the 
+\emph on
+Save Gramma
+\emph default
+ problem:
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Tom walks to the crossroads.
+\end_layout
+
+\begin_layout Plain Layout
+The bandit walks to the crossroads.
+\end_layout
+
+\begin_layout Plain Layout
+The bandit kills Tom.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+It can be found with an author temporal limit of 3, since the plan contains
+ only 3 actions, but it cannot be found unless the character temporal limit
+ is higher.
+ This is because Tom needs to imagine a longer plan to justify why he would
+ want to walk to the crossroads:
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Tom walks to the crossroads.
+\end_layout
+
+\begin_layout Plain Layout
+Tom walks to the market.
+\end_layout
+
+\begin_layout Plain Layout
+Tom buys the medicine from the merchant.
+\end_layout
+
+\begin_layout Plain Layout
+Tom walks to the crossroads.
+\end_layout
+
+\begin_layout Plain Layout
+Tom walks to the cottage.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Only the first action in Tom's plan actually happens in the story before
+ he is interrupted by the bandit.
+ Still, he has to have a reason to walk to the crossroads before he can
+ act, and the planner cannot find this reason unless the character temporal
+ limit is set to 5 or higher.
+\end_layout
+
+\begin_layout Standard
+The third limit is the 
+\emph on
+epistemic limit
+\emph default
+, which constrains how deeply Sabre will search into a character's theory
+ of mind.
+ It is important to note that Sabre always has an infinitely deep theory
+ of mind, and beliefs are always modeled the same way regardless of this
+ limit.
+ The epistemic limit only affects which states will be explored by the search.
+ In other words, setting this limit to 0 does not remove or alter Sabre's
+ theory of mind; it only limits which solutions can be found.
+ It is also important to note that Sabre can still 
+\emph on
+reason
+\emph default
+ deeper than this limit without necessarily 
+\emph on
+searching
+\emph default
+ deeper than this limit.
+ Tom's plan to buy the medicine from the merchant requires reasoning 2 layers
+ deep, because Tom has to anticipate that the merchant will sell him the
+ medicine.
+ Sabre has to reason about what Tom believes the merchant believes (2 layers).
+ However, the solution can still be found with an epistemic limit of 1.
+ The state that represents the merchant's beliefs after buying the medicine
+ is generated even though it is never visited.
+ Not visited means Sabre never considers building longer plans starting
+ in that state, but because the merchant's utility is instantly improved
+ in that state, Sabre does not need a longer plan to recognize it as good
+ for the merchant.
+ An epistemic limit of 1 is sufficient to find this explanation, even though
+ it reasons about a belief at layer 2.
+\end_layout
+
+\begin_layout Standard
+For each problem, we list recommended settings for the author temporal limit,
+ character temporal limit, and epistemic limit.
+ These limits allow all of the exemplar solutions described for that problem.
+ For some problems, we recommend a higher epistemic limit than what is strictly
+ required to produced the example solutions because those problems allow
+ interesting behavior that can only happen at higher epistemic limits.
+ For example, in Save Gramma, characters will never report the bandit's
+ location to the guard unless they can imagine the guard chasing after the
+ bandit, so while the exemplar solutions can be found with an epistemic
+ limit of 1, we recommend 2 for that problem to allow actions like 
+\family typewriter
+report
+\family default
+ to be explored.
+\end_layout
+
+\begin_layout Section
+Problems
+\end_layout
+
+\begin_layout Standard
+This section explains the origin of each benchmark problem, mentions any
+ important details about how we translated it, and recommends search settings
+ for using the problem as a benchmark in Sabre.
+\end_layout
+
+\begin_layout Subsection
+Bribery
+\end_layout
+
+\begin_layout Standard
+This is the first of four problems detailed in the appendix of Mark O.
+ Riedl's dissertation.
+ His dissertation is one of the seminal works on narrative planning that
+ established the model of intention used in several future planners.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{riedl2004thesis}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The problem is small and describes how a villain gains control over the
+ president using a bribe.
+ It has three characters: the villain, the president, and a hero who the
+ villain can manipulate into robbing a bank to obtain the money needed for
+ the bribe.
+ The two solutions to this problem were originally meant to highlight a
+ feature of Riedl's Fabulist system
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "riedl2006story"
+literal "false"
+
+\end_inset
+
+ that allowed characters to act contrary to their personalities if given
+ sufficient motivation.
+ In this problem, the usually lawful hero can rob a bank if they are first
+ coerced by the villain.
+\end_layout
+
+\begin_layout Standard
+Riedl's planner models intention but not belief.
+ It also has a feature that allows one character to delegate its goals to
+ another, which was used in the 
+\family typewriter
+coerce
+\family default
+ action.
+ There is no easy way to translate this notion of goal delegation into Sabre's
+ utility functions.
+ To maintain the minimality and simplicity of the original problem, we have
+ modified the 
+\family typewriter
+coerce
+\family default
+ action to cause the coerced character to want an item to be at a specific
+ location.
+ In the example below, 
+\family typewriter
+coerce(Villain, Hero, Money)
+\family default
+ makes the hero want the villain to have the money.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: The villain robs the bank themselves.
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Villain, Money, Bank)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+bribe(Villain, President, Money)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: The villain coerces the hero into robbing the bank.
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+threaten(Villain, Hero)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+coerce(Villain, Hero, Money)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Hero, Money, Bank)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+give(Hero, Villain, Money)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+bribe(Villain, President, Money)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+bribery
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Deer Hunter
+\end_layout
+
+\begin_layout Standard
+This is the second of four problems detailed in the appendix of Riedl's
+ dissertation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{riedl2004thesis}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The problem illustrates how actions can be reused for multiple goals.
+ The protagonist, Bubba, owns a gun and some ammunition.
+ He can become greedy and use his gun to rob a bank.
+ He can also become hungry and use his gun to hunt a deer.
+\end_layout
+
+\begin_layout Standard
+Riedl's planner models intention but not belief.
+ In the original problem, author-only actions caused Bubba to adopt the
+ goal of having money or not being hungry.
+ This allowed the planner to choose either or both goals for the story.
+ We have preserved that structure by changing the 
+\family typewriter
+decide_to_get_money
+\family default
+ action to increase Bubba's greed (allowing him to raise his utility by
+ stealing money) and the 
+\family typewriter
+decide_to_eat
+\family default
+ action to make Bubba hungry (lowering his utility, and allowing him to
+ raise it again by eating).
+ The author gains 1 point of utility when Bubba gets money and 1 point when
+ the deer is eaten.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: Bubba robs a bank.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+decide_to_get_money(Bubba)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(Bubba, Rifle, House)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(Bubba, Ammo, House)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+load(Bubba, Rifle, Ammo)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+go(Bubba, House, Bank)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Bubba, Clerk, Rifle, Bank)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: Bubba hunts a deer.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+decide_to_eat(Bubba)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(Bubba, Rifle, House)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(Bubba, Ammo, House)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+load(Bubba, Rifle, Ammo)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+go(Bubba, House, Forest)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+shoot(Bubba, Bambi, Rifle, Forest)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+eat(Bubba, Bambi, Forest)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 3: Bubba does both.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+decide_to_get_money(Bubba)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+decide_to_eat(Bubba)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(Bubba, Rifle, House)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(Bubba, Ammo, House)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+load(Bubba, Rifle, Ammo)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+go(Bubba, House, Bank)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Bubba, Clerk, Rifle, Bank)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+go(Bubba, Bank, Forest)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+shoot(Bubba, Bambi, Rifle, Forest)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+eat(Bubba, Bambi, Forest)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+deerhunter_any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+deerhunter_both
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Secret Agent
+\end_layout
+
+\begin_layout Standard
+This is the third of four problems detailed in the appendix of Riedl's dissertat
+ion.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{riedl2004thesis}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The problem requires a secret agent to enter the compound of an evil mastermind
+ and assassinate him.
+ To enter, he must be unarmed, but to assassinate the mastermind he needs
+ a gun, which he can find in the compound.
+\end_layout
+
+\begin_layout Standard
+Riedl's planner models intention but not belief.
+ It also has a feature that allows the planner to decide some parts of the
+ initial state that the author intentionally left unspecified.
+ In this example, the location of the gun was unspecified, and the planner
+ could place it at any location.
+ We have preserved this feature by adding the 
+\family typewriter
+find
+\family default
+ action, which allows the agent to find an item at their current location
+ as long as the item's location has not yet been set.
+ Note the 
+\family typewriter
+find
+\family default
+ action has the secret agent as a consenting character.
+ It cannot be an author-only action; if so the agent would not believe it
+ is possible to find a gun after entering the compound and would never act.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: The secret agent assassinates the mastermind.
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+move(SecretAgent, Headquarters, Dropbox)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(SecretAgent, Papers, Dropbox)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+move(SecretAgent, Dropbox, Courtyard)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+move(SecretAgent, Courtyard, Lobby)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+find(SecretAgent, Gun, Lobby)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(SecretAgent, Gun, Lobby)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+move(SecretAgent, Lobby, Office)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+kill(SecretAgent, Mastermind, Gun, Office)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+secretagent
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Aladdin
+\end_layout
+
+\begin_layout Standard
+This is the fourth and largest of four problems detailed in the appendix
+ of Riedl's dissertation.
+ It was also detailed in a journal article about Riedl's IPOCL planner,
+ so we suggest using that citation when referring to this problem.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{riedl2010narrative}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The problem is an alternative version of the tale of 
+\emph on
+Aladdin
+\emph default
+, which was added to a later edition of 
+\emph on
+One Thousand and One Nights
+\emph default
+ and later adapted into a 1992 Disney film.
+ Many elements have been changed.
+ Jafar is king, not adviser to the king.
+ A dragon has been added.
+ The end of the story has been changed.
+ These modifications were likely due to the fact that Riedl's planner did
+ not support conflict, the ability for an agent to partially execute a plan
+ which then fails.
+ Support for conflict was added in a later algorithm by Ware et al.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014conflict"
+literal "false"
+
+\end_inset
+
+ which enabled new solutions to this problem.
+\end_layout
+
+\begin_layout Standard
+Riedl's and Young's planner models intention but not belief.
+ It also has a feature that allows one character to delegate its goals to
+ another, which was used in the original 
+\family typewriter
+order
+\family default
+ and 
+\family typewriter
+command
+\family default
+ actions.
+ There is no easy way to translate this notion of goal delegation into Sabre's
+ utility functions.
+ To maintain their spirit, we have replaced them with the 
+\family typewriter
+command_kill
+\family default
+, 
+\family typewriter
+command_love
+\family default
+, and 
+\family typewriter
+command_bring
+\family default
+ actions, which model a requester assigning a task to a worker.
+ The tasks require the worker to kill a character, bring an item, or cause
+ another character to love the requester respectively.
+ Characters gain utility by completing tasks.
+\end_layout
+
+\begin_layout Standard
+The original problem goal has two parts: Jasmine should be married to Jafar
+ and the genie should be dead.
+ The author gains 1 point of utility for each, allowing two versions of
+ this problem.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: Aladdin is frightened by the genie and slays it.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+fall_in_love(Aladdin, Jasmine, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Aladdin, Castle, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+slay(Aladdin, Dragon, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pillage(Aladdin, Dragon, Lamp, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+summon(Aladdin, Genie, Lamp, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+appear_threatening(Genie, Aladdin, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+slay(Aladdin, Genie, Mountain)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: Jafar uses a love spell to marry Jasmine.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+fall_in_love(Jafar, Jasmine, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Jafar, Castle, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+slay(Jafar, Dragon, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pillage(Jafar, Dragon, Lamp, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Jafar, Mountain, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+summon(Jafar, Genie, Lamp, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+command_love(Jafar, Genie, Jasmine, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+love_spell(Genie, Jasmine, Jafar)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+marry(Jafar, Jasmine, Castle)
+\end_layout
+
+\end_inset
+
+
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 3: Jafar marries Jasmine and Aladdin slays the genie.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+fall_in_love(Jafar, Jasmine, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Jafar, Castle, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+slay(Jafar, Dragon, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pillage(Jafar, Dragon, Lamp, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Jafar, Mountain, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+summon(Jafar, Genie, Lamp, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+command_love(Jafar, Genie, Jasmine, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+love_spell(Genie, Jasmine, Jafar)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+marry(Jafar, Jasmine, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+appear_threatening(Genie, Aladdin, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+slay(Aladdin, Genie, Castle)
+\end_layout
+
+\end_inset
+
+
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 4: Story used by Riedl and Young to evaluate IPOCL
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "riedl2010narrative"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+fall_in_love(Jafar, Jasmine, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+command_bring(Jafar, Aladdin, Lamp, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Aladdin, Castle, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+slay(Aladdin, Dragon, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pillage(Aladdin, Dragon, Lamp, Mountain)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Aladdin, Mountain, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+give(Aladdin, Jafar, Lamp, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+summon(Jafar, Genie, Lamp, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+command_love(Jafar, Genie, Jasmine, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+love_spell(Genie, Jasmine, Jafar)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+marry(Jafar, Jasmine, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+appear_threatening(Genie, Aladdin, Castle)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+slay(Aladdin, Genie, Castle)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+aladdin_any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+aladdin_both
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+13
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Hospital
+\end_layout
+
+\begin_layout Standard
+This problem was first used by a storytelling system called 
+\emph on
+NetworkING
+\emph default
+, which focuses on the relationships between characters and how they change
+ as a driving force for narrative generation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{porteous2013networking}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The problem describes a medical drama where hospital staff navigate fraught
+ relationships as they treat patients.
+ A version of the problem was provided by Julie Porteous on her website.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+url{https://porteousjulie.bitbucket.io/}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The version on her website is simpler than the one described in the paper.
+ Actions like 
+\family typewriter
+spread-malicious-gossip
+\family default
+ and 
+\family typewriter
+show-appreciation-treatment-advice
+\family default
+ are missing, with this simpler version focusing on a stressed doctor who
+ can make a mistake when treating too many patients.
+\end_layout
+
+\begin_layout Standard
+Porteous et al.
+ use an off-the-shelf planner which does not reason about intention or belief.
+ We have added these concepts based on our understanding of medical dramas.
+ Because Sabre models belief, we were able to combine the 
+\family typewriter
+assess
+\family default
+ and 
+\family typewriter
+mistake-asses
+\family default
+ action into a single action.
+ The doctor can diagnose a patient with the wrong illness if they are overworked.
+ The effects of our 
+\family typewriter
+assess
+\family default
+ action are that the doctor and patient believe the patient has a certain
+ illness, but these beliefs can be wrong.
+\end_layout
+
+\begin_layout Standard
+We have also fixed what we suppose to be two bugs.
+ In the original, the effects of the 
+\family typewriter
+mistake-assess
+\family default
+ action were never used in the preconditions of other actions or in the
+ goal.
+ Also, the preconditions of the 
+\family typewriter
+die
+\family default
+ and 
+\family typewriter
+recover
+\family default
+ action were not constrained by the patient's diagnosis.
+ This meant patients who got the correct treatment could still die and those
+ who got the wrong treatment could still recover.
+ This may have been intended, but we modified the problem so that patients
+ who get the correct treatment always recover and those who get the wrong
+ treatment always die.
+ In doing this, we removed the 
+\family typewriter
+die
+\family default
+ and 
+\family typewriter
+recover
+\family default
+ actions and added a conditional effect to 
+\family typewriter
+treat
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+The original problem was specified as a PDDL domain with 10 associated problems.
+ We used the first problem in our translation, which has a single doctor
+ and 3 patients.
+ Because they are not needed in that problem, we removed the 
+\family typewriter
+move
+\family default
+, 
+\family typewriter
+get-work-help
+\family default
+, and 
+\family typewriter
+lose-consciousness
+\family default
+ actions from our version.
+ Each of the original 10 problems had different goals.
+ In our version, the author gains 1 point of utility if some patient has
+ been healed and 1 point if some patient has died.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: Dr.
+ Hathaway treats a single patient.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+admit(Hathaway, Jones, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Jones, Admissions, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+assess(Hathaway, Jones, SymptomA, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+treat(Hathaway, Jones, TreatmentA, PatientRoomA)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: Dr.
+ Hathaway admits too many patients and misdiagnoses Jones.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+admit(Hathaway, Jones, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+admit(Hathaway, Ross, PatientRoomB)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+admit(Hathaway, Young, PatientRoomC)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Jones, Admissions, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+assess(Hathaway, Jones, SymptomB, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+treat(Hathaway, Jones, TreatmentB, PatientRoomA)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 3: Dr.
+ Hathaway makes one incorrect and one correct diagnosis.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+admit(Hathaway, Jones, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+admit(Hathaway, Ross, PatientRoomB)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+admit(Hathaway, Young, PatientRoomC)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Jones, Admissions, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+assess(Hathaway, Jones, SymptomB, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+treat(Hathaway, Jones, TreatmentB, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Ross, Admissions, PatientRoomA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Ross, PatientRoomA, PatientRoomB)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Hathaway, PatientRoomA, PatientRoomB)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+assess(Hathaway, Ross, SymptomA, PatientRoomB)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+treat(Hathaway, Ross, TreatmentA, PatientRoomB)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+hospital_any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+hospital_both
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+11
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Basketball
+\end_layout
+
+\begin_layout Standard
+This problem was introduced by Kartal et al.
+ in an experiment that used Monte Carlo Tree Search and a model of believable
+ actions for planning-based story generation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{kartal2014user}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+It describes a crime drama where characters can commit theft and murder
+ while investigators search for clues and arrest criminals.
+ Characters get angry when their items are stolen but can let off steam
+ by playing basketball.
+ The version of the problem we translated was provided by Julie Porteous
+ on her website.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+url{https://porteousjulie.bitbucket.io/}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The version on her website differs slightly from the one described in the
+ paper.
+ The 
+\family typewriter
+earthquake
+\family default
+ action is missing, and some additional concepts are present, like vehicles.
+ This PDDL domain was provided with 10 different problems whose objects
+ and initial states are similar but whose goals specify a variety of outcomes,
+ like what crimes should be committed, who should be angry, who should be
+ arrested, etc.
+ We used a small set of objects: three civilians, one detective, three locations
+, and two items.
+ We did not include 
+\family typewriter
+earthquake
+\family default
+, since this was meant to be an unbelievable action, and we did not include
+ vehicles.
+ Though we implemented the 
+\family typewriter
+shareClues
+\family default
+ action, there is only one inspector, so this action will never occur.
+\end_layout
+
+\begin_layout Standard
+The original problem was created for a traditional planner, so it did not
+ include character goals.
+ We gave each of the citizens different utility functions: Alice starts
+ angry and wants to be calm.
+ Bob is calm and wants everyone to be calm.
+ Charlie starts angry and wants Alice to be dead.
+ The author gains 1 point of utility if fewer than two citizens are angry
+ and 1 point if someone has been arrested.
+\end_layout
+
+\begin_layout Standard
+The original problem also did not model belief, but the 
+\family typewriter
+knows-clue
+\family default
+ predicate and 
+\family typewriter
+findClues
+\family default
+ action have obvious belief semantics.
+ The investigator gains 1 point of utility for every location they investigate
+ and every criminal they arrest.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: Bob calms Alice by playing basketball with her.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Bob, HomeB, BasketballCourt)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Alice, Downtown, BasketballCourt)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+play_basketball(Bob, Alice, BasketballCourt)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: Sherlock arrests Charlie for murder.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+kill(Charlie, Alice, Bat, Downtown)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+find_clues(Sherlock, Murder, Bat, Downtown)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+suspect_of_crime(Sherlock, Charlie, Murder, Bat, Downtown)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+arrest(Sherlock, Charlie, Downtown, Murder)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 3: Alice is calmed by basketball but arrested for theft.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Bob, HomeB, BasketballCourt)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Alice, Downtown, BasketballCourt)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Sherlock, Downtown, BasketballCourt)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Alice, Bob, Basketball, BasketballCourt)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+play_basketball(Alice, Bob, BasketballCourt)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+suspect_of_crime(Sherlock, Alice, Theft, Basketball, BasketballCourt)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+arrest(Sherlock, Alice, BasketballCourt, Theft)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+basketball_any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+basketball_both
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Western
+\end_layout
+
+\begin_layout Standard
+This is the first of three narrative planning problems used by Ware et al.
+ to study perceptions of conflict in automatically generated stories.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2014conflict}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The problem is detailed in the appendix of Ware's dissertation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2014thesis}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+It tells the story of rancher Hank in the American old West whose son Timmy
+ is bitten by a snake.
+ Hank robs the town general store to get some antivenom but is then arrested
+ by Will, the town sheriff.
+\end_layout
+
+\begin_layout Standard
+This planning domain and its one associated problem were created for Ware's
+ and Young's Glaive narrative planner
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014glaive"
+literal "false"
+
+\end_inset
+
+ which was designed to allow conflict.
+ The story cannot be told unless characters form plans that are thwarted
+ before they are complete.
+ For example, Hank's plan to steal the antivenom is thwarted by the sheriff.
+\end_layout
+
+\begin_layout Standard
+Glaive supports intention but not belief.
+ We used a default model of belief where characters observe the actions
+ that happen at their location, with one exception.
+ The sheriff needs to observe all instances of the 
+\family typewriter
+take
+\family default
+ action or else he will only be aware of crimes committed at his location.
+ We also fixed a bug in the initial state of this problem where no sheriff
+ had been specified.
+\end_layout
+
+\begin_layout Standard
+In the original problem, the 
+\family typewriter
+travel
+\family default
+ action specified where the traveler was leaving from and where they were
+ going to.
+ The 
+\family typewriter
+force-travel
+\family default
+ action moved both the traveler and a helpless prisoner.
+ Since moving alone and moving with a prisoner both required one action,
+ and since the travel actions specified their origin, it was possible for
+ characters to take meandering routes to their destinations.
+ For example, once bitten by a snake, Timmy could tie up his father, move
+ both of them to the jailhouse, and them travel by himself to the general
+ store to steal the antivenom.
+ This path is minimal in the sense that no actions can be left out, but
+ it is strange.
+ We have modified the 
+\family typewriter
+travel
+\family default
+ and 
+\family typewriter
+force-travel
+\family default
+ actions so they no longer include their origin.
+ We have also changed the 
+\family typewriter
+force-travel
+\family default
+ action to move only the prisoner.
+ This avoids unnecessarily long paths that are a convenient but strange
+ way to achieve the author's goal.
+\end_layout
+
+\begin_layout Standard
+Like IPOCL
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "riedl2010narrative"
+literal "false"
+
+\end_inset
+
+, Glaive allows characters to adopt and drop goals.
+ We translated these concepts into utility functions by using relationships.
+ Every character has a numeric relationship, including a relationship with
+ themselves.
+ When someone a character loves is healthy, the relationship has a value
+ of 2.
+ When someone the character loves is sick, the relationship has a value
+ of 1.
+ Otherwise, relationships have a value of 0.
+ All characters love themselves.
+ Thus, when a character is bitten by a snake, their utility goes down, as
+ does the utility of everyone who loves them.
+ That utility can be restored by healing the sick loved one, or permanently
+ lost if the loved one dies.
+ The author's utility is 1 if Timmy is dead and Hank is tied up in the jailhouse
+, otherwise the author utility is 0.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: Story used in the study by Ware et al.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014conflict"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+snakebite(Timmy, Ranch)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Hank, GeneralStore)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+tie_up(Hank, Carl, GeneralStore)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+take(Hank, Antivenom, Carl, GeneralStore)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Will, GeneralStore)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+tie_up(Will, Hank, GeneralStore)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+force_travel(Will, Hank, Jailhouse)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+die(Timmy, Snakebite, Ranch)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+western
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Fantasy
+\end_layout
+
+\begin_layout Standard
+This is the second of three narrative planning problems used by Ware et
+ al.
+ to study perceptions of conflict in automatically generated stories.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2014conflict}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The problem is detailed in the appendix of Ware's dissertation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2014thesis}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+It tells a Medieval story of princess Talia and two potential suitors: the
+ poor Rory whom she loves and the rich Vince whom she does not love.
+ There is also a nearby dragon who has treasure that can be stolen but is
+ on the lookout to increase her hoard.
+\end_layout
+
+\begin_layout Standard
+This planning domain and its one associated problem were created for Ware's
+ and Young's Glaive narrative planner
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014glaive"
+literal "false"
+
+\end_inset
+
+.
+ Glaive supports intention but not belief.
+ We used a default model of belief where characters observe the actions
+ that happen at their location.
+\end_layout
+
+\begin_layout Standard
+The author's utility is based on Talia's happiness.
+ She wants to be married to someone she loves and she wants to be rich—the
+ wealthier the better.
+ Each character has a different utility function to add some variety to
+ the possible stories.
+ Talia wants to be happily married and wealthy; she does not care about
+ hunger.
+ Rory wants to be happily married, fed, and rich.
+ Vince wants to be happily married and fed; he does not care about money.
+ The dragon wants to be wealthy and fed; she does not care about marriage.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: Talia gets rich.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Talia, Village, Cave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(Talia, Treasure, Cave)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: Talia marries for love.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+propose(Rory, Talia, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+accept(Talia, Rory, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+marry(Rory, Talia, Village)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 3: Talia marries for money.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+propose(Vince, Talia, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+accept(Talia, Vince, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+marry(Vince, Talia, Village)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 4: Talia finds love and wealth.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+propose(Rory, Talia, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+accept(Talia, Rory, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+marry(Rory, Talia, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Talia, Village, Cave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(Talia, Treasure, Cave)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 5: Story used in the study by Ware et al.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014conflict"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative plan for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+propose(Rory, Talia, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+accept(Talia, Rory, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Rory, Village, Cave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Rory, Gargax, Treasure, Cave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Rory, Cave, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+marry(Rory, Talia, Village)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 6: Talia has it all.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 3)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+propose(Rory, Talia, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+accept(Talia, Rory, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+marry(Rory, Talia, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+get_hungry(Gargax)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Gargax, Cave, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+eat(Gargax, Vince, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+take(Talia, Money, Vince, Village)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Talia, Village, Cave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+pickup(Talia, Treasure, Cave)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+fantasy_any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+fantasy_two
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+fantasy_all
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Space
+\end_layout
+
+\begin_layout Standard
+This is the third of three narrative planning problems used by Ware et al.
+ to study perceptions of conflict in automatically generated stories.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2014conflict}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The problem is detailed in the appendix of Ware's dissertation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2014thesis}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+It tells the story of starship captain Zoe who wants to befriend the reptilian
+ guardian of an alien planet which features a volcano that might erupt at
+ any time.
+ Zoe does not know that the guardian will get angry if she walks on the
+ planet's surface, and conflict may ensue.
+\end_layout
+
+\begin_layout Standard
+This planning domain and its one associated problem were created for Ware's
+ and Young's Glaive narrative planner
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014glaive"
+literal "false"
+
+\end_inset
+
+.
+ Glaive supports intention but not belief.
+ We used a default model of belief where characters observe the actions
+ that happen at their location, with one exception.
+ When someone sets foot on a location for which someone is the guardian,
+ the guardian observes the action and gets angry.
+ Otherwise, the exemplar stories that involve conflict between Zoe and the
+ lizard beast are not possible.
+\end_layout
+
+\begin_layout Standard
+We fixed a bug in this problem that prevented characters from traveling
+ between locations on the planet.
+\end_layout
+
+\begin_layout Standard
+A dead character always has a utility of 0.
+ Otherwise, characters get 1 point of utility for being healthy and 1 point
+ for being in a safe location.
+ They also gain 1 point for each friend they have and lose 1 point for each
+ enemy.
+ Zoe can make an enemy of the lizard beast by visiting the planet, but the
+ two can become friends via the 
+\family typewriter
+make_peace
+\family default
+ action.
+ The author goal in the original problem could be achieved without taking
+ any character actions, so we have made the author's utility a little more
+ complex to encourage a variety of stories.
+ The author gets 1 point for making the surface of the planet uninhabitable,
+ 1 point for each dead character, and 3 points if Zoe is friends with the
+ lizard beast.
+ Note it is not possible to achieve author utility 6 because Zoe's friendship
+ toward the lizard beast ends if Zoe dies.
+\end_layout
+
+\begin_layout Standard
+The original solution to this problem used by Ware et al.
+ in their study is not a solution in our translated problem because Sabre
+ requires that solutions be minimal (that is, no actions can be left out
+ without decreasing author utility).
+ The original story involved an interesting but unnecessary fight between
+ Zoe and the lizard beast.
+ That plan is still a valid sequence of explained actions in our problem,
+ but because the fight can be left out, Sabre does not consider it a solution.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: The volcano erupts.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+begin_erupt(Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+erupt(Surface)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: Zoe dies from the volcano.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+teleport_from_ship(Zoe, Ship, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+begin_erupt(Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+erupt(Surface)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 3: Zoe and the lizard beast make peace.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 3)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+teleport_from_ship(Zoe, Ship, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Zoe, Surface, Cave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+make_peace(Zoe, Lizard, Cave)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 4: Zoe and the lizard beast make peace, then the volcano erupts.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 4)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+teleport_from_ship(Zoe, Ship, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Zoe, Surface, Cave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+make_peace(Zoe, Lizard, Cave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+begin_erupt(Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+erupt(Surface)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 5: Zoe and the lizard beast make peace, then the beast dies.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 5)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+teleport_from_ship(Zoe, Ship, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Lizard, Cave, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+make_peace(Zoe, Lizard, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+begin_erupt(Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+teleport_to_ship(Zoe, Surface, Ship)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+erupt(Surface)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Plan 6: Story used in the study by Ware et al.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014conflict"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+teleport_from_ship(Zoe, Ship, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Lizard, Cave, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+attack(Lizard, Zoe, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+stun(Zoe, Lizard, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+begin_erupt(Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+teleport_to_ship(Zoe, Surface, Ship)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+break_free(Lizard, Surface)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Lizard, Surface, Cave)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+erupt(Surface)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+space_any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+space_two
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+space_three
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+space_four
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+space_all
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Raiders of the Lost Ark
+\end_layout
+
+\begin_layout Standard
+This problem was used as an example of a story that cannot be told without
+ conflict in Ware and Young's paper on the Glaive narrative planner.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2014glaive}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+A slightly expanded version of the problem is detailed in the appendix of
+ Ware's dissertation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2014thesis}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+It describes the plot of the 1981 film by the same name.
+ Indiana Jones is the only one who knows where to find the Ark of the Covenant.
+ He travels to Tanis to excavate it, but before he can return home he is
+ intercepted by the Nazis.
+ They believe the Ark will grant them power and open it, but instead its
+ angelic guardians kill the Nazis, leaving Jones free to retake it and return
+ home.
+\end_layout
+
+\begin_layout Standard
+This planning domain and its one associated problem were created for the
+ Glaive narrative planner
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014glaive"
+literal "false"
+
+\end_inset
+
+ which supports intention but not belief.
+ The original problem used a 
+\family typewriter
+knows-location
+\family default
+ predicate to ensure only Jones could dig up the Ark.
+ We have replaced that with Sabre's model of belief.
+ Because the Nazis could not have wrong beliefs about the outcome of opening
+ the Ark, their goal in the original problem is that the Ark be open.
+ In our version, their goal is to be immortal, and they have a wrong belief
+ about the danger of opening the Ark, which is more in line with the film
+ the problem is based on.
+\end_layout
+
+\begin_layout Standard
+The author's utility is a straightforward translation of the original film's
+ ending and the original problem's goal: 1 point if both the US Army has
+ the Ark and the Nazis are dead, otherwise 0.
+ Jones and the US Army have the same goal, that the US Army should have
+ the Ark.
+ The problem cannot be solved without reasoning about conflict—the ability
+ of characters to form and begin executing plans and then be thwarted by
+ others.
+ Jones is the only one who can excavate the ark.
+ He does so hoping to bring it to the Army, but before he can finish his
+ plan the Nazis steal it.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: Seemingly unnecessary travel.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known solution)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Jones, USA, Tanis)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+dig(Jones, Ark, Tanis)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+take(Nazis, Ark, Jones, Tanis)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Nazis, Tanis, USA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+open(Nazis, Ark, USA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+take(USArmy, Ark, Nazis, USA)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The shortest solution deviates from the plot of the original film by having
+ the Nazis travel to the US before opening the Ark.
+ Their plan is unnecessarily long, but still valid.
+ At first, it may seem to violate Sabre's minimality constraint, because
+ they could omit the travel action and still complete their plan, but they
+ cannot omit the travel action and still open the Ark 
+\emph on
+in the US
+\emph default
+.
+ This situation highlights a problem with putting a location parameter in
+ the signature of each action—
+\family typewriter
+open(Nazis, Ark, USA)
+\family default
+ and 
+\family typewriter
+open(Nazis, Ark, Tanis)
+\family default
+ are different actions, though we tend to think of them as the same.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: Plot of the original film.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Jones, USA, Tanis)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+dig(Jones, Ark, Tanis)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+take(Nazis, Ark, Jones, Tanis)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+open(Nazis, Ark, Tanis)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+take(Jones, Ark, Nazis, Tanis)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+travel(Jones, Tanis, USA)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+give(Jones, Ark, USArmy, USA)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+raiders
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Treasure Island
+\end_layout
+
+\begin_layout Standard
+This problem was used as a minimal example of a story demonstrating intention,
+ conflict, wrong beliefs, and communication in the paper that introduced
+ Sabre's model of belief.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{shirvani2017possible}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+It is a simplified version of Robert Louis Stevenson's story by the same
+ name.
+ Jim Hawkins inherits a treasure map detailing the location of buried pirate
+ treasure, but he has no ship to reach the island.
+ Long John Silver has a ship but does not know the location of the treasure.
+ First, Hawkins spreads a rumor that the treasure is buried on Treasure
+ Island.
+ Silver sails them both to the island.
+ Hawkins digs up the treasure.
+ Both characters hope to end up with the treasure, but Hawkins succeeds
+ in the end.
+\end_layout
+
+\begin_layout Standard
+The problem was designed before Sabre was implemented, and once tested we
+ found it had two bugs which demonstrate the complexity of belief reasoning
+ and which we have fixed.
+ In the original, Silver begins the story believing the treasure's location
+ is unknown: 
+\family typewriter
+believes(Silver, location(Treasure))=?
+\family default
+.
+ This uses Sabre's unknown constant 
+\family typewriter
+?
+\family default
+, which behaves more like 
+\emph on
+null
+\emph default
+ than true uncertainty, so it might be more accurate to say that Silver
+ believes the treasure is nowhere.
+ Missing from the original problem, but added in our translation, is the
+ additional fact that Hawkins believes Silver believes the treasure is nowhere.
+ If this is not specified, then Sabre will assume Hawkins believes that
+ Silver believes the same as he—that is, Hawkins will believe Silver knows
+ the location of the treasure.
+ If Silver already knows the location of the treasure, there is no need
+ for the 
+\family typewriter
+rumor
+\family default
+ action.
+\end_layout
+
+\begin_layout Standard
+The second bug in the original was that Hawkins was the only character who
+ observed 
+\family typewriter
+rumor
+\family default
+.
+ At first this does not seem like a bug, because the effects of 
+\family typewriter
+rumor
+\family default
+ directly modify Silver's beliefs so that he thinks the treasure is buried
+ on the island.
+ However, if Silver does not also observe the action, Silver will not believe
+ that Hawkins believes the treasure is on the island.
+ Silver can only expect Hawkins to sail with him to the island if Silver
+ believes Hawkins believes there is treasure to be had there.
+ In our translation, Silver also observes 
+\family typewriter
+rumor
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Utility functions are simple.
+ Characters get 1 point for having the treasure and otherwise have a utility
+ of 0.
+ The author gets 1 point for Hawkins having the treasure, otherwise 0.
+\end_layout
+
+\begin_layout Standard
+This problem is small and simple, perhaps trivially so.
+ We added it to this collection because it demonstrates many of Sabre's
+ features, including intention, conflict, belief, and belief updates.
+ It can be a valuable debugging tool.
+ It is also interesting because it requires an epistemic limit of 3 or higher
+ to solve.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: The plot of the original story.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known solution)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+rumor()
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+sail()
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+dig()
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+take(Hawkins, Treasure)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+treasure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Save Gramma
+\end_layout
+
+\begin_layout Standard
+This problem was originally based on a narrative planning domain for the
+ game 
+\emph on
+The Best Laid Plans
+\emph default
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2015blp"
+literal "false"
+
+\end_inset
+
+, a prototype interactive narrative driven by the Glaive narrative planner
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014glaive"
+literal "false"
+
+\end_inset
+
+.
+ Ware details the full original domain and two associated problems in his
+ dissertation
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ware2014thesis"
+literal "false"
+
+\end_inset
+
+.
+ Solutions in the original are long due to a large map of mostly empty locations.
+ For future experiments, Ware et al.
+ distilled the most interesting parts of this problem into a smaller problem
+ called 
+\emph on
+Save Gramma
+\emph default
+ which was the basis for a game used to validate that Sabre's model of character
+ behavior was believable.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{ware2022multi}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+This version of the problem, originally written for Sabre, is meant to be
+ as small as possible while still offering a wide variety of possible stories.
+ The player takes the role of Tom, who is given a coin by his sick grandmother.
+ Tom can walk to the market to buy some medicine.
+ Tom wins if he can return home with the medicine.
+ He loses if he dies along the way.
+ The problem also includes a bandit who wants to steal items and a town
+ guard who wants to punish criminals.
+\end_layout
+
+\begin_layout Standard
+There are several ways to win and lose.
+ Tom can be killed by the bandit during a robbery.
+ He can buy the medicine and return home.
+ He can use his coin to buy a sword and resort to robbery to get the medicine,
+ though he then risks being killed by the guard.
+ Tom can also steal the coin from the bandit's camp to buy both a sword
+ and the medicine.
+ Tom can report the bandit's location to the guard, either to get the guard's
+ help or to get the guard to leave his post so Tom can rob the merchant
+ with no witnesses.
+\end_layout
+
+\begin_layout Standard
+Tom gets 1 point of utility for being home with the potion; otherwise his
+ utility is 0.
+ The merchant gets 2 points for every coin she has, as long as she is not
+ a criminal.
+ The merchant also gets 1 point for being at the market, her preferred location.
+ The guard gets 2 points of utility when the bandit is dead, as long as
+ the guard is not a criminal.
+ The guard also gets 2 points of utility if Tom is a criminal, Tom is dead,
+ and the guard is not a criminal.
+ The guard gets 1 point for being at the market, his preferred location.
+ The bandit gets 2 points for each coin she has (her coin can remain in
+ the chest at her camp).
+ The bandit also gets 2 points for having the medicine.
+ The bandit gets 1 point for being at the camp, her preferred location.
+\end_layout
+
+\begin_layout Standard
+The author gets 1 point when Tom is dead but 2 points if Tom is home with
+ the medicine.
+ Thus, the author will accept any story that ends, but prefers for Tom to
+ win.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: Tom dies in a robbery.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Cottage, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Bandit, Camp, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+attack(Bandit, Tom, Crossroads)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: Tom buys the medicine.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Cottage, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Crossroads, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+buy(Tom, Medicine, TomCoin, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Market, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Crossroads, Cottage)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 3: Tom turns to crime and pays the price.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Cottage, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Crossroads, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+buy(Tom, MerchantSword, TomCoin, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+rob(Tom, Medicine, Merchant, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+attack(Guard, Tom, Market)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 4: Sometimes crime does pay.
+\end_layout
+
+\begin_layout Plain Layout
+(Alternative solution for author utility 2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Cottage, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Crossroads, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+buy(Tom, MerchantSword, TomCoin, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+rob(Tom, Medicine, Merchant, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Market, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Crossroads, Cottage)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+This problem has many other plans made of explained actions which Sabre
+ does not consider solutions because they are not minimal (that is, some
+ actions could be removed without lowering the author utility).
+ These plans are still interesting because this problem was designed to
+ be interactive, with a player controlling Tom and the planner constantly
+ rewriting the story in response.
+ Here is one example of an interesting but non-minimal plan where Tom reports
+ the bandit's location to the guard.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Plan 5: Tom gets help from the guard.
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Cottage, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Bandit, Camp, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+rob(Bandit, TomCoin, Tom, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Crossroads, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+report(Tom, Crossroads, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Guard, Market, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+attack(Guard, Bandit, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Market, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+loot(Tom, TomCoin, Bandit, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Crossroads, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+buy(Tom, Medicine, TomCoin, Market)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Market, Crossroads)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+walk(Tom, Crossroads, Cottage)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Though all four exemplar solutions can be found with an epistemic limit
+ of 1, we recommend setting the epistemic limit to 2 for this problem because
+ some interesting actions (like 
+\family typewriter
+report
+\family default
+) are only possible when one character anticipates the actions of another.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+gramma_any
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+gramma_win
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Jailbreak
+\end_layout
+
+\begin_layout Standard
+This problem was used in a series of experiments by Farrell, Ware, and Baker
+ to investigate which events people remember and expect during an interactive
+ story.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{farrell2020manipulating}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The authors later implemented the story in Sabre.
+ It is about two prison inmates, Ernest and Roy.
+ They steal a pack of cigarettes and become the target of the prison bully
+ who threatens to kill them.
+ Ernest plans escape by stealing some civilian clothes to flee down the
+ highway.
+ Roy plans revenge on the bully by stealing a knife to stab him in the gym.
+ In the original experiment, both make preparations for their plans and
+ meet at the air vents.
+ The vents lead both to the highway (for escape) and the gym (for revenge).
+ The guards come running, and one inmate must give himself up so the other
+ can succeed.
+ The experiment altered the characters, timing, and locations of events
+ to measure which events players remembered and which ending they chose.
+\end_layout
+
+\begin_layout Standard
+Both Ernest and Roy gain 2 points of utility for stealing the cigarettes.
+ They each take a -1 penalty if they have been threatened by the bully.
+ They can avoid that penalty by escaping or killing the bully.
+ They also gain a -3 penalty for being dead.
+ The bully gains 1 point for being in the gym, his preferred location.
+ He takes a -1 penalty if someone he has threatened is alive.
+ He can remove that penalty by killing the people he has threatened.
+ The author gains 1 point for each dead inmate.
+ The author also gains 3 points when the cigarettes have been stolen and
+ the threat to each inmate has been neutralized.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: The bully kills an inmate.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Ernest, Cigarettes, Cells)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+confiscate(Ernest, Cigarettes, Cells, Gym)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+recreation(Bully, Gym)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+kill(Bully, Ernest, Gym)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 2: Ernest escapes.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 3)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Ernest, Cigarettes, Cells)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+chores(Ernest, Laundry)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Ernest, Clothes, Laundry)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+confiscate(Ernest, Cigarettes, Laundry, Highway)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+disguise(Ernest, Clothes, Highway)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+escape(Ernest, Highway)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 3: Roy gets revenge.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known plan for author utility 6)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Roy, Cigarettes, Cells)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+recreation(Bully, Gym)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+chores(Roy, Kitchen)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+steal(Roy, Knife, Kitchen)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+confiscate(Roy, Cigarettes, Kitchen, Gym)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+lock_gym(Roy, Gym)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+revenge(Roy, Bully, Gym)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+There were many versions of the story used in Farrell et al.'s experiments
+ that varied in the order and content, but all of them were a mix of the
+ escape and revenge plans with only one inmate succeeding at the end.
+ The actions in these plans are explained but not minimal (that is, actions
+ can be removed without decreasing the author's utility), so Sabre does
+ not consider them solutions.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+jailbreak_lose
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+jailbreak_escape
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+jailbreak_revenge
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Lovers
+\end_layout
+
+\begin_layout Standard
+This problem was proposed by Farrell and Ware as a randomizable setting
+ for testing belief and intention recognition using an early version of
+ Sabre.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{quote}
+\end_layout
+
+\begin_layout Plain Layout
+
+	
+\backslash
+bibentry{farrell2020narrative}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{quote}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The problem is a grid world filled with agents and items.
+ Each character wants one of the items.
+ A character is happy if they have the item they want.
+ Each character also loves one other character.
+ A character gets 1 point of utility for being happy and 1 point if the
+ character they love is happy.
+ The author picks two characters.
+ If both are happy, the author gets 1 point; otherwise the author utility
+ is 0.
+\end_layout
+
+\begin_layout Standard
+The initial locations of agents and items can be randomized.
+ Whom characters love and which two the author wants to be happy can be
+ randomized.
+ Characters can also have random wrong beliefs about where items are or
+ who wants which items.
+\end_layout
+
+\begin_layout Standard
+Characters can move around, pick up items, trade items with others, and
+ tell other characters they want an item.
+ Characters can lie about what item they want.
+\end_layout
+
+\begin_layout Standard
+This problem was designed to feature intention, belief, conflict, communication,
+ and deception but in practice communication is rarely part of an optimal
+ solution because characters can usually correct their wrong beliefs while
+ moving around.
+ Many randomized versions of this problem were used in the original experiments.
+ For our version, we engineered the problem so the shortest solution requires
+ deception.
+\end_layout
+
+\begin_layout Standard
+In the solution, character C1 lies to C2, claiming to want I3 which C2 is
+ holding.
+ C2 will give I3 to C1 because C2 loves C1.
+ That love is unrequited, because C1 trades it to its lover, C3 so both
+ will have the items they want.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+Solution 1: C1 lies to C2 to get the item C3 wants.
+\end_layout
+
+\begin_layout Plain Layout
+(Shortest known solution)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+move(C1, R11, R12)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+tell(C1, C2, I3, R12)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+give(C2, I3, C1, R12)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+move(C1, R12, R22)
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+trade(C1, I3, C3, I1, R22)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Though the solution can be found with an epistemic limit of 1, we recommend
+ setting the epistemic limit to 2 for this problem because many interesting
+ behaviors are only possible when one character anticipates the actions
+ of another.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Version
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Goal Utility
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+lovers
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\series bold
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\series default
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Setting
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Author Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Character Temporal Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Epistemic Limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Acknowledgments
+\end_layout
+
+\begin_layout Standard
+The original research on the Sabre narrative planner, and on these benchmark
+ tests for it, was supported in part by the U.S.
+ National Science Foundation.
+ The opinions and recommendations expressed in this technical report are
+ those of the authors and do not necessarily reflect the views of the National
+ Science Foundation.
+ We would also like to thank the authors of all the original problems that
+ we translated into Sabre syntax for their contributions to the narrative
+ planning research community.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="1">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename nsflogo.eps
+	lyxscale 10
+	width 2cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Grant #2145153
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset space \quad{}
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="1">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename nsflogo.eps
+	lyxscale 10
+	width 2cm
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Grant #1911053
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "bibliography"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

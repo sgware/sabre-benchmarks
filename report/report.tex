@@ -393,9 +393,8 @@ him to the jailhouse, then walk to the general store to steal the
 antivenom himself. His path via the jailhouse, and his dragging a
 prisoner around with him, are an unnecessarily long yet still valid
 and minimal path to the general store. It also happens to be a convenient
-way to achieve the author's goal. We have modified the problem so
-characters cannot walk once bitten by a snake in order to rule out
-this strange solution.
+way to achieve the author's goal. We have modified the problem to
+rule out this strange solution.
 
 \subsection{Recommended Search Settings}
 
@@ -1221,6 +1220,21 @@ location, with one exception. The sheriff needs to observe all instances
 of the \texttt{take} action or else he will only be aware of crimes
 committed at his location. We also fixed a bug in the initial state
 of this problem where no sheriff had been specified.
+
+In the original problem, the \texttt{travel} action specified where
+the traveler was leaving from and where they were going to. The \texttt{force-travel}
+action moved both the traveler and a helpless prisoner. Since moving
+alone and moving with a prisoner both required one action, and since
+the travel actions specified their origin, it was possible for characters
+to take meandering routes to their destinations. For example, once
+bitten by a snake, Timmy could tie up his father, move both of them
+to the jailhouse, and them travel by himself to the general store
+to steal the antivenom. This path is minimal in the sense that no
+actions can be left out, but it is strange. We have modified the \texttt{travel}
+and \texttt{force-travel} actions so they no longer include their
+origin. We have also changed the \texttt{force-travel} action to move
+only the prisoner. This avoids unnecessarily long paths that are a
+convenient but strange way to achieve the author's goal.
 
 Like IPOCL~\cite{riedl2010narrative}, Glaive allows characters to
 adopt and drop goals. We translated these concepts into utility functions

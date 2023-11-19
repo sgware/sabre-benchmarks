@@ -35,10 +35,18 @@
  *     Hank loves Timmy. All characters want to have the items they own. The
  *     sheriff wants all characters to have the items they own and wants to
  *     imprison thieves.
- * (5) The travel and force_travel actions now require that the traveler not be
- *     sick. This prevents several solutions where people get bitten and then
- *     get their own antivenom, usually force_traling'ing others along with them
- *     in a way that is convenient for the author but appears strange.
+ * (5) In the original domain, the travel and force_travel actions specified
+ *     the location the character was coming from as well as the locaiton they
+ *     were traveling too. Also, the foce_travel action was just as good a way
+ *     for a character to move locations as the travel action. This means that
+ *     several solutions were possible where characters would tie one another up
+ *     and move around is strange ways that happened to be convenient for the
+ *     author. For example, Timmy would tie up Hank and force_travel with him to
+ *     the jailhouse and then travel to the general store. This path was
+ *     unnecessarily long but it was not redundant. The travel action has been
+ *     modified so that it does not specify the origin, and the force_travel
+ *     action has been modified so that the consenting character no longer moves
+ *     with the character being forced. This prevents the strange solutions.
  *
  * Shortest solution (author temporal limit 8, character temporal limit 5;
  * epistemic limit 1):
@@ -133,8 +141,6 @@ action die(victim : character, cause : sickness, place : place) {
 action travel(character : character, place : place) {
 	precondition:
 		alive(character) &
-		!exists(s : sickness)
-			sick(character, s) &
 		free(character) &
 		at(character) != place;
 	effect:
@@ -193,15 +199,13 @@ action untie(character : character, victim : character, place : place) {
 action force_travel(character : character, victim : character, place : place) {
 	precondition:
 		alive(character) &
-		!exists(s : sickness)
-			sick(character, s) &
 		free(character) &
 		alive(victim) &
 		!free(victim) &
 		at(character) != place &
 		at(character) == at(victim);
 	effect:
-		at(character) = place &
+		//at(character) = place &
 		at(victim) = place;
 	consenting: character;
 	observing(c : character): alive(c) & (at(c) == at(character) | at(c) == place);

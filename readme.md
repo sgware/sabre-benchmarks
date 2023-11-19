@@ -25,13 +25,13 @@ run it:
 git clone --recurse-submodules https://github.com/sgware/sabre-benchmarks
 cd sabre-benchmarks
 javac -cp sabre/lib/sabre.jar -sourcepath src -d bin src/edu/uky/cs/nil/sabre/bench/Main.java
-java -Xms10g -Xmx10g -cp bin;sabre/lib/sabre.jar edu.uky.cs.nil.sabre.bench.Main
+java -Xms60g -Xmx60g -cp bin;sabre/lib/sabre.jar edu.uky.cs.nil.sabre.bench.Main
 ```
 
-The `-Xms10g` argument sets the Java Virtual Machine's minimum heap space to 10
-gigabytes, and the `-Xmx10g` argument sets the JVM's maximum heap space to 10
+The `-Xms60g` argument sets the Java Virtual Machine's minimum heap space to 60
+gigabytes, and the `-Xmx60g` argument sets the JVM's maximum heap space to 10
 gigabytes. You can adjust these numbers up or down depending on how much memory
-is available.
+is available and how many threads will run simultaneously.
 
 All relevant settings can be found at the top of
 [`Main.java`](src/edu/uky/cs/nil/sabre/bench/Main.java). You can change how many
