@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import edu.uky.cs.nil.sabre.Solution;
 import edu.uky.cs.nil.sabre.comp.ActionShuffler;
 import edu.uky.cs.nil.sabre.comp.CompiledAction;
 import edu.uky.cs.nil.sabre.io.DefaultPrinter;
@@ -27,7 +28,7 @@ import edu.uky.cs.nil.sabre.util.Worker.Status;
 public class Main {
 	
 	/** The number of parallel processes to run tests on */
-	public static final int THREADS = 5;
+	public static final int THREADS = 6;
 
 	/**
 	 * The maximum number of nodes a {@link ProgressionSearch search} may {@link
@@ -180,9 +181,8 @@ public class Main {
 		List<Benchmark> problems = getProblems();
 		for(Benchmark problem : problems) {
 			problem.load(status);
-			report.addProblem(problem);
+			report.addProblem(problem, status);
 			System.out.println("\nProblem \"" + problem.name + "\" before compilation:\n\n" + printer.toString(problem.getProblem()));
-			System.out.println("\nProblem \"" + problem.name + "\" after compilation:\n\n" + printer.toString(problem.getCompiledProblem()));
 		}
 		// Print the details of each planner.
 		List<ProgressionPlanner> planners = getPlanners();
@@ -193,11 +193,12 @@ public class Main {
 		// Verify that each planner can solve each problem.
 		for(Benchmark problem : problems) {
 			for(ProgressionPlanner planner : planners) {
-				if(problem.getSolution() == null)
+				Solution<CompiledAction> solution = problem.getSolution(planner, status);
+				if(solution == null)
 					System.out.println("\nWarning: Problem \"" + problem.name + "\" does not have an assoicated solution to verify.");
 				else {
 					ProgressionCostFactory heuristic = planner.getHeuristic();
-					planner.setHeuristic(new VerificationHeuristic.Factory(heuristic, problem.getSolution()));
+					planner.setHeuristic(new VerificationHeuristic.Factory(heuristic, solution));
 					ProgressionSearch search = problem.getSearch(planner, 1, status);
 					Result<CompiledAction> result = search.get(status);
 					if(result.getSuccess())

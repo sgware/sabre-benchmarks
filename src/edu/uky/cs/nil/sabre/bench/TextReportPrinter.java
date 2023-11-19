@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import edu.uky.cs.nil.sabre.Settings;
+import edu.uky.cs.nil.sabre.Utilities;
 
 /**
  * A {@link ReportPrinter report printer} that writes a {@link Report report} in
@@ -60,22 +61,19 @@ public class TextReportPrinter implements ReportPrinter {
 		print("Threads:       " + Main.THREADS + "\n");
 		print("Runs:          " + Main.RUNS + "\n");
 		print("Shuffle:       " + Main.SHUFFLE + "\n");
-		print("Start:         " + ZonedDateTime.ofInstant(Instant.ofEpochMilli(report.getStart()), ZoneId.systemDefault()) + "\n");
-		print("End:           " + ZonedDateTime.ofInstant(Instant.ofEpochMilli(report.getEnd()), ZoneId.systemDefault()) + "\n");
-		print("Duration:      " + (report.getEnd() - report.getStart()) + "ms\n");
-		print("Compute Time:  " + report.getComputeTime() + "ms\n");
+		print("Start:         " + report.getStart() + " (" + ZonedDateTime.ofInstant(Instant.ofEpochMilli(report.getStart()), ZoneId.systemDefault()) + ")\n");
+		print("End:           " + report.getEnd() + " (" + ZonedDateTime.ofInstant(Instant.ofEpochMilli(report.getEnd()), ZoneId.systemDefault()) + ")\n");
+		long duration = report.getEnd() - report.getStart();
+		print("Duration:      " + duration + "ms (" + Utilities.time(duration) + ")\n");
+		print("Compute Time:  " + report.getComputeTime() + "ms (" + Utilities.time(report.getComputeTime()) + ")\n");
 		print("\n= Problems =\n\n");
 		print(report.problems);
-		print("\n\n= Compiled Problems =\n\n");
-		print(report.compiled);
 		print("\n\n= Planners =\n\n");
 		print(report.planners);
 		print("\n\n= Results =\n\n");
 		print(report.results);
 		print("\n\n= Summary =\n\n");
 		print(report.summary);
-		print("\n\n");
-		print(report.best);
 	}
 	
 	/**
@@ -88,9 +86,9 @@ public class TextReportPrinter implements ReportPrinter {
 	public void print(Table table) throws IOException {
 		int[] width = new int[table.columns.size()];
 		for(Table.Column column : table.columns)
-			width[column.index] = Math.max(width[column.index], toString(column.label).length());
+			width[column.getIndex()] = Math.max(width[column.getIndex()], toString(column.label).length());
 		for(Table.Cell cell : table)
-			width[cell.column.index] = Math.max(width[cell.column.index], toString(cell.get()).length());
+			width[cell.column.getIndex()] = Math.max(width[cell.column.getIndex()], toString(cell.get()).length());
 		String line = "+";
 		for(int w : width) {
 			for(int i=0; i<w; i++)
@@ -99,21 +97,21 @@ public class TextReportPrinter implements ReportPrinter {
 		}
 		print(line + "\n");
 		for(Table.Column column : table.columns) {
-			if(column.index == 0)
+			if(column.getIndex() == 0)
 				print("| ");
 			else
 				print(" | ");
-			print(column.label, width[column.index]);
-			if(column.index == table.columns.size() - 1)
+			print(column.label, width[column.getIndex()]);
+			if(column.getIndex() == table.columns.size() - 1)
 				print(" |");
 		}
 		print("\n" + line);
 		for(Table.Row row : table.rows) {
 			print("\n| ");
 			for(Table.Cell cell : row) {
-				if(cell.column.index > 0)
+				if(cell.column.getIndex() > 0)
 					print(" | ");
-				print(cell.get(), width[cell.column.index]);
+				print(cell.get(), width[cell.column.getIndex()]);
 			}
 			print(" |");
 		}

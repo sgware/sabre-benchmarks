@@ -46,14 +46,14 @@ public class CSVTablePrinter implements Closeable {
 	 */
 	public void print(Table table) throws IOException {
 		for(Table.Column column : table.columns) {
-			if(column.index > 0)
+			if(column.getIndex() > 0)
 				print(",");
 			print("\"" + column.label.toString() + "\"");
 		}
 		for(Table.Row row : table.rows) {
 			print("\n");
 			for(Table.Cell cell : row) {
-				if(cell.column.index > 0)
+				if(cell.column.getIndex() > 0)
 					print(",");
 				print(cell);
 			}

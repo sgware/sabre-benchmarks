@@ -2,17 +2,17 @@ package edu.uky.cs.nil.sabre.bench;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import edu.uky.cs.nil.sabre.Problem;
 import edu.uky.cs.nil.sabre.comp.CompiledAction;
 import edu.uky.cs.nil.sabre.comp.CompiledProblem;
+import edu.uky.cs.nil.sabre.comp.Grounder;
+import edu.uky.cs.nil.sabre.comp.Simplifier;
 import edu.uky.cs.nil.sabre.prog.ProgressionPlanner;
 import edu.uky.cs.nil.sabre.search.Result;
 import edu.uky.cs.nil.sabre.util.ImmutableArray;
+import edu.uky.cs.nil.sabre.util.Worker.Status;
 
 /**
  * A report is a collection of information, mostly organized into {@link Table
@@ -24,78 +24,170 @@ import edu.uky.cs.nil.sabre.util.ImmutableArray;
 public class Report {
 
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the {@link Benchmark#name name of a
-	 * benchmark problem}
+	 * Column label in the {@link #problems problems table} for the {@link
+	 * Benchmark#name name of a benchmark problem}
 	 */
 	public static final String PROBLEMS_NAME = "Name";
 	
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the number of {@link
-	 * edu.uky.cs.nil.sabre.Universe#characters characters} in a problem
+	 * Column label in the {@link #problems problems table} for the number of
+	 * {@link edu.uky.cs.nil.sabre.Universe#characters characters} in a problem
 	 */
 	public static final String PROBLEMS_CHARACTERS = "Characters";
 	
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the number of {@link
-	 * edu.uky.cs.nil.sabre.Universe#entities entities} in a problem
+	 * Column label in the {@link #problems problems table} for the number of
+	 * {@link edu.uky.cs.nil.sabre.Universe#entities entities} in a problem
 	 */
 	public static final String PROBLEMS_ENTITIES = "Entities";
 	
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the number of {@link Problem#fluents
-	 * fluents} in a problem
+	 * Column label in the {@link #problems problems table} for the number of
+	 * {@link Problem#fluents fluents} in a problem before compilation
 	 */
-	public static final String PROBLEMS_FLUENTS = "Fluents";
+	public static final String PROBLEMS_FLUENT_TEMPLATES = "Fluent Templates";
 	
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the number of {@link Problem#actions
-	 * actions} in a problem
+	 * Column label in the {@link #problems problems table} for the number of
+	 * {@link Problem#fluents fluents} in a problem after it is grounded and
+	 * simplified
 	 */
-	public static final String PROBLEMS_ACTIONS = "Actions";
+	public static final String PROBLEMS_GROUND_FLUENTS = "Ground Fluents";
 	
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the number of {@link Problem#triggers
-	 * triggers} in a problem
+	 * Column label in the {@link #problems problems table} for the number of
+	 * {@link Problem#actions actions} in a problem before compilation
 	 */
-	public static final String PROBLEMS_TRIGGERS = "Triggers";
+	public static final String PROBLEMS_ACTION_TEMPLATES = "Action Templates";
 	
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the {@link
+	 * Column label in the {@link #problems problems table} for the number of
+	 * {@link Problem#actions actions} in a problem after it is gounded and
+	 * simplified
+	 */
+	public static final String PROBLEMS_GROUND_ACTIONS = "Ground Actions";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the number of
+	 * {@link Problem#triggers triggers} in a problem before compilation
+	 */
+	public static final String PROBLEMS_TRIGGER_TEMPLATES = "Trigger Templates";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the number of
+	 * {@link Problem#triggers triggers} in a problem after it is grounded and
+	 * simplified
+	 */
+	public static final String PROBLEMS_GROUND_TRIGGERS = "Ground Triggers";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the {@link
 	 * edu.uky.cs.nil.sabre.search.Search#getGoal() utility a solution to the
 	 * benchmark problem must achieve}
 	 */
 	public static final String PROBLEMS_GOAL = "Goal";
 	
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the {@link
+	 * Column label in the {@link #problems problems table} for the {@link
 	 * edu.uky.cs.nil.sabre.search.Search#authorTemporalLimit author temporal
 	 * limit} used for the problem
 	 */
-	public static final String PROBLEMS_ATL = "ATL";
+	public static final String PROBLEMS_ATL = "Author Temporal Limit";
 	
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the {@link
+	 * Column label in the {@link #problems problems table} for the {@link
 	 * edu.uky.cs.nil.sabre.search.Search#characterTemporalLimit character
 	 * temporal limit} used for the problem
 	 */
-	public static final String PROBLEMS_CTL = "CTL";
+	public static final String PROBLEMS_CTL = "Character Temporal Limit";
 	
 	/**
-	 * Column label in the {@link #problems problems table} and {@link #compiled
-	 * compiled problems table} for the {@link
+	 * Column label in the {@link #problems problems table} for the {@link
 	 * edu.uky.cs.nil.sabre.search.Search#epistemicLimit epistemic limit} used
 	 * for the problem
 	 */
-	public static final String PROBLEMS_EL = "EL";
+	public static final String PROBLEMS_EL = "Epistemic Limit";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the total number
+	 * of times the problem was solved by all planners
+	 */
+	public static final String PROBLEMS_SOLVED = "Times Solved";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the minimum
+	 * number of nodes visited by any planner when working on the problem
+	 */
+	public static final String PROBLEMS_MIN_VISITED = "Min Nodes Visited";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the maximum
+	 * number of nodes visited by any planner when working on the problem
+	 */
+	public static final String PROBLEMS_MAX_VISITED = "Max Nodes Visited";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the average
+	 * number of nodes visited by any planner when working on the problem
+	 */
+	public static final String PROBLEMS_AVG_VISITED = "Avg. Nodes Visited";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the standard
+	 * deviation in the number of nodes visited by any planner when working on
+	 * the problem
+	 */
+	public static final String PROBLEMS_STD_VISITED = "Nodes Visited Std.";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the minimum
+	 * number of nodes generated by any planner when working on the problem
+	 */
+	public static final String PROBLEMS_MIN_GENERATED = "Min Nodes Generated";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the maximum
+	 * number of nodes generated by any planner when working on the problem
+	 */
+	public static final String PROBLEMS_MAX_GENERATED = "Max Nodes Generated";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the average
+	 * number of nodes generated by any planner when working on the problem
+	 */
+	public static final String PROBLEMS_AVG_GENERATED = "Avg. Nodes Generated";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the standard
+	 * deviation inthe number of nodes generated by any planner when working on
+	 * the problem
+	 */
+	public static final String PROBLEMS_STD_GENERATED = "Nodes Generated Std.";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the minimum
+	 * amount of time spent by any planner when working on the problem
+	 */
+	public static final String PROBLEMS_MIN_TIME = "Min Time (ms)";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the maximum
+	 * amount of time spent by any planner when working on the problem
+	 */
+	public static final String PROBLEMS_MAX_TIME = "Max Time (ms)";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the average
+	 * amount of time spent by any planner when working on the problem
+	 */
+	public static final String PROBLEMS_AVG_TIME = "Avg. Time (ms)";
+	
+	/**
+	 * Column label in the {@link #problems problems table} for the standard
+	 * deviation in the amount of time spent by any planner when working on the
+	 * problem
+	 */
+	public static final String PROBLEMS_STD_TIME = "Time Std. (ms)";
 	
 	/**
 	 * Column label in the {@link #planners planners table} for the {@link
@@ -120,6 +212,30 @@ public class Report {
 	 * ProgressionPlanner#getCost() heuristic function used by the planner}
 	 */
 	public static final String PLANNERS_HEURISTIC = "Heuristic";
+	
+	/**
+	 * Column label in the {@link #planners planners table} for the total number
+	 * of problems this planner solved across all tests
+	 */
+	public static final String PLANNERS_SOLVED = "Problems Solved";
+	
+	/**
+	 * Column label in the {@link #planners planners table} for the total number
+	 * of nodes this planner visited across all tests
+	 */
+	public static final String PLANNERS_VISITED = "Total Nodes Visited";
+	
+	/**
+	 * Column label in the {@link #planners planners table} for the total number
+	 * of nodes this planner generated across all tests
+	 */
+	public static final String PLANNERS_GENERATED = "Total Nodes Generated";
+	
+	/**
+	 * Column label in the {@link #planners planners table} for the total number
+	 * of milliseconds this planner spent on all tests
+	 */
+	public static final String PLANNERS_TIME = "Total Time (ms)";
 	
 	/**
 	 * Column label in the {@link #results results table} for the {@link
@@ -184,6 +300,41 @@ public class Report {
 	 * ProgressionPlanner#name name of a planner}
 	 */
 	public static final String SUMMARY_PLANNER = "Planner";
+	
+	/**
+	 * Column label in the {@link #summary summary table} for the number of
+	 * times one planner succeeded on one problem
+	 */
+	public static final String SUMMARY_SUCCESSES = "Successes";
+	
+	/**
+	 * Column label in the {@link #summary summary table} for the minimum {@link
+	 * edu.uky.cs.nil.sabre.Plan#size() number of actions} in a planner's {@link
+	 * Result#solution solution} across all runs of one planner on one problem
+	 */
+	public static final String SUMMARY_MIN_PLAN_LENGTH = "Min Plan Length";
+	
+	/**
+	 * Column label in the {@link #summary summary table} for the maximum {@link
+	 * edu.uky.cs.nil.sabre.Plan#size() number of actions} in a planner's {@link
+	 * Result#solution solution} across all runs of one planner on one problem
+	 */
+	public static final String SUMMARY_MAX_PLAN_LENGTH = "Max Plan Length";
+	
+	/**
+	 * Column label in the {@link #summary summary table} for the average {@link
+	 * edu.uky.cs.nil.sabre.Plan#size() number of actions} in a planner's {@link
+	 * Result#solution solution} across all runs of one planner on one problem
+	 */
+	public static final String SUMMARY_AVG_PLAN_LENGTH = "Avg. Plan Length";
+	
+	/**
+	 * Column label in the {@link #summary summary table} for the standard
+	 * deviation in {@link edu.uky.cs.nil.sabre.Plan#size() the number of
+	 * actions} in a planner's {@link Result#solution solution} across all
+	 * runs of one planner on one problem
+	 */
+	public static final String SUMMARY_STD_PLAN_LENGTH = "Plan Length Std.";
 	
 	/**
 	 * Column label in the {@link #summary summary table} for the minimum {@link
@@ -272,68 +423,10 @@ public class Report {
 	public static final String SUMMARY_STD_TIME = "Time Std. (ms)";
 	
 	/**
-	 * Column label in the {@link #best best table} for the {@link
-	 * Benchmark#name name of a benchmark problem}
-	 */
-	public static final String BEST_PROBLEM = "Problem";
-	
-	/**
-	 * Column label in the {@link #best best table} for the {@link
-	 * ProgressionPlanner#name name of the planner} with the lowest average
-	 * number of nodes visited for the problem
-	 */
-	public static final String BEST_PLANNER_VISITED = "Best Planner (Visited)";
-	
-	/**
-	 * Column label in the {@link #best best table} for the average {@link
-	 * edu.uky.cs.nil.sabre.prog.ProgressionSearch#getVisited() number of nodes
-	 * visited} by the planner that had the lowest average number of nodes
-	 * visited for the problem
-	 */
-	public static final String BEST_AVG_VISITED = "Avg. Nodes Visited";
-	
-	/**
-	 * Column label in the {@link #best best table} for the {@link
-	 * ProgressionPlanner#name name of the planner} with the lowest average
-	 * number of nodes generated for the problem
-	 */
-	public static final String BEST_PLANNER_GENERATED = "Best Planner (Generated)";
-	
-	/**
-	 * Column label in the {@link #best best table} for the average {@link
-	 * edu.uky.cs.nil.sabre.prog.ProgressionSearch#getGenerated() number of
-	 * nodes generated} by the planner that had the lowest average number of
-	 * nodes generated for the problem
-	 */
-	public static final String BEST_AVG_GENERATED = "Avg. Nodes Generated";
-	
-	/**
-	 * Column label in the {@link #best best table} for the {@link
-	 * ProgressionPlanner#name name of the planner} with the lowest average
-	 * time spent for the problem
-	 */
-	public static final String BEST_PLANNER_TIME = "Best Planner (Time)";
-	
-	/**
-	 * Column label in the {@link #best best table} for the average {@link
-	 * Result#time time spent} by the planner with the lowest average amount of
-	 * time spent for the problem
-	 */
-	public static final String BEST_AVG_TIME = "Avg. Time (ms)";
-	
-	/**
 	 * Gives summary statistics about the size, goal, and search limits on each
 	 * {@link Benchmark benchmark problem} before the problem is compiled
 	 */
 	public final Table problems = new Table();
-	
-	/**
-	 * Contains summary statistics about the size, goal, and search limits on
-	 * each {@link Benchmark benchmark problem} after the problem is {@link
-	 * ProgressionPlanner#compile(Problem, edu.uky.cs.nil.sabre.util.Worker.Status)
-	 * compiled}
-	 */
-	public final Table compiled = new Table();
 	
 	/**
 	 * Contains the name and relevant details of each {@link ProgressionPlanner
@@ -350,14 +443,6 @@ public class Report {
 	 * (this table remains empty until {@link #setEnd() all tests are complete})
 	 */
 	public final Table summary = new Table();
-	
-	/**
-	 * Contains details on which {@link ProgressionPlanner planner} performed
-	 * best on each {@link Benchmark benchmark problem} according to different
-	 * metrics (this table remains empty until {@link #setEnd() all tests are
-	 * complete})
-	 */
-	public final Table best = new Table();
 	
 	/**
 	 * The {@link System#currentTimeMillis() time} the tests started, as set by
@@ -378,15 +463,16 @@ public class Report {
 		problems.addColumn(PROBLEMS_NAME, String.class);
 		problems.addColumn(PROBLEMS_CHARACTERS, Integer.class);
 		problems.addColumn(PROBLEMS_ENTITIES, Integer.class);
-		problems.addColumn(PROBLEMS_FLUENTS, Integer.class);
-		problems.addColumn(PROBLEMS_ACTIONS, Integer.class);
-		problems.addColumn(PROBLEMS_TRIGGERS, Integer.class);
+		problems.addColumn(PROBLEMS_FLUENT_TEMPLATES, Integer.class);
+		problems.addColumn(PROBLEMS_GROUND_FLUENTS, Integer.class);
+		problems.addColumn(PROBLEMS_ACTION_TEMPLATES, Integer.class);
+		problems.addColumn(PROBLEMS_GROUND_ACTIONS, Integer.class);
+		problems.addColumn(PROBLEMS_TRIGGER_TEMPLATES, Integer.class);
+		problems.addColumn(PROBLEMS_GROUND_TRIGGERS, Integer.class);
 		problems.addColumn(PROBLEMS_GOAL, Double.class);
 		problems.addColumn(PROBLEMS_ATL, Integer.class);
 		problems.addColumn(PROBLEMS_CTL, Integer.class);
 		problems.addColumn(PROBLEMS_EL, Integer.class);
-		for(Table.Column column : problems.columns)
-			compiled.addColumn(column.label, column.type);
 		planners.addColumn(PLANNERS_NAME, String.class);
 		planners.addColumn(PLANNERS_SEARCH, String.class);
 		planners.addColumn(PLANNERS_COST, String.class);
@@ -401,6 +487,11 @@ public class Report {
 		results.addColumn(RESULTS_TIME, Long.class);
 		summary.addColumn(SUMMARY_PROBLEM, String.class);
 		summary.addColumn(SUMMARY_PLANNER, String.class);
+		summary.addColumn(SUMMARY_SUCCESSES, Long.class);
+		summary.addColumn(SUMMARY_MIN_PLAN_LENGTH, Long.class);
+		summary.addColumn(SUMMARY_MAX_PLAN_LENGTH, Long.class);
+		summary.addColumn(SUMMARY_AVG_PLAN_LENGTH, Double.class);
+		summary.addColumn(SUMMARY_STD_PLAN_LENGTH, Double.class);
 		summary.addColumn(SUMMARY_MIN_VISITED, Long.class);
 		summary.addColumn(SUMMARY_MAX_VISITED, Long.class);
 		summary.addColumn(SUMMARY_AVG_VISITED, Double.class);
@@ -413,13 +504,6 @@ public class Report {
 		summary.addColumn(SUMMARY_MAX_TIME, Long.class);
 		summary.addColumn(SUMMARY_AVG_TIME, Double.class);
 		summary.addColumn(SUMMARY_STD_TIME, Double.class);
-		best.addColumn(BEST_PROBLEM, String.class);
-		best.addColumn(BEST_PLANNER_VISITED, String.class);
-		best.addColumn(BEST_AVG_VISITED, Double.class);
-		best.addColumn(BEST_PLANNER_GENERATED, String.class);
-		best.addColumn(BEST_AVG_GENERATED, Double.class);
-		best.addColumn(BEST_PLANNER_TIME, String.class);
-		best.addColumn(BEST_AVG_TIME, Double.class);
 	}
 	
 	@Override
@@ -455,8 +539,10 @@ public class Report {
 	
 	/**
 	 * Returns the {@link System#currentTimeMillis() timestamp} when the tests
-	 * ended. This method also causes the {@link #summary summary} and {@link
-	 * #best best} tables to be populated.
+	 * ended. This method also causes the {@link #summary summary} table to be
+	 * populated, additional columns to be added to the {@link #problems
+	 * problems} and {@link #planners planners} tables, and the problems and
+	 * planners tables to be sorted
 	 * 
 	 * @return the time the tests ended
 	 */
@@ -492,27 +578,31 @@ public class Report {
 	
 	/**
 	 * Adds details for a new benchmark problem to the {@link #problems
-	 * problems} and {@link #compiled compiled problems} tables.
+	 * problems} table. This method will {@link Grounder ground} and then {@link
+	 * Simplifier simplify} a problem so that statistics about the ground
+	 * problem can be added to the table.
 	 * 
-	 * @param problem the new benchmark problem to add
+	 * @param benchmark the new benchmark problem to add
+	 * @param status a status to update while the problem is compiled
 	 */
-	public void addProblem(Benchmark problem) {
-		addProblem(problem, problem.getProblem(), problems);
-		addProblem(problem, problem.getCompiledProblem(), compiled);
-	}
-	
-	private final void addProblem(Benchmark benchmark, Problem problem, Table table) {
-		table.addRow(problem);
-		table.set(problem, PROBLEMS_NAME, problem.name);
-		table.set(problem, PROBLEMS_CHARACTERS, problem.universe.characters.size());
-		table.set(problem, PROBLEMS_ENTITIES, problem.universe.entities.size());
-		table.set(problem, PROBLEMS_FLUENTS, problem.fluents.size());
-		table.set(problem, PROBLEMS_ACTIONS, problem.actions.size());
-		table.set(problem, PROBLEMS_TRIGGERS, problem.triggers.size());
-		table.set(problem, PROBLEMS_GOAL, benchmark.goal);
-		table.set(problem, PROBLEMS_ATL, benchmark.atl);
-		table.set(problem, PROBLEMS_CTL, benchmark.ctl);
-		table.set(problem, PROBLEMS_EL, benchmark.el);
+	public void addProblem(Benchmark benchmark, Status status) {
+		Problem problem = benchmark.getProblem();
+		CompiledProblem compiled = Grounder.compile(problem, new Status());
+		compiled = Simplifier.compile(compiled, new Status());
+		problems.addRow(problem);
+		problems.set(problem, PROBLEMS_NAME, problem.name);
+		problems.set(problem, PROBLEMS_CHARACTERS, problem.universe.characters.size());
+		problems.set(problem, PROBLEMS_ENTITIES, problem.universe.entities.size());
+		problems.set(problem, PROBLEMS_FLUENT_TEMPLATES, problem.fluents.size());
+		problems.set(problem, PROBLEMS_GROUND_FLUENTS, compiled.fluents.size());
+		problems.set(problem, PROBLEMS_ACTION_TEMPLATES, problem.actions.size());
+		problems.set(problem, PROBLEMS_GROUND_ACTIONS, compiled.actions.size());
+		problems.set(problem, PROBLEMS_TRIGGER_TEMPLATES, problem.triggers.size());
+		problems.set(problem, PROBLEMS_GROUND_TRIGGERS, compiled.triggers.size());
+		problems.set(problem, PROBLEMS_GOAL, benchmark.goal);
+		problems.set(problem, PROBLEMS_ATL, benchmark.atl);
+		problems.set(problem, PROBLEMS_CTL, benchmark.ctl);
+		problems.set(problem, PROBLEMS_EL, benchmark.el);
 	}
 	
 	/**
@@ -537,201 +627,140 @@ public class Report {
 	 * @throws IllegalStateException if the test has not completed
 	 */
 	public void addResult(TestSuite.Test test) {
-		addResult(test.problem, test.planner, test.run, test.getResult());
-	}
-	
-	private final void addResult(Benchmark problem, ProgressionPlanner planner, int run, Result<CompiledAction> result) {
-		results.addRow(result);
-		results.set(result, RESULTS_PROBLEM, problem.name);
-		results.set(result, RESULTS_PLANNER, planner.name);
-		results.set(result, RESULTS_RUN, run);
-		results.set(result, RESULTS_SUCCESS, result.getSuccess());
+		results.addRow(test);
+		Result<CompiledAction> result = test.getResult();
+		results.set(test, RESULTS_PROBLEM, test.problem.name);
+		results.set(test, RESULTS_PLANNER, test.planner.name);
+		results.set(test, RESULTS_RUN, test.run);
+		results.set(test, RESULTS_SUCCESS, result.getSuccess());
 		if(result.getSuccess())
-			results.set(result, RESULTS_PLAN_LENGTH, result.solution.size());
-		results.set(result, RESULTS_VISITED, result.visited);
-		results.set(result, RESULTS_GENERATED, result.generated);
-		results.set(result, RESULTS_TIME, result.time);
+			results.set(test, RESULTS_PLAN_LENGTH, result.solution.size());
+		results.set(test, RESULTS_VISITED, result.visited);
+		results.set(test, RESULTS_GENERATED, result.generated);
+		results.set(test, RESULTS_TIME, result.time);
 	}
 	
-	/**
-	 * A function for getting the {@link Result#visited number of nodes visited}
-	 * from a result
-	 */
-	private static final Function<Result<?>, Number> VISITED = r -> r.visited;
-	
-	/**
-	 * A function for getting the {@link Result#generated number of nodes
-	 * generated} from a result
-	 */
-	private static final Function<Result<?>, Number> GENERATED = r -> r.generated;
-	
-	/**
-	 * A function for getting the {@link Result#time amount of time taken} from
-	 * a result
-	 */
-	private static final Function<Result<?>, Number> TIME = r -> r.time;
+	private static final class ResultsFilter implements Predicate<Table.Cell> {
+
+		public final Object column;
+		public final Problem problem;
+		public final ProgressionPlanner planner;
+		
+		public ResultsFilter(Object column, Problem problem, ProgressionPlanner planner) {
+			this.column = column;
+			this.problem = problem;
+			this.planner = planner;
+		}
+		
+		public ResultsFilter(Object column, Problem problem) {
+			this(column, problem, null);
+		}
+		
+		public ResultsFilter(Object column, ProgressionPlanner planner) {
+			this(column, null, planner);
+		}
+		
+		@Override
+		public boolean test(Table.Cell cell) {
+			return cell.column.label.equals(column) &&
+				(problem == null || cell.row.get(RESULTS_PROBLEM).get().equals(problem.name)) &&
+				(planner == null || cell.row.get(RESULTS_PLANNER).get().equals(planner.name));
+		}
+	}
 	
 	/**
 	 * Fills in the {@link #summary summary} and {@link #best best} tables.
 	 */
 	private void fillSummary() {
-		for(int i=0; i<compiled.rows.size(); i++) {
-			CompiledProblem problem = (CompiledProblem) compiled.rows.get(i).label;
-			ProgressionPlanner bestVisitedPlanner = null;
-			Double bestVisited = null;
-			ProgressionPlanner bestGeneratedPlanner = null;
-			Double bestGenerated = null;
-			ProgressionPlanner bestTimePlanner = null;
-			Double bestTime = null;
+		for(int i=0; i<problems.rows.size(); i++) {
+			Problem problem = (Problem) problems.rows.get(i).label;
 			for(int j=0; j<planners.rows.size(); j++) {
 				ProgressionPlanner planner = (ProgressionPlanner) planners.rows.get(j).label;
 				Object key = new ImmutableArray<>(problem, planner);
 				summary.addRow(key);
 				summary.set(key, SUMMARY_PROBLEM, problem.name);
 				summary.set(key, SUMMARY_PLANNER, planner.name);
-				List<Number> visited = collect(problem.name, planner.name, VISITED);
-				Double avgVisited = avg(visited);
-				if(avgVisited != null && (bestVisitedPlanner == null || avgVisited < bestVisited)) {
-					bestVisitedPlanner = planner;
-					bestVisited = avgVisited;
-				}
-				summary.set(key, SUMMARY_MIN_VISITED, min(visited));
-				summary.set(key, SUMMARY_MAX_VISITED, max(visited));
-				summary.set(key, SUMMARY_AVG_VISITED, avgVisited);
-				summary.set(key, SUMMARY_STD_VISITED, std(visited));
-				List<Number> generated = collect(problem.name, planner.name, GENERATED);
-				Double avgGenerated = avg(generated);
-				if(avgGenerated != null && (bestGeneratedPlanner == null || avgGenerated < bestGenerated)) {
-					bestGeneratedPlanner = planner;
-					bestGenerated = avgGenerated;
-				}
-				summary.set(key, SUMMARY_MIN_GENERATED, min(generated));
-				summary.set(key, SUMMARY_MAX_GENERATED, max(generated));
-				summary.set(key, SUMMARY_AVG_GENERATED, avgGenerated);
-				summary.set(key, SUMMARY_STD_GENERATED, std(generated));
-				List<Number> time = collect(problem.name, planner.name, TIME);
-				Double avgTime = avg(time);
-				if(avgTime != null && (bestTimePlanner == null || avgTime < bestTime)) {
-					bestTimePlanner = planner;
-					bestTime = avgTime;
-				}
-				summary.set(key, SUMMARY_MIN_TIME, min(time));
-				summary.set(key, SUMMARY_MAX_TIME, max(time));
-				summary.set(key, SUMMARY_AVG_TIME, avgTime);
-				summary.set(key, SUMMARY_STD_TIME, std(time));
-			}
-			best.addRow(problem);
-			best.set(problem, BEST_PROBLEM, problem.name);
-			if(bestVisitedPlanner != null) {
-				best.set(problem, BEST_PLANNER_VISITED, bestVisitedPlanner.name);
-				best.set(problem, BEST_AVG_VISITED, bestVisited);
-			}
-			if(bestGeneratedPlanner != null) {
-				best.set(problem, BEST_PLANNER_GENERATED, bestGeneratedPlanner.name);
-				best.set(problem, BEST_AVG_GENERATED, bestGenerated);
-			}
-			if(bestTimePlanner != null) {
-				best.set(problem, BEST_PLANNER_TIME, bestTimePlanner.name);
-				best.set(problem, BEST_AVG_TIME, bestTime);
+				Iterable<Integer> length = results.values(Integer.class, new ResultsFilter(RESULTS_PLAN_LENGTH, problem, planner));
+				summary.set(key, SUMMARY_SUCCESSES, Statistic.COUNT.calculate(length));
+				summary.set(key, SUMMARY_MIN_PLAN_LENGTH, Statistic.MIN_INTEGER.calculate(length));
+				summary.set(key, SUMMARY_MAX_PLAN_LENGTH, Statistic.MAX_INTEGER.calculate(length));
+				summary.set(key, SUMMARY_AVG_PLAN_LENGTH, Statistic.AVERAGE.calculate(length));
+				summary.set(key, SUMMARY_STD_PLAN_LENGTH, Statistic.STANDARD_DEVIATION.calculate(length));
+				Iterable<Long> visited = results.values(Long.class, new ResultsFilter(RESULTS_VISITED, problem, planner));
+				summary.set(key, SUMMARY_MIN_VISITED, Statistic.MIN_INTEGER.calculate(visited));
+				summary.set(key, SUMMARY_MAX_VISITED, Statistic.MAX_INTEGER.calculate(visited));
+				summary.set(key, SUMMARY_AVG_VISITED, Statistic.AVERAGE.calculate(visited));
+				summary.set(key, SUMMARY_STD_VISITED, Statistic.STANDARD_DEVIATION.calculate(visited));
+				Iterable<Long> generated = results.values(Long.class, new ResultsFilter(RESULTS_GENERATED, problem, planner));
+				summary.set(key, SUMMARY_MIN_GENERATED, Statistic.MIN_INTEGER.calculate(generated));
+				summary.set(key, SUMMARY_MAX_GENERATED, Statistic.MAX_INTEGER.calculate(generated));
+				summary.set(key, SUMMARY_AVG_GENERATED, Statistic.AVERAGE.calculate(generated));
+				summary.set(key, SUMMARY_STD_GENERATED, Statistic.STANDARD_DEVIATION.calculate(generated));
+				Iterable<Long> time = results.values(Long.class, new ResultsFilter(RESULTS_TIME, problem, planner));
+				summary.set(key, SUMMARY_MIN_TIME, Statistic.MIN_INTEGER.calculate(time));
+				summary.set(key, SUMMARY_MAX_TIME, Statistic.MAX_INTEGER.calculate(time));
+				summary.set(key, SUMMARY_AVG_TIME, Statistic.AVERAGE.calculate(time));
+				summary.set(key, SUMMARY_STD_TIME, Statistic.STANDARD_DEVIATION.calculate(time));
 			}
 		}
-	}
-	
-	/**
-	 * Collects all values of a type for one planner on one problem from the
-	 * {@link #results results table}. Values will only be collected if the
-	 * planner succeeded in solving the problem.
-	 * 
-	 * @param problem the problem being solved
-	 * @param planner the planner attempting to solve the problem
-	 * @param statistic the type of value to be collected
-	 * @return all values of that type when the planner succeeded in solving
-	 * the problem
-	 */
-	private final List<Number> collect(String problem, String planner, Function<Result<?>, Number> statistic) {
-		ArrayList<Number> values = new ArrayList<>();
-		for(Table.Row row : results.rows)
-			if(row.get(RESULTS_PROBLEM).get().equals(problem) && row.get(RESULTS_PLANNER).get().equals(planner) && ((Result<?>) row.label).getSuccess())
-				values.add(statistic.apply((Result<?>) row.label));
-		return values;
-	}
-	
-	/**
-	 * Finds the minimum in a list of values.
-	 * 
-	 * @param values the values
-	 * @return the smallest value, or null if the list of values was empty
-	 */
-	private static final Number min(List<Number> values) {
-		Number min = null;
-		for(Number value : values)
-			if(min == null || compare(value, min) < 0)
-				min = value;
-		return min;
-	}
-	
-	/**
-	 * Finds the maximum in a list of values.
-	 * 
-	 * @param values the values
-	 * @return the largest value, or null if the list of values was empty
-	 */
-	private static final Number max(List<Number> values) {
-		Number max = null;
-		for(Number value : values)
-			if(max == null || compare(value, max) > 0)
-				max = value;
-		return max;
-	}
-	
-	/**
-	 * Compares two {@link Number Java number objects}.
-	 * 
-	 * @param n1 the first number to compare
-	 * @param n2 the second number to compare
-	 * @return a negative number if the first number is smaller than the second,
-	 * a positive number if the first number is larger than the second, or 0 if
-	 * the numbers are the same
-	 */
-	private static final int compare(Number n1, Number n2) {
-		return new BigDecimal(n1.toString()).compareTo(new BigDecimal(n2.toString()));
-	}
-	
-	/**
-	 * Calculates the average of a list of values.
-	 * 
-	 * @param values the values to average
-	 * @return the average, or null if the list of values was empty
-	 */
-	private static final Double avg(List<Number> values) {
-		if(values.size() == 0)
-			return null;
-		double total = 0;
-		double count = 0;
-		for(Number value : values) {
-			total += value.doubleValue();
-			count++;
+		planners.addColumn(PLANNERS_SOLVED, Long.class);
+		planners.addColumn(PLANNERS_VISITED, Long.class);
+		planners.addColumn(PLANNERS_GENERATED, Long.class);
+		planners.addColumn(PLANNERS_TIME, Long.class);
+		for(Table.Row row : planners.rows) {
+			ProgressionPlanner planner = (ProgressionPlanner) row.label;
+			planners.set(planner, PLANNERS_SOLVED, Statistic.SUM_INTEGER.calculate(summary.values(Long.class, cell -> {
+				return
+					cell.row.get(SUMMARY_PLANNER).get().equals(planner.name) &&
+					cell.column.label.equals(SUMMARY_SUCCESSES);
+			})));
+			planners.set(planner, PLANNERS_VISITED, Statistic.SUM_INTEGER.calculate(results.values(Long.class, new ResultsFilter(RESULTS_VISITED, planner))));
+			planners.set(planner, PLANNERS_GENERATED, Statistic.SUM_INTEGER.calculate(results.values(Long.class, new ResultsFilter(RESULTS_GENERATED, planner))));
+			planners.set(planner, PLANNERS_TIME, Statistic.SUM_INTEGER.calculate(results.values(Long.class, new ResultsFilter(RESULTS_TIME, planner))));
 		}
-		return total / count;
-	}
-	
-	/**
-	 * Calculates the standard deviation in a list of values.
-	 * 
-	 * @param values the values for which to calculate standard deviation
-	 * @return the standard deviation, or null if the list of values was empty
-	 */
-	private static final Number std(List<Number> values) {
-		if(values.size() == 0)
-			return null;
-		double mean = avg(values);
-		double count = 0;
-		double sumOfSquares = 0;
-		for(Number value : values) {
-			count++;
-			double difference = value.doubleValue() - mean;
-			sumOfSquares += difference * difference;
+		planners.sort(PLANNERS_TIME, Long.class, Statistic.INTEGER_ASCENDING);
+		planners.sort(PLANNERS_GENERATED, Long.class, Statistic.INTEGER_ASCENDING);
+		planners.sort(PLANNERS_VISITED, Long.class, Statistic.INTEGER_ASCENDING);
+		planners.sort(PLANNERS_SOLVED, Long.class, Statistic.INTEGER_DESCENDING);
+		problems.addColumn(PROBLEMS_SOLVED, Long.class);
+		problems.addColumn(PROBLEMS_MIN_VISITED, Long.class);
+		problems.addColumn(PROBLEMS_MAX_VISITED, Long.class);
+		problems.addColumn(PROBLEMS_AVG_VISITED, Double.class);
+		problems.addColumn(PROBLEMS_STD_VISITED, Double.class);
+		problems.addColumn(PROBLEMS_MIN_GENERATED, Long.class);
+		problems.addColumn(PROBLEMS_MAX_GENERATED, Long.class);
+		problems.addColumn(PROBLEMS_AVG_GENERATED, Double.class);
+		problems.addColumn(PROBLEMS_STD_GENERATED, Double.class);
+		problems.addColumn(PROBLEMS_MIN_TIME, Long.class);
+		problems.addColumn(PROBLEMS_MAX_TIME, Long.class);
+		problems.addColumn(PROBLEMS_AVG_TIME, Double.class);
+		problems.addColumn(PROBLEMS_STD_TIME, Double.class);	
+		for(Table.Row row : problems.rows) {
+			Problem problem = (Problem) row.label;
+			problems.set(problem, PROBLEMS_SOLVED, Statistic.SUM_INTEGER.calculate(summary.values(Long.class, cell -> {
+				return
+					cell.row.get(SUMMARY_PROBLEM).get().equals(problem.name) &&
+					cell.column.label.equals(SUMMARY_SUCCESSES);
+			})));
+			Iterable<Long> visited = results.values(Long.class, new ResultsFilter(RESULTS_VISITED, problem));
+			problems.set(problem, PROBLEMS_MIN_VISITED, Statistic.MIN_INTEGER.calculate(visited));
+			problems.set(problem, PROBLEMS_MAX_VISITED, Statistic.MAX_INTEGER.calculate(visited));
+			problems.set(problem, PROBLEMS_AVG_VISITED, Statistic.AVERAGE.calculate(visited));
+			problems.set(problem, PROBLEMS_STD_VISITED, Statistic.STANDARD_DEVIATION.calculate(visited));
+			Iterable<Long> generated = results.values(Long.class, new ResultsFilter(RESULTS_GENERATED, problem));
+			problems.set(problem, PROBLEMS_MIN_GENERATED, Statistic.MIN_INTEGER.calculate(generated));
+			problems.set(problem, PROBLEMS_MAX_GENERATED, Statistic.MAX_INTEGER.calculate(generated));
+			problems.set(problem, PROBLEMS_AVG_GENERATED, Statistic.AVERAGE.calculate(generated));
+			problems.set(problem, PROBLEMS_STD_GENERATED, Statistic.STANDARD_DEVIATION.calculate(generated));
+			Iterable<Long> time = results.values(Long.class, new ResultsFilter(RESULTS_TIME, problem));
+			problems.set(problem, PROBLEMS_MIN_TIME, Statistic.MIN_INTEGER.calculate(time));
+			problems.set(problem, PROBLEMS_MAX_TIME, Statistic.MAX_INTEGER.calculate(time));
+			problems.set(problem, PROBLEMS_AVG_TIME, Statistic.AVERAGE.calculate(time));
+			problems.set(problem, PROBLEMS_STD_TIME, Statistic.STANDARD_DEVIATION.calculate(time));
 		}
-		return Math.sqrt(sumOfSquares / count);
+		problems.sort(PROBLEMS_AVG_TIME, Double.class, Statistic.DECIMAL_ASCENDING);
+		problems.sort(PROBLEMS_AVG_GENERATED, Double.class, Statistic.DECIMAL_ASCENDING);
+		problems.sort(PROBLEMS_AVG_VISITED, Double.class, Statistic.DECIMAL_ASCENDING);
+		problems.sort(PROBLEMS_SOLVED, Long.class, Statistic.INTEGER_DESCENDING);		
 	}
 }

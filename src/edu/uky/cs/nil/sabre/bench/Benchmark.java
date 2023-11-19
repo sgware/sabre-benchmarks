@@ -68,18 +68,6 @@ public class Benchmark {
 	private Problem problem = null;
 	
 	/**
-	 * The {@link ProgressionPlanner#compile(Problem, Status) compiled} problem
-	 */
-	private CompiledProblem compiled = null;
-	
-	/**
-	 * The solution to the problem used to verify that the problem is solvable,
-	 * as defined by a file in the 'solutions' directory with the same {@link
-	 * #name name} as this benchmark test
-	 */
-	private Solution<CompiledAction> solution = null;
-	
-	/**
 	 * Constructs a new benchmark task.
 	 * 
 	 * @param name a unique name for the task that will be used in the {@link
@@ -101,28 +89,18 @@ public class Benchmark {
 	}
 	
 	/**
-	 * Parses the problem file, compiled it, and parses an example solution if
-	 * one exists.
+	 * Parses the problem file.
 	 * 
-	 * @param status a status to update while parsing and compiling
-	 * @throws IOException if an error occurs when reading the problem or
-	 * solution file
-	 * @throws ParseException if the problem or solution file cannot be parsed
+	 * @param status a status to update while parsing
+	 * @throws IOException if an error occurs when reading the problem
+	 * @throws ParseException if the problem cannot be parsed
 	 */
-	@SuppressWarnings("unchecked")
 	public void load(Status status) throws IOException, ParseException {
 		Parser parser = new DefaultParser();
 		problem = parser.parse(new BufferedReader(new FileReader(new File("problems/" + file + ".txt"))), Problem.class);
 		ProblemBuilder builder = new ProblemBuilder(problem);
 		builder.setName(name);
 		problem = new Problem(builder);
-		ProgressionPlanner planner = new ProgressionPlanner();
-		compiled = planner.compile(problem, status);
-		File solutionFile = new File("solutions/" + name + ".txt");
-		if(solutionFile.exists()) {
-			parser.define(compiled);
-			solution = parser.parse(solutionFile, Solution.class);
-		}
 	}
 	
 	/**
@@ -137,25 +115,32 @@ public class Benchmark {
 	}
 	
 	/**
-	 * Returns the {@link ProgressionPlanner#compile(Problem, Status) compiled}
-	 * {@link CompiledProblem problem} to be solved in this benchmark task. This
-	 * method returns null unless {@link #load(Status)} has been called.
-	 * 
-	 * @return the compiled problem
-	 */
-	public CompiledProblem getCompiledProblem() {
-		return compiled;
-	}
-	
-	/**
 	 * Returns a known example {@link Solution solution} to the task if one is
 	 * defined. This method returns null unless {@link #load(Status)} has been
-	 * called and an example solution is provided.
+	 * called and an example solution is provided. In order to parse a solution,
+	 * all the {@link CompiledAction compiled actions} in a ground {@link
+	 * CompiledProblem compiled problem} must first be defined. This method
+	 * will compile the problem using a provided planner and use the resulting
+	 * compiled problem to parse the solution.
 	 * 
+	 * @param planner the planner to use to compile the problem
+	 * @param status a status to update while the problem is compiled
 	 * @return an example solution, or null if one is not provided
+	 * @throws IOException if an exception occurred while reading the solution
+	 * file
+	 * @throws ParseException if an exception occurred while parsing the
+	 * solution file
 	 */
-	public Solution<CompiledAction> getSolution() {
-		return solution;
+	@SuppressWarnings("unchecked")
+	public Solution<CompiledAction> getSolution(ProgressionPlanner planner, Status status) throws IOException, ParseException {
+		File solutionFile = new File("solutions/" + file + ".txt");
+		if(solutionFile.exists()) {
+			CompiledProblem compiled = planner.compile(getProblem(), status);
+			Parser parser = new DefaultParser();
+			parser.define(compiled);
+			return parser.parse(solutionFile, Solution.class);
+		}
+		return null;
 	}
 	
 	/**
@@ -171,7 +156,7 @@ public class Benchmark {
 	 * @return the search
 	 */
 	public ProgressionSearch getSearch(ProgressionPlanner planner, int run, Status status) {
-		CompiledProblem compiled = getCompiledProblem();
+		CompiledProblem compiled = planner.compile(problem, status);
 		if(run > 1 && Main.SHUFFLE)
 			compiled = ActionShuffler.compile(compiled, new Random(run), status);
 		ProgressionSearch search = null;
