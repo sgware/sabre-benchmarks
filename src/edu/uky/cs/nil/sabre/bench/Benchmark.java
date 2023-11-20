@@ -133,7 +133,7 @@ public class Benchmark {
 	 */
 	@SuppressWarnings("unchecked")
 	public Solution<CompiledAction> getSolution(ProgressionPlanner planner, Status status) throws IOException, ParseException {
-		File solutionFile = new File("solutions/" + file + ".txt");
+		File solutionFile = new File("solutions/" + name + ".txt");
 		if(solutionFile.exists()) {
 			CompiledProblem compiled = planner.compile(getProblem(), status);
 			Parser parser = new DefaultParser();

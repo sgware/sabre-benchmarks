@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 
 import edu.uky.cs.nil.sabre.Action;
 import edu.uky.cs.nil.sabre.Character;
+import edu.uky.cs.nil.sabre.Problem;
 import edu.uky.cs.nil.sabre.Settings;
 import edu.uky.cs.nil.sabre.Solution;
 import edu.uky.cs.nil.sabre.SolutionGoal;
@@ -80,7 +81,10 @@ public class VerificationHeuristic implements ProgressionCost {
 
 		@Override
 		public VerificationHeuristic getCost(CompiledProblem problem, Status status) {
-			return new VerificationHeuristic(parent.getCost(problem, status), actions);
+			LinkedHashSet<SolutionAction> actions = new LinkedHashSet<>();
+			for(SolutionAction action : this.actions)
+				actions.add(action.translate(problem));
+			return new VerificationHeuristic(parent.getCost(problem, status), new ImmutableSet<>(actions));
 		}
 	}
 
@@ -153,6 +157,23 @@ public class VerificationHeuristic implements ProgressionCost {
 				Utilities.equals(node.getCharacter(), character) &&
 				temporal == node.getTemporalDepth() &&
 				epistemic == node.getEpistemicDepth();
+		}
+		
+		/**
+		 * Returns a new solution action using action and character objects from
+		 * a provided problem.
+		 * 
+		 * @param problem the problem from which to get the action and character
+		 * @return a new solution action using that problem's action and
+		 * character
+		 */
+		public SolutionAction translate(Problem problem) {
+			return new SolutionAction(
+				problem.getAction(this.action.signature),
+				this.character == null ? null : problem.universe.getCharacter(this.character.name),
+				temporal,
+				epistemic
+			);
 		}
 	}
 	
