@@ -77,7 +77,7 @@ public class HTMLReportPrinter implements ReportPrinter {
 			if(Main.SHUFFLE)
 				print(", and the order of actions was shuffled each time");
 		}
-		int total = report.planners.rows.size() * report.planners.rows.size() * Main.RUNS;
+		int total = report.problems.rows.size() * report.planners.rows.size() * Main.RUNS;
 		print(", for a total of " + total + " tests.</p>\n");
 		print("\t\t<p>");
 		if(Main.SEARCH_LIMIT == Planner.UNLIMITED_NODES)
