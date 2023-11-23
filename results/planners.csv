@@ -1,0 +1,10 @@
+"Name","Search Method","Cost","Heuristic","Problems Solved","Total Nodes Visited","Total Nodes Generated","Total Time (ms)"
+"EFS h+","explanation-first","temporal","sum graph with no repeated roots",190,102718275,451302793,116335148
+"EFS rp","explanation-first","temporal","relaxed plan with no repeated roots",185,103732878,448787380,99498032
+"GFS rp","goal-first","temporal","relaxed plan with no repeated roots",170,105788706,418584767,81955345
+"A* rp","best-first","temporal","relaxed plan with no repeated roots",169,106606732,1512023373,362030094
+"GFS h+","goal-first","temporal","sum graph with no repeated roots",160,116842883,424882538,91779771
+"GFS","goal-first","temporal","reachability",159,116895164,633070519,34415451
+"A* h+","best-first","temporal","sum graph with no repeated roots",158,114945795,1811230006,505120432
+"EFS","explanation-first","temporal","reachability",150,135929089,288874049,24434983
+"BFS","best-first","temporal","reachability",140,133056785,931775232,207415884
