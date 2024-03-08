@@ -29,7 +29,7 @@ java -Xms60g -Xmx60g -cp bin;sabre/lib/sabre.jar edu.uky.cs.nil.sabre.bench.Main
 ```
 
 The `-Xms60g` argument sets the Java Virtual Machine's minimum heap space to 60
-gigabytes, and the `-Xmx60g` argument sets the JVM's maximum heap space to 10
+gigabytes, and the `-Xmx60g` argument sets the JVM's maximum heap space to 60
 gigabytes. You can adjust these numbers up or down depending on how much memory
 is available and how many threads will run simultaneously.
 
