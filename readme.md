@@ -24,8 +24,8 @@ run it:
 ```
 git clone --recurse-submodules https://github.com/sgware/sabre-benchmarks
 cd sabre-benchmarks
-javac -cp sabre/lib/sabre.jar -sourcepath src -d bin src/edu/uky/cs/nil/sabre/bench/Main.java
-java -Xms60g -Xmx60g -cp bin;sabre/lib/sabre.jar edu.uky.cs.nil.sabre.bench.Main
+javac -cp sabre/jar/sabre.jar -sourcepath src -d bin src/edu/uky/cs/nil/sabre/bench/Main.java
+java -Xms60g -Xmx60g -cp bin;sabre/jar/sabre.jar edu.uky.cs.nil.sabre.bench.Main
 ```
 
 The `-Xms60g` argument sets the Java Virtual Machine's minimum heap space to 60
