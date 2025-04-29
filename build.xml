@@ -12,12 +12,12 @@
 		<mkdir dir="results"/>
 	</target>
 	<target name="compile">
-		<javac srcdir="src" destdir="bin" classpath="sabre/lib/sabre.jar" includeantruntime="false"/>
+		<javac srcdir="src" destdir="bin" classpath="sabre/build/jar/sabre.jar" includeantruntime="false"/>
 	</target>
     <target name="javadoc">
     	<javadoc
     		doctitle="Sabre Benchmark Tool Documentation"
-    		classpath=".;sabre/lib/sabre.jar"
+    		classpath=".;sabre/build/jar/sabre.jar"
     		sourcepath="src"
     		destdir="doc"
     		packagenames="edu.uky.cs.nil.sabre.bench"
