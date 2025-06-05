@@ -104,18 +104,22 @@ public class Main {
 	private static final List<ProgressionPlanner> getPlanners() {
 		ArrayList<ProgressionPlanner> list = new ArrayList<>();
 		ProgressionCostFactory t = ProgressionCostFactory.TEMPORAL;
-		ProgressionCostFactory reach = ReachabilityHeuristic.FACTORY;
+		ProgressionCostFactory reach = new RepeatedRootHeuristic.Factory(ReachabilityHeuristic.FACTORY);
 		ProgressionCostFactory hplus = new RepeatedRootHeuristic.Factory(GraphHeuristic.SUM);
+		ProgressionCostFactory hmax = new RepeatedRootHeuristic.Factory(GraphHeuristic.MAX);
 		ProgressionCostFactory rp = new RepeatedRootHeuristic.Factory(RelaxedPlanHeuristic.FACTORY);
 		/*					Name		Search Method				Cost	Heuristic	*/
 		list.add(getPlanner("BFS",		Method.BEST_FIRST,			t,		reach	));
 		list.add(getPlanner("EFS",		Method.EXPLANATION_FIRST,	t,		reach	));
 		list.add(getPlanner("GFS",		Method.GOAL_FIRST,			t,		reach	));
 		list.add(getPlanner("A* h+",	Method.BEST_FIRST,			t,		hplus	));
+		list.add(getPlanner("A* hmax",	Method.BEST_FIRST,			t,		hmax	));
 		list.add(getPlanner("A* rp",	Method.BEST_FIRST,			t,		rp		));
 		list.add(getPlanner("EFS h+",	Method.EXPLANATION_FIRST,	t,		hplus	));
+		list.add(getPlanner("EFS hmax",	Method.EXPLANATION_FIRST,	t,		hmax	));
 		list.add(getPlanner("EFS rp",	Method.EXPLANATION_FIRST,	t,		rp		));
 		list.add(getPlanner("GFS h+",	Method.GOAL_FIRST,			t,		hplus	));
+		list.add(getPlanner("GFS hmax",	Method.GOAL_FIRST,			t,		hmax	));
 		list.add(getPlanner("GFS rp",	Method.GOAL_FIRST,			t,		rp		));
 		return list;
 	}
