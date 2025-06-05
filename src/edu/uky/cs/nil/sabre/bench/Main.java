@@ -28,7 +28,7 @@ import edu.uky.cs.nil.sabre.util.Worker.Status;
 public class Main {
 	
 	/** The number of parallel processes to run tests on */
-	public static final int THREADS = 6;
+	public static final int THREADS = 10;
 
 	/**
 	 * The maximum number of nodes a {@link ProgressionSearch search} may {@link
