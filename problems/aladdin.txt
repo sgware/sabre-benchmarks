@@ -16,15 +16,14 @@
  * been made as follows:
  * (1) Characters no longer have a sex and any pair of humans can marry.
  * (2) Characters can only marry if they are not already married.
- * (3) The original domain had various actions which causes characters to adopt
+ * (3) The original domain had various actions which caused characters to adopt
  *     goals (e.g. when a monster appears threatening to a character, that
  *     character intends for the monster to be dead). These goals have been
  *     adapted to utility functions as follows:
  *     - A dead character has a utility of 0.
- *     - An character married to someone they love is happy, and happy
- *       characters get +1 utility. They can lose this utility if their spouse
- *       dies.
- *     - An character afraid of a living monster gets -1 utility. They regain
+ *     - A character married to someone they love is happy, and happy characters
+ *       get +1 utility. They can lose this utility if their spouse dies.
+ *     - A character afraid of a living monster gets -1 utility. They regain
  *       the utility when the monster dies.
  *     - Characters gain utility by completing tasks (see below).
  * (4) The IPOCL narrative planner, for which this domain was originally
