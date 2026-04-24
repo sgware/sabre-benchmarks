@@ -115,6 +115,12 @@ public class Report {
 	public static final String PROBLEMS_SOLVED = "Times Solved";
 	
 	/**
+	 * Column label in the {@link #problems problems table} for the number of
+	 * unique planners that solved a problem
+	 */
+	public static final String PROBLEMS_UNIQUE_SOLVED = "Unique Planners Solved";
+	
+	/**
 	 * Column label in the {@link #problems problems table} for the minimum
 	 * number of nodes visited by any planner when working on the problem
 	 */
@@ -218,6 +224,12 @@ public class Report {
 	 * of problems this planner solved across all tests
 	 */
 	public static final String PLANNERS_SOLVED = "Problems Solved";
+	
+	/**
+	 * Column label in the {@link #planners planners table} for the total number
+	 * of problems this planner solved at least once across all tests
+	 */
+	public static final String PLANNERS_UNIQUE_SOLVED = "Unique Problems Solved";
 	
 	/**
 	 * Column label in the {@link #planners planners table} for the total number
@@ -704,6 +716,7 @@ public class Report {
 			}
 		}
 		planners.addColumn(PLANNERS_SOLVED, Long.class);
+		planners.addColumn(PLANNERS_UNIQUE_SOLVED, Long.class);
 		planners.addColumn(PLANNERS_VISITED, Long.class);
 		planners.addColumn(PLANNERS_GENERATED, Long.class);
 		planners.addColumn(PLANNERS_TIME, Long.class);
@@ -714,6 +727,12 @@ public class Report {
 					cell.row.get(SUMMARY_PLANNER).get().equals(planner.name) &&
 					cell.column.label.equals(SUMMARY_SUCCESSES);
 			})));
+			planners.set(planner, PLANNERS_UNIQUE_SOLVED, Statistic.COUNT.calculate(summary.values(Long.class, cell -> {
+				return
+					cell.row.get(SUMMARY_PLANNER).get().equals(planner.name) &&
+					cell.column.label.equals(SUMMARY_SUCCESSES) &&
+					cell.get(Long.class) > 0;
+			})));
 			planners.set(planner, PLANNERS_VISITED, Statistic.SUM_INTEGER.calculate(results.values(Long.class, new ResultsFilter(RESULTS_VISITED, planner))));
 			planners.set(planner, PLANNERS_GENERATED, Statistic.SUM_INTEGER.calculate(results.values(Long.class, new ResultsFilter(RESULTS_GENERATED, planner))));
 			planners.set(planner, PLANNERS_TIME, Statistic.SUM_INTEGER.calculate(results.values(Long.class, new ResultsFilter(RESULTS_TIME, planner))));
@@ -723,6 +742,7 @@ public class Report {
 		planners.sort(PLANNERS_VISITED, Long.class, Statistic.INTEGER_ASCENDING);
 		planners.sort(PLANNERS_SOLVED, Long.class, Statistic.INTEGER_DESCENDING);
 		problems.addColumn(PROBLEMS_SOLVED, Long.class);
+		problems.addColumn(PROBLEMS_UNIQUE_SOLVED, Long.class);
 		problems.addColumn(PROBLEMS_MIN_VISITED, Long.class);
 		problems.addColumn(PROBLEMS_MAX_VISITED, Long.class);
 		problems.addColumn(PROBLEMS_AVG_VISITED, Double.class);
@@ -741,6 +761,12 @@ public class Report {
 				return
 					cell.row.get(SUMMARY_PROBLEM).get().equals(problem.name) &&
 					cell.column.label.equals(SUMMARY_SUCCESSES);
+			})));
+			problems.set(problem, PROBLEMS_UNIQUE_SOLVED, Statistic.COUNT.calculate(summary.values(Long.class, cell -> {
+				return
+					cell.row.get(SUMMARY_PROBLEM).get().equals(problem.name) &&
+					cell.column.label.equals(SUMMARY_SUCCESSES) &&
+					cell.get(Long.class) > 0;
 			})));
 			Iterable<Long> visited = results.values(Long.class, new ResultsFilter(RESULTS_VISITED, problem));
 			problems.set(problem, PROBLEMS_MIN_VISITED, Statistic.MIN_INTEGER.calculate(visited));

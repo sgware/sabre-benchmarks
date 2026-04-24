@@ -1,10 +1,13 @@
-"Name","Search Method","Cost","Heuristic","Problems Solved","Total Nodes Visited","Total Nodes Generated","Total Time (ms)"
-"EFS h+","explanation-first","temporal","sum graph with no repeated roots",190,102718275,451302793,116335148
-"EFS rp","explanation-first","temporal","relaxed plan with no repeated roots",185,103732878,448787380,99498032
-"GFS rp","goal-first","temporal","relaxed plan with no repeated roots",170,105788706,418584767,81955345
-"A* rp","best-first","temporal","relaxed plan with no repeated roots",169,106606732,1512023373,362030094
-"GFS h+","goal-first","temporal","sum graph with no repeated roots",160,116842883,424882538,91779771
-"GFS","goal-first","temporal","reachability",159,116895164,633070519,34415451
-"A* h+","best-first","temporal","sum graph with no repeated roots",158,114945795,1811230006,505120432
-"EFS","explanation-first","temporal","reachability",150,135929089,288874049,24434983
-"BFS","best-first","temporal","reachability",140,133056785,931775232,207415884
+"Name","Search Method","Cost","Heuristic","Problems Solved","Unique Problems Solved","Total Nodes Visited","Total Nodes Generated","Total Time (ms)"
+"EFS hmax","explanation-first","temporal","max graph with no repeated roots",220,22,62622088,1055166881,495051708
+"A* rp","best-first","temporal","relaxed plan with no repeated roots",210,21,75700487,1358929434,519811970
+"A* hmax","best-first","temporal","max graph with no repeated roots",200,20,72910957,1483127065,656158160
+"BFS","best-first","temporal","reachability with no repeated roots",190,19,89917237,2051877658,371370699
+"EFS rp","explanation-first","temporal","relaxed plan with no repeated roots",187,20,99223571,429322038,143359160
+"A* h+","best-first","temporal","sum graph with no repeated roots",180,18,94259960,1674828824,660089474
+"EFS h+","explanation-first","temporal","sum graph with no repeated roots",173,18,104100897,458403887,175351817
+"EFS","explanation-first","temporal","reachability with no repeated roots",171,18,126045031,885820042,140548360
+"GFS hmax","goal-first","temporal","max graph with no repeated roots",170,17,105171576,1241269543,438811020
+"GFS rp","goal-first","temporal","relaxed plan with no repeated roots",170,17,105592581,398741696,119897764
+"GFS h+","goal-first","temporal","sum graph with no repeated roots",158,16,118456303,416973352,138849497
+"GFS","goal-first","temporal","reachability with no repeated roots",150,15,124398049,651378680,55494302

@@ -189,7 +189,7 @@ public class VerificationHeuristic implements ProgressionCost {
 		SolutionPlan<?> plan = (SolutionPlan<?>) solution;
 		actions.add(new SolutionAction(plan.first, plan.getCharacter(), temporal, epistemic));
 		for(Solution<?> explanation : plan.explanations)
-			toActions(explanation, 0, epistemic + 1, actions);
+			toActions(explanation, temporal, epistemic + 1, actions);
 		toActions(plan.next(), temporal + 1, epistemic, actions);
 	}
 	
