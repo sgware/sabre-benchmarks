@@ -2,19 +2,22 @@
 
 This is a tool for testing many configurations of the
 [Sabre Narrative Planner](https://github.com/sgware/sabre) on a variety of
-[benchmark story planning problems](problems) collected from several authors. It
-also serves as a repository of example Sabre problems.
+[benchmark story planning problems](https://github.com/sgware/sabre-benchmarks/tree/main/problems)
+collected from several authors. It also serves as a repository of example Sabre
+problems.
 
 This tool automatically produces a summary of the performance of every planner
 on every problem in [HTML](results.html) and [plain text](results.txt) formats.
-It also writes the contents of each table in the report to [CSV format](results)
-for easy use by other tools.
+It also writes the contents of each table in the report to
+[CSV format](https://github.com/sgware/sabre-benchmarks/tree/main/results) for
+easy use by other tools.
 
 Many of these problems were originally designed for other narrative planners
 with different syntax and features. A [technical report](report.pdf) explains
 the origins of each problem and the methods used to translate them into Sabre
-problems. When possible, the [original versions](originals) of these problems
-are also included in this repository for reference.
+problems. When possible, the
+[original versions](https://github.com/sgware/sabre-benchmarks/tree/main/originals)
+of these problems are also included in this repository for reference.
 
 ## Usage
 
@@ -42,12 +45,16 @@ between runs. You can comment out benchmark problems or planner configurations
 you don't want to test.
 
 To add a new benchmark problem, you need to place the relevant Sabre problem
-file in the [problems](problems) directory and add a new line to
+file in the
+[problems](https://github.com/sgware/sabre-benchmarks/tree/main/problems)
+directory and add a new line to
 [`Main.java`](src/edu/uky/cs/nil/sabre/bench/Main.java) that gives a unique name
 for the benchmark problem, the name of the problem file, the goal utility that
 must be achieved, and the author temporal limit, character temporal limit, and
 epistemic limit on the search. Optionally, you can also add a known solution to
-the [solutions](solutions) directory. The name of the file should match the name
+the
+[solutions](https://github.com/sgware/sabre-benchmarks/tree/main/solutions)
+directory. The name of the file should match the name
 of the benchmark problem (not the name of the problem file). Before the tests
 begin, every planner will attempt to reproduce that solution using a special
 heuristic that only allows the planner to use actions from that solution in its
@@ -92,7 +99,9 @@ timeline of accepting pull requests.
 
 To have your benchmark problem included in this collection, please create a pull
 request with the following changes:
-- Add your problem file to the [problems](problems) directory.
+- Add your problem file to the
+  [problems](https://github.com/sgware/sabre-benchmarks/tree/main/problems)
+  directory.
 - Your problem file must include a block comment at the top of the file
   explaining the story it models, the origin of the problem, and at least one
   known solution. See the [Raiders of the Lost Ark](problems/raiders.txt)
@@ -106,7 +115,9 @@ request with the following changes:
   other systems should be inserted based on the date the original version of the
   problem was created for the original system.
 - If your problem is a translation of some existing problem, please add the
-  original problem to the [originals](originals) directory.
+  original problem to the
+  [originals](https://github.com/sgware/sabre-benchmarks/tree/main/originals)
+  directory.
 - Add a description of your problem to the [technical report](report/report.tex)
   explaining this collection. Problems should be added in chronological order
   based on the creation of the original problem, as above. You should also add
@@ -124,18 +135,18 @@ problem and the recommended settings for testing them can be cited as:
 
 > Stephen G. Ware and Rachelyn Farrell, "A Collection of Benchmark Problems for
 > the Sabre Narrative Planner, Version 1.1" Technical Report, Narrative
-> Intelligence Lab, University of Kentucky, November 2026.
+> Intelligence Lab, University of Kentucky, April 2026.
 
 BibTeX entry:
 
 ```
 @techreport{ware2023collection,
   author={Ware, Stephen G. and Farrell, Rachelyn},
-  title={A Collection of Benchmark Problems for the {Sabre} Narrative Planner},
+  title={A Collection of Benchmark Problems for the {Sabre} Narrative Planner Version 1.1},
   institution={Narrative Intelligence Lab},
   address={University of Kentucky},
-  year={2023},
-  month={November},
-  howpublished={\url{https://github.com/sgware/sabre-benchmarks/blob/main/report.pdf}}
+  year={2026},
+  month={April},
+  howpublished={\url{https://sgware.github.io/sabre-benchmarks/report.pdf}}
 }
 ```
