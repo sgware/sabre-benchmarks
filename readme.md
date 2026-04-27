@@ -58,14 +58,16 @@ search.
 The Sabre Benchmark Tool was developed by Stephen G. Ware PhD, Associate
 Professor of Computer Science at the University of Kentucky.
 
-Sabre and the code for this Benchmark Tool are released under the Creative
-Commons Attribution-NonCommercial 4.0 International license. This means you are
-free to share, remix, and add to this software for non-commercial projects as
-long as you give credit to the original creators. See the license file for
-details. The University of Kentucky retains all right not specifically granted.
+This project is released under the GNU General Public License version 3.0 (GPL
+3). This means you are free to share and modify this software, even for
+commercial purposes, as long as you give credit to the original creators and you
+also release your modifications under the GPL 3 license. See the license file
+for details. The University of Kentucky retains all right not specifically
+granted.
 
-To license this code for a commercial project, contact the University of
-Kentucky Office of Technology Commercialization at <otcinfo@uky.edu>.
+To license this work for a project not compatible with the terms of the GPL
+license, contact the University of Kentucky Office of Technology
+Commercialization at <otcinfo@uky.edu>.
 
 The benchmark problems included with this tool were created by various authors
 who hold the copyrights. See each problem file for authorship details.
@@ -75,6 +77,8 @@ benchmark problems.
 
 ## Version History
 
+- Version 1.1 - Updated to Sabre v0.8. Minor fixes to existing problems. Changed
+  license to GPL 3.0.
 - Version 1.0 - First public release testing 27 versions of 14 problems using
   Sabre version 0.7.
 
@@ -119,8 +123,8 @@ The [technical report](report.pdf) explaining the origin of each benchmark
 problem and the recommended settings for testing them can be cited as:
 
 > Stephen G. Ware and Rachelyn Farrell, "A Collection of Benchmark Problems for
-> the Sabre Narrative Planner," Technical Report, Narrative Intelligence Lab,
-> University of Kentucky, November 2023.
+> the Sabre Narrative Planner, Version 1.1" Technical Report, Narrative
+> Intelligence Lab, University of Kentucky, November 2026.
 
 BibTeX entry:
 

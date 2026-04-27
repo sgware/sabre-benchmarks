@@ -17,7 +17,7 @@ public class Settings {
 	public static final int MAJOR_VERSION_NUMBER = 1;
 	
 	/** The minor version number comes after the decimal point */
-	public static final int MINOR_VERSION_NUMBER = 0;
+	public static final int MINOR_VERSION_NUMBER = 1;
 	
 	/** The full version number (major + minor) as a string */
 	public static final String VERSION_STRING = MAJOR_VERSION_NUMBER + "." + MINOR_VERSION_NUMBER;
@@ -29,4 +29,9 @@ public class Settings {
 	
 	/** A URL where more information about this software can be found. */
 	public static final String URL = "https://github.com/sgware/sabre-benchmarks";
+	
+	/**
+	 * A private constructor means this class cannot be instantiated.
+	 */
+	private Settings() {}
 }

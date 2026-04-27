@@ -84,6 +84,13 @@ public class Table implements Iterable<Table.Cell> {
 		/** The sequences in this group, in order */
 		private final ArrayList<S> members = new ArrayList<>();
 		
+		/**
+		 * Constructs a new, empty group.
+		 */
+		private Group() {
+			// Empty
+		}
+		
 		@Override
 		public Iterator<S> iterator() {
 			return members.iterator();
@@ -294,6 +301,13 @@ public class Table implements Iterable<Table.Cell> {
 	
 	/** The cells in this table, in order by rows and then columns */
 	private final ArrayList<Cell> cells = new ArrayList<>();
+	
+	/**
+	 * Constructs a new, empty table.
+	 */
+	public Table() {
+		// Empty
+	}
 	
 	@Override
 	public String toString() {

@@ -109,6 +109,13 @@ public class TestSuite {
 		/** Status object for this thread */
 		private final Status status = new Status();
 		
+		/**
+		 * Constructs a new test runner thread.
+		 */
+		public Runner() {
+			// Empty
+		}
+		
 		@Override
 		public void run() {
 			Exception exception = new RuntimeException("One of the threads running tests did not finish correctly, perhaps due to an out of memory error.");

@@ -5,7 +5,7 @@
 	<target name="clean">
 		<delete dir="bin"/>
 		<mkdir dir="bin"/>
-		<delete dir="doc"/>
+		<delete dir="docs"/>
 		<delete file="results.html"/>
 		<delete file="results.txt"/>
 		<delete dir="results"/>
@@ -19,7 +19,7 @@
     		doctitle="Sabre Benchmark Tool Documentation"
     		classpath=".;sabre/build/jar/sabre.jar"
     		sourcepath="src"
-    		destdir="doc"
+    		destdir="docs"
     		packagenames="edu.uky.cs.nil.sabre.bench"
     		access="protected"
     		source="11"
@@ -27,5 +27,5 @@
     		author="true"
     		version="true"
     	/>
-    </target>
+	</target>
 </project>

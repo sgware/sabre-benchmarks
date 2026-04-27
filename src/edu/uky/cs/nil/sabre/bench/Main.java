@@ -221,4 +221,9 @@ public class Main {
 		System.out.println("Sabre Benchmark tests ended on " + ZonedDateTime.now());
 		return report;
 	}
+	
+	/**
+	 * A private constructor means this class cannot be instantiated.
+	 */
+	private Main() {}
 }
