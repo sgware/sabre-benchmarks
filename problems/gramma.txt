@@ -254,6 +254,28 @@ trigger unarmed(character : character) {
 		!armed(character);
 };
 
+trigger see_character_alive(observer : character, other : character, place : place) {
+	precondition:
+		alive(observer) &
+		location(observer) == place &
+		location(other) == place &
+		alive(other) &
+		believes(observer, !alive(other));
+	effect:
+		believes(observer, alive(other));
+};
+
+trigger see_character_dead(observer : character, other : character, place : place) {
+	precondition:
+		alive(observer) &
+		location(observer) == place &
+		location(other) == place &
+		!alive(other) &
+		believes(observer, alive(other));
+	effect:
+		believes(observer, !alive(other));
+};
+
 trigger see_character_at(observer : character, other : character, place : place) {
 	precondition:
 		alive(observer) &
