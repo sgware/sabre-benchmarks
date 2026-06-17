@@ -7,7 +7,9 @@ collected from several authors. It also serves as a repository of example Sabre
 problems.
 
 This tool automatically produces a summary of the performance of every planner
-on every problem in [HTML](results.html) and [plain text](results.txt) formats.
+on every problem in
+[HTML](https://sgware.github.io/sabre-benchmarks/results.html) and
+[plain text](https://sgware.github.io/sabre-benchmarks/results.txt) formats.
 It also writes the contents of each table in the report to
 [CSV format](https://github.com/sgware/sabre-benchmarks/tree/main/results) for
 easy use by other tools.
