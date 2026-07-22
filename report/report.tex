@@ -1098,6 +1098,9 @@ one detective, three locations, and two items. We did not include
 \texttt{earthquake}, since this was meant to be an unbelievable action,
 and we did not include vehicles. Though we implemented the \texttt{shareClues}
 action, there is only one inspector, so this action will never occur.
+In the original problem, it was possible for characters to do most actions
+(such as playing basketball) even after being arrested; we have added
+preconditions to some actions to require the characters be not arrested.
 
 The original problem was created for a traditional planner, so it
 did not include character goals. We gave each of the citizens different

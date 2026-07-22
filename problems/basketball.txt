@@ -91,8 +91,9 @@ at(Sherlock) = Downtown;
 action travel(character : character, from : place, to : place){
 	precondition:
 		from != to & 
-		at(character) == from &
-		alive(character);
+		alive(character) &
+		underArrest(character) == 0 &
+		at(character) == from;
 	effect:
 		at(character) = to;
 	consenting: character; 
@@ -101,11 +102,13 @@ action travel(character : character, from : place, to : place){
 
 action arrest(police : police, character : character, place : place, crime : crime){
 	precondition: 
-		at(police) == place &
-		at(character) == place &
 		police != character &
 		alive(police) &
+		underArrest(police) == 0 &
+		at(police) == place &
 		alive(character) &
+		underArrest(character) == 0 &
+		at(character) == place &
 		suspect(character, crime);
 	effect:
 		underArrest(character) = 1;
@@ -115,11 +118,12 @@ action arrest(police : police, character : character, place : place, crime : cri
 
 action steal(thief : citizen, victim : citizen, item : item, place : place){
 	precondition:
+		thief != victim &
+		alive(thief) &
+		underArrest(thief) == 0 &
 		at(thief) == place &
 		at(victim) == place &
-		has(item) == victim &
-		thief != victim &
-		alive(thief);
+		has(item) == victim;
 	effect:
 		has(item) = thief &
 		angry(victim) = 1 &
@@ -131,11 +135,13 @@ action steal(thief : citizen, victim : citizen, item : item, place : place){
 action play_basketball(player1 : citizen, player2 : citizen, place : basketballPlace){
 	precondition:
 		player1 != player2 &
-		at(player1) == place &
 		alive(player1) &
-		at(player2) == place &
+		underArrest(player1) == 0 &
+		at(player1) == place &
+		has(Basketball) == player1 &
 		alive(player2) &
-		has(Basketball) == player1;
+		underArrest(player2) == 0 &
+		at(player2) == place;
 	effect:
 		angry(player1) = 0 &
 		angry(player2) = 0;
@@ -146,12 +152,12 @@ action play_basketball(player1 : citizen, player2 : citizen, place : basketballP
 action kill(killer : citizen, victim : citizen, item : item, place : place){
 	precondition:
 		killer != victim &
-		at(killer) == place &
-		at(victim) == place &
 		alive(killer) &
-		alive(victim) &
+		underArrest(killer) == 0 &
+		at(killer) == place &
 		has(item) == killer &
-		underArrest(killer) == 0;
+		alive(victim) &
+		at(victim) == place;
 	effect:
 		!alive(victim) &
 		clue(Murder, item, place);
@@ -161,8 +167,9 @@ action kill(killer : citizen, victim : citizen, item : item, place : place){
 	
 action find_clues(police : police, crime : crime, item : item, place : place){
 	precondition:
-		at(police) == place &
-		alive(police);
+		alive(police) &
+		underArrest(police) == 0 &
+		at(police) == place;
 	effect:
 		searched(place) = 1 &
 		if(clue(crime, item, place))
@@ -174,10 +181,10 @@ action find_clues(police : police, crime : crime, item : item, place : place){
 action share_clues(police1 : police, police2 : police, crime : crime, item : item, place : place){
 	precondition:
 		police1 != police2 &
-		at(police1) == place &
 		alive(police1) &
-		at(police2) == place &
+		at(police1) == place &
 		alive(police2) &
+		at(police2) == place &
 		clue(crime, item, place);
 	effect:
 		believes(police2, clue(crime, item, place));
@@ -188,10 +195,10 @@ action share_clues(police1 : police, police2 : police, crime : crime, item : ite
 action suspect_of_crime(police : police, citizen : citizen, crime : crime, item : item, place : place){
 	precondition:
 		police != citizen &
-		at(police) == place &
 		alive(police) &
-		at(citizen) == place &
+		at(police) == place &
 		alive(citizen) &
+		at(citizen) == place &
 		has(item) == citizen &
 		exists(p : place) clue(crime, item, p);
 	effect:
@@ -200,8 +207,31 @@ action suspect_of_crime(police : police, citizen : citizen, crime : crime, item 
 	observing(c : character) : at(c) == place;
 };
 
+trigger see_alive(character : character, other : character, item : item, place : place){
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		alive(other) &
+		believes(character, !alive(other));
+	effect:
+		believes(character, alive(other));
+};
+
+trigger see_dead(character : character, other : character, item : item, place : place){
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		!alive(other) &
+		believes(character, alive(other));
+	effect:
+		believes(character, !alive(other));
+};
+
 trigger see_has(character : character, other : character, item : item, place : place){
 	precondition:
+		alive(character) &
 		at(character) == place &
 		at(other) == place &
 		has(item) == other &
@@ -212,6 +242,7 @@ trigger see_has(character : character, other : character, item : item, place : p
 
 trigger see_hasnt(character : character, other : character, item : item, place : place){
 	precondition:
+		alive(character) &
 		at(character) == place &
 		at(other) == place &
 		has(item) != other & 
@@ -222,6 +253,7 @@ trigger see_hasnt(character : character, other : character, item : item, place :
 
 trigger see_at(character : character, other : character, place : place){
 	precondition:
+		alive(character) &
 		at(character) == place &
 		at(other) == place &
 		believes(character, at(other) != place);
@@ -231,6 +263,7 @@ trigger see_at(character : character, other : character, place : place){
 
 trigger see_gone(character : character, other : character, place : place){
 	precondition:
+		alive(character) &
 		at(character) == place &
 		at(other) != place &
 		believes(character, at(other) == place);
